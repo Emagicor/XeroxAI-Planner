@@ -12,16 +12,16 @@ OUTPUT for that room:
   "assumptions": []
 }
 
-EXAMPLE — Inferred room:
-INPUT: Room labeled "Bath" with no dimension annotations, next to a bedroom.
+EXAMPLE — Non-derivable / Unmentioned room dimensions (Strict Non-Hallucination):
+INPUT: Room labeled "Hallway" with no dimension annotations, and its boundaries cannot be mathematically derived from surrounding structural context.
 OUTPUT for that room:
 {
-  "name": "Bathroom",
+  "name": "Hallway",
   "bbox": [420, 80, 580, 260],
   "polygon": [[420,80],[580,80],[580,260],[420,260]],
-  "length_ft": 8, "width_ft": 5, "area_sqft": 40,
-  "confidence_pct": 58, "dimension_source": "assumed",
-  "assumptions": ["No dimensions visible. Standard bathroom minimum 8x5ft applied.", "Width inferred from adjacent bedroom wall alignment."]
+  "length_ft": null, "width_ft": null, "area_sqft": null,
+  "confidence_pct": 50, "dimension_source": "assumed",
+  "assumptions": ["Dimensions not mentioned or geometrically derivable."]
 }
 
 Now analyze the uploaded floor plan image. Return ONLY a valid JSON object — no markdown, no backticks, no explanation.
@@ -33,9 +33,9 @@ JSON Schema:
       "name": "string — descriptive room name",
       "bbox": [x_min, y_min, x_max, y_max],
       "polygon": [[x1,y1],[x2,y2],...],
-      "length_ft": number,
-      "width_ft": number,
-      "area_sqft": number,
+      "length_ft": number | null,
+      "width_ft": number | null,
+      "area_sqft": number | null,
       "confidence_pct": integer 0-100,
       "dimension_source": "measured" | "derived" | "assumed",
       "assumptions": ["string", ...]
@@ -80,22 +80,17 @@ IDENTIFY ALL of the following if present:
 - Staircase areas
 - Any other labeled space
 
-DIMENSION EXTRACTION RULES:
-- If dimension text is visible and readable: source = "measured", confidence 90–100%
-- If some dimensions visible and others can be mathematically derived: source = "derived", confidence 70–89%
-- If no dimensions visible, use architectural heuristics: source = "assumed", confidence 40–69%
+DIMENSION EXTRACTION & ANTI-HALLUCINATION RULES:
+1. If dimension text is visible and readable: source = "measured", confidence 90–100%.
+2. If some dimensions are missing but can be confidently determined using strict geometric inference, parallel wall alignments, or basic arithmetic addition/subtraction of adjacent known spaces: source = "derived", confidence 70–89%.
+3. CRITICAL ANTI-HALLUCINATION MANDATE: If a room's dimensions are not explicitly listed AND cannot be explicitly solved via structural arithmetic or parallel wall matching, do NOT approximate, guess, or apply standard heuristics to fabricate numerical values. You must directly indicate that they were not mentioned by setting length_ft, width_ft, and area_sqft to null. Set dimension_source to "assumed" and include exactly this string in the assumptions array: "Dimensions not mentioned or geometrically derivable."
 
-ARCHITECTURAL HEURISTICS for assumptions:
+ARCHITECTURAL HEURISTICS for assumptions (Apply ONLY to clear up structural configurations, never to guess missing numbers if the Anti-Hallucination rule triggers):
 - Standard interior door width = 3 ft
 - Standard wall thickness = 6 inches
-- Minimum bedroom = 10 x 10 ft
-- Standard master bedroom = 12 x 14 ft
-- Standard bathroom = 5 x 8 ft
-- Half bath / powder room = 3 x 6 ft
-- Standard kitchen = 8 x 10 ft minimum
 - Standard corridor width = 3.5 ft
 - Relative proportions from adjacent rooms with known dimensions
-- Always explain each assumption clearly in the assumptions array"""
+- Always explain each structural assumption clearly in the assumptions array"""
 
 CORRECTION_PROMPT_TEMPLATE = """You previously analyzed a floor plan and produced this JSON output:
 

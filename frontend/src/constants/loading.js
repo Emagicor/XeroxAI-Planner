@@ -1,5 +1,6 @@
 export const LOADING_STEPS = [
-  'Uploading…',
-  'Analyzing with Gemini Vision…',
-  'Drawing annotations…',
+  'Validating file…',
+  'Rasterizing pages…',
+  'Vision model extraction…',
+  'Building review table…',
 ]

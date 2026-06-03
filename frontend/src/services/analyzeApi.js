@@ -9,7 +9,15 @@ export async function analyzeFloorPlan(file) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err.error || 'Analysis failed')
+    const detail = err.detail
+    const message =
+      typeof detail === 'string'
+        ? detail
+        : detail?.message ||
+          (Array.isArray(detail) ? detail[0]?.msg : null) ||
+          err.error ||
+          `Analysis failed (${res.status})`
+    throw new Error(message)
   }
 
   return res.json()

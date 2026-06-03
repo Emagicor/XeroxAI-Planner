@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: ./backend2.0
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend2.0/.env
+    environment:
+      APP_ENV: production
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:3000","http://localhost:80"]'
+    volumes:
+      - zerox-tmp:/tmp/zerox
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5000
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  zerox-tmp:

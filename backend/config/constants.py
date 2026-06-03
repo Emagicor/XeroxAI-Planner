@@ -20,6 +20,16 @@ ROOM_HEX_COLORS = [
     "#888780",
 ]
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.5-flash"
 MAX_ANALYSIS_ATTEMPTS = 3
 PDF_RENDER_DPI = 150
+
+ALLOWED_MIME_TYPES = {
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+}
+ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
+MAX_UPLOAD_SIZE = 15 * 1024 * 1024
+MAX_PDF_PAGE_COUNT = 10

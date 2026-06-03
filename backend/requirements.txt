@@ -1,5 +1,7 @@
-flask
-flask-cors
+fastapi
+uvicorn
+python-multipart
+pypdf
 google-generativeai
 pillow
 pdf2image

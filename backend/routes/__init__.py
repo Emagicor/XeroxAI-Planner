@@ -1,7 +1,9 @@
-from routes.analyze import analyze_bp
-from routes.health import health_bp
+from routes.analyze import analyze_router
+from routes.health import health_router
+from routes.export import export_router
 
 
 def register_routes(app) -> None:
-    app.register_blueprint(health_bp)
-    app.register_blueprint(analyze_bp)
+    app.include_router(health_router)
+    app.include_router(analyze_router)
+    app.include_router(export_router)

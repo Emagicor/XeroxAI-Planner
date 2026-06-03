@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { LOADING_STEPS } from '../constants/loading'
 import { analyzeFloorPlan } from '../services/analyzeApi'
-import { downloadAnalysisCSV } from '../utils/csv'
 
 export function useFloorPlanAnalysis() {
   const [file, setFile] = useState(null)
@@ -10,7 +9,6 @@ export function useFloorPlanAnalysis() {
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState(null)
-  const [activeRoom, setActiveRoom] = useState(null)
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -18,9 +16,11 @@ export function useFloorPlanAnalysis() {
     setLoadingStep(0)
     const t1 = setTimeout(() => setLoadingStep(1), 800)
     const t2 = setTimeout(() => setLoadingStep(2), 2400)
+    const t3 = setTimeout(() => setLoadingStep(3), 4800)
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
+      clearTimeout(t3)
     }
   }, [loading])
 
@@ -29,7 +29,6 @@ export function useFloorPlanAnalysis() {
     setPreview(null)
     setResult(null)
     setError(null)
-    setActiveRoom(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -68,8 +67,6 @@ export function useFloorPlanAnalysis() {
     handleUpload()
   }
 
-  const downloadCSV = () => downloadAnalysisCSV(result)
-
   return {
     file,
     preview,
@@ -78,14 +75,11 @@ export function useFloorPlanAnalysis() {
     loadingStep,
     loadingSteps: LOADING_STEPS,
     error,
-    activeRoom,
-    setActiveRoom,
     fileInputRef,
     handleFileSelect,
     handleDrop,
     handleUpload,
     resetAll,
     retryUpload,
-    downloadCSV,
   }
 }

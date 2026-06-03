@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 
-health_bp = Blueprint("health", __name__)
+health_router = APIRouter()
 
 
-@health_bp.route("/health", methods=["GET"])
+@health_router.get("/health")
 def health():
-    return jsonify({"status": "ok"})
+    return JSONResponse(content={"status": "ok"})

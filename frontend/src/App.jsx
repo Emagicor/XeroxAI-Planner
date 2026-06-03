@@ -13,15 +13,12 @@ function App() {
     loadingStep,
     loadingSteps,
     error,
-    activeRoom,
-    setActiveRoom,
     fileInputRef,
     handleFileSelect,
     handleDrop,
     handleUpload,
     resetAll,
     retryUpload,
-    downloadCSV,
   } = useFloorPlanAnalysis()
 
   return (
@@ -32,31 +29,25 @@ function App() {
         <Header />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {!result && (
-          <UploadSection
-            file={file}
-            preview={preview}
-            loading={loading}
-            loadingStep={loadingStep}
-            loadingSteps={loadingSteps}
-            error={error}
-            fileInputRef={fileInputRef}
-            onFileSelect={handleFileSelect}
-            onDrop={handleDrop}
-            onUpload={handleUpload}
-            onRetry={retryUpload}
-          />
-        )}
+          {!result && (
+            <UploadSection
+              file={file}
+              preview={preview}
+              loading={loading}
+              loadingStep={loadingStep}
+              loadingSteps={loadingSteps}
+              error={error}
+              fileInputRef={fileInputRef}
+              onFileSelect={handleFileSelect}
+              onDrop={handleDrop}
+              onUpload={handleUpload}
+              onRetry={retryUpload}
+            />
+          )}
 
-        {result && (
-          <ResultsSection
-            result={result}
-            activeRoom={activeRoom}
-            onSelectRoom={setActiveRoom}
-            onDownloadCSV={downloadCSV}
-            onReset={resetAll}
-          />
-        )}
+          {result && (
+            <ResultsSection result={result} onReset={resetAll} />
+          )}
         </main>
       </div>
     </div>
