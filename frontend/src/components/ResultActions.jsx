@@ -1,9 +1,12 @@
 export default function ResultActions({
   onDownloadCSV,
   onDownloadXLSX,
+  onDownloadJSON,
+  onDownloadGroundTruth,
   onCopy,
   onReset,
   copyDone,
+  xlsxLoading = false,
 }) {
   return (
     <div className="mt-4 flex flex-wrap gap-3 items-center">
@@ -17,10 +20,29 @@ export default function ResultActions({
       <button
         type="button"
         onClick={onDownloadXLSX}
-        className="px-4 py-2 rounded-lg border border-line bg-surface text-[#F0EEE8] hover:border-accent/50 transition-colors text-sm font-medium"
+        disabled={xlsxLoading}
+        className="px-4 py-2 rounded-lg border border-line bg-surface text-[#F0EEE8] hover:border-accent/50 transition-colors text-sm font-medium disabled:opacity-50"
       >
-        Download XLSX
+        {xlsxLoading ? 'Exporting…' : 'Download XLSX'}
       </button>
+      {onDownloadJSON && (
+        <button
+          type="button"
+          onClick={onDownloadJSON}
+          className="px-4 py-2 rounded-lg border border-line bg-surface text-[#F0EEE8] hover:border-accent/50 transition-colors text-sm font-medium"
+        >
+          Download AI JSON
+        </button>
+      )}
+      {onDownloadGroundTruth && (
+        <button
+          type="button"
+          onClick={onDownloadGroundTruth}
+          className="px-4 py-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:border-emerald-400/50 transition-colors text-sm font-medium"
+        >
+          Download ground truth
+        </button>
+      )}
       <button
         type="button"
         onClick={onCopy}

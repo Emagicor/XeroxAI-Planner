@@ -54,7 +54,7 @@ export function normalizeAnalyzeResponse(data) {
         assumed: false,
         notes: page.ineligible_reason ?? page.reason ?? 'Ineligible page',
         eligible: false,
-        removed: false,
+        included: false,
         roomIndex: null,
       })
       continue
@@ -74,9 +74,10 @@ export function normalizeAnalyzeResponse(data) {
         assumed: Boolean(room.is_assumed ?? room.dimension_source === 'assumed'),
         notes: (room.assumptions ?? []).join('; '),
         eligible: true,
-        removed: false,
+        included: true,
         roomIndex,
         colorIndex: roomIndex,
+        isManual: false,
       })
     })
   }
@@ -86,11 +87,10 @@ export function normalizeAnalyzeResponse(data) {
     annotatedPages[0] ??
     null
 
-  return {
+  const doc = {
     jobId: data.job_id ?? data.jobId ?? null,
     filename: data.filename ?? '',
     pageCount: data.total_pages ?? data.page_count ?? pages.length,
-    grandTotalSqft: data.grand_total_sqft ?? 0,
     eligiblePages: data.eligible_pages ?? 0,
     ineligiblePages: data.ineligible_pages ?? ineligiblePages.length,
     ineligibleList: ineligiblePages,
@@ -98,6 +98,87 @@ export function normalizeAnalyzeResponse(data) {
     defaultPage: firstAnnotated?.page ?? annotatedPages[0]?.page ?? 1,
     rows,
     raw: data,
+  }
+  doc.grandTotalSqft = grandTotalSqft(rows)
+  return doc
+}
+
+/** Rows shown in the review table (eligible + user-added). */
+export function tableRows(rows) {
+  return rows.filter((r) => r.eligible !== false)
+}
+
+/** Rows included in totals and primary export. */
+export function includedRows(rows) {
+  return rows.filter((r) => r.eligible !== false && r.included !== false)
+}
+
+/** @deprecated use includedRows */
+export function activeRows(rows) {
+  return includedRows(rows)
+}
+
+export function createEmptyRoom(page, colorIndex = 0) {
+  return {
+    id: nextRowId(),
+    page,
+    floor: `Page ${page}`,
+    name: 'New room',
+    lengthFt: null,
+    widthFt: null,
+    areaSqft: null,
+    method: 'Manual',
+    confidencePct: 0,
+    assumed: false,
+    notes: '',
+    eligible: true,
+    included: true,
+    isManual: true,
+    roomIndex: null,
+    colorIndex,
+  }
+}
+
+export function rowToExportRecord(row, unit, convertAreaFromSqft, unitLabelFn) {
+  const dims =
+    row.lengthFt != null && row.widthFt != null
+      ? `${row.lengthFt}' × ${row.widthFt}'`
+      : ''
+  return {
+    page_floor: row.floor,
+    page: row.page,
+    area_name: row.name,
+    length_ft: row.lengthFt,
+    width_ft: row.widthFt,
+    dimensions: dims,
+    area_sqft: row.areaSqft,
+    computed_area: convertAreaFromSqft(row.areaSqft, unit),
+    unit: unitLabelFn(unit),
+    method: row.method,
+    confidence_pct: row.confidencePct,
+    assumed: row.assumed,
+    included: row.included !== false,
+    notes: row.notes ?? '',
+  }
+}
+
+export function buildEditedExportDocument(doc, unit, convertAreaFromSqft, unitLabelFn) {
+  const all = tableRows(doc.rows)
+  const included = includedRows(doc.rows)
+  const totalSqft = grandTotalSqft(doc.rows)
+
+  return {
+    exported_at: new Date().toISOString(),
+    source_job_id: doc.jobId,
+    filename: doc.filename,
+    unit,
+    unit_label: unitLabelFn(unit),
+    grand_total_sqft: totalSqft,
+    grand_total_display: convertAreaFromSqft(totalSqft, unit),
+    rooms_included: included.length,
+    rooms_in_table: all.length,
+    rows: all.map((r) => rowToExportRecord(r, unit, convertAreaFromSqft, unitLabelFn)),
+    pages_summary: doc.pageCount,
   }
 }
 
@@ -119,16 +200,13 @@ export function recomputeRowArea(row) {
   return row
 }
 
-export function activeRows(rows) {
-  return rows.filter((r) => !r.removed && r.eligible !== false)
-}
-
 export function grandTotalSqft(rows) {
-  return activeRows(rows).reduce((sum, r) => sum + (r.areaSqft ?? 0), 0)
+  return includedRows(rows).reduce((sum, r) => sum + (r.areaSqft ?? 0), 0)
 }
 
 export function rowsToExportLines(rows, unit, convertAreaFromSqft, unitLabelFn) {
   const header = [
+    'Include',
     'Page/Floor',
     'Area Name',
     'Dimensions',
@@ -140,7 +218,7 @@ export function rowsToExportLines(rows, unit, convertAreaFromSqft, unitLabelFn) 
   ]
   const lines = [header.join(',')]
 
-  for (const r of activeRows(rows)) {
+  for (const r of tableRows(rows)) {
     const dims =
       r.lengthFt != null && r.widthFt != null
         ? `${r.lengthFt}' × ${r.widthFt}'`
@@ -148,6 +226,7 @@ export function rowsToExportLines(rows, unit, convertAreaFromSqft, unitLabelFn) 
     const area = convertAreaFromSqft(r.areaSqft, unit)
     lines.push(
       [
+        r.included !== false ? 'Yes' : 'No',
         `"${r.floor}"`,
         `"${(r.name || '').replace(/"/g, '""')}"`,
         `"${dims}"`,
@@ -161,6 +240,6 @@ export function rowsToExportLines(rows, unit, convertAreaFromSqft, unitLabelFn) 
   }
   const total = convertAreaFromSqft(grandTotalSqft(rows), unit)
   lines.push('')
-  lines.push(`Grand Total,,,${total ?? ''},${unitLabelFn(unit)},,,`)
+  lines.push(`Grand Total (included only),,,${total ?? ''},${unitLabelFn(unit)},,,`)
   return lines.join('\n')
 }

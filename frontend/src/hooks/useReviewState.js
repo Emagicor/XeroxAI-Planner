@@ -1,11 +1,20 @@
 import { useCallback, useMemo, useState } from 'react'
 import {
-  activeRows,
+  createEmptyRoom,
   grandTotalSqft,
+  includedRows,
   normalizeAnalyzeResponse,
   recomputeRowArea,
+  tableRows,
 } from '../utils/analysis'
 import { convertAreaFromSqft } from '../utils/units'
+
+function recomputeDoc(prev) {
+  return {
+    ...prev,
+    grandTotalSqft: grandTotalSqft(prev.rows),
+  }
+}
 
 export function useReviewState(analyzeData) {
   const [unit, setUnit] = useState('sqft')
@@ -26,27 +35,32 @@ export function useReviewState(analyzeData) {
         const updated = { ...r, ...patch }
         return recomputeRowArea(updated)
       })
-      return {
-        ...prev,
-        rows: nextRows,
-        grandTotalSqft: grandTotalSqft(nextRows),
-      }
+      return recomputeDoc({ ...prev, rows: nextRows })
     })
   }, [])
 
-  const removeRow = useCallback((id) => {
+  const toggleIncluded = useCallback((id, included) => {
     setDoc((prev) => {
       if (!prev) return prev
       const nextRows = prev.rows.map((r) =>
-        r.id === id ? { ...r, removed: true } : r,
+        r.id === id ? { ...r, included } : r,
       )
-      return {
-        ...prev,
-        rows: nextRows,
-        grandTotalSqft: grandTotalSqft(nextRows),
-      }
+      return recomputeDoc({ ...prev, rows: nextRows })
     })
   }, [])
+
+  const addRoom = useCallback((page) => {
+    setDoc((prev) => {
+      if (!prev) return prev
+      const targetPage = page ?? activePage ?? prev.defaultPage ?? 1
+      const onPage = prev.rows.filter(
+        (r) => r.page === targetPage && r.eligible !== false,
+      )
+      const colorIndex = onPage.length
+      const room = createEmptyRoom(targetPage, colorIndex)
+      return recomputeDoc({ ...prev, rows: [...prev.rows, room] })
+    })
+  }, [activePage])
 
   const selectRow = useCallback((row) => {
     if (!row || !row.eligible) return
@@ -63,7 +77,7 @@ export function useReviewState(analyzeData) {
           r.page === activePage &&
           r.roomIndex === roomIndex &&
           r.eligible &&
-          !r.removed,
+          r.included !== false,
       )
       if (match) setActiveRowId(match.id)
     },
@@ -75,17 +89,20 @@ export function useReviewState(analyzeData) {
     [doc?.grandTotalSqft, unit],
   )
 
-  const visibleRows = useMemo(() => activeRows(rows), [rows])
+  const visibleRows = useMemo(() => includedRows(rows), [rows])
+  const editableRows = useMemo(() => tableRows(rows), [rows])
 
   return {
     doc,
     unit,
     setUnit,
     rows,
+    editableRows,
     visibleRows,
     displayTotal,
     updateRow,
-    removeRow,
+    toggleIncluded,
+    addRoom,
     activePage,
     activeRoom,
     activeRowId,

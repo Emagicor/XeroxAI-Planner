@@ -14,6 +14,8 @@ export default function UploadSection({
   onDrop,
   onUpload,
   onRetry,
+  hidePrimaryButton = false,
+  primaryLabel = 'Analyze Floor Plan',
 }) {
   return (
     <section className="mb-8">
@@ -26,14 +28,14 @@ export default function UploadSection({
         onDrop={onDrop}
       />
 
-      {file && !loading && (
+      {file && !loading && !hidePrimaryButton && (
         <div className="mt-6 flex justify-center">
           <button
             type="button"
             onClick={onUpload}
             className="px-8 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20"
           >
-            Analyze Floor Plan
+            {primaryLabel}
           </button>
         </div>
       )}

@@ -1,0 +1,27 @@
+{
+  "pages": [
+    {
+      "page_number": 1,
+      "rooms": [
+        {
+          "name": "Living Room",
+          "length_ft": 18,
+          "width_ft": 14,
+          "area_sqft": 252
+        },
+        {
+          "name": "Kitchen",
+          "length_ft": 12,
+          "width_ft": 10,
+          "area_sqft": 120
+        },
+        {
+          "name": "Master Bedroom",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168
+        }
+      ]
+    }
+  ]
+}
