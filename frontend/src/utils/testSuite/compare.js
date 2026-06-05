@@ -2,9 +2,9 @@
  * Compare AI analyze output vs ground truth (order-independent, L/W swap ignored).
  */
 
-import { extractRoomsFromPayload } from './normalize'
+import { describeAnalyzeEvalBlocker, extractRoomsFromPayload } from './normalize'
 
-const DEFAULT_DIM_TOLERANCE_FT = 0.0
+const DEFAULT_DIM_TOLERANCE_FT = 0
 const DEFAULT_AREA_TOLERANCE_SQFT = 0
 const NAME_MATCH_THRESHOLD = 0.72
 
@@ -174,6 +174,52 @@ export function matchRooms(gtRooms, aiRooms) {
   return [...pairs, ...falsePositives]
 }
 
+/**
+ * Regression-style dimension errors on matched room pairs (L/W swap ignored).
+ * Pairs where either side lacks both dimensions are skipped.
+ */
+export function computeDimensionErrors(pairs) {
+  const matchedWithGt = pairs.filter((p) => p.gt && p.ai)
+  const squaredErrors = []
+  const absoluteErrors = []
+  let missingDimensionPairs = 0
+
+  for (const pair of matchedWithGt) {
+    const gtPair = sortedDimensionPair(pair.gt.lengthFt, pair.gt.widthFt)
+    const aiPair = sortedDimensionPair(pair.ai.lengthFt, pair.ai.widthFt)
+
+    if (!gtPair || !aiPair) {
+      if (gtPair || aiPair) missingDimensionPairs += 1
+      continue
+    }
+
+    for (let i = 0; i < 2; i += 1) {
+      const diff = gtPair[i] - aiPair[i]
+      squaredErrors.push(diff * diff)
+      absoluteErrors.push(Math.abs(diff))
+    }
+  }
+
+  const dimensionSampleCount = squaredErrors.length
+  const dimensionMSE =
+    dimensionSampleCount > 0
+      ? squaredErrors.reduce((sum, v) => sum + v, 0) / dimensionSampleCount
+      : null
+  const dimensionRMSE = dimensionMSE != null ? Math.sqrt(dimensionMSE) : null
+  const dimensionMAE =
+    absoluteErrors.length > 0
+      ? absoluteErrors.reduce((sum, v) => sum + v, 0) / absoluteErrors.length
+      : null
+
+  return {
+    dimensionMSE,
+    dimensionRMSE,
+    dimensionMAE,
+    dimensionSampleCount,
+    missingDimensionPairs,
+  }
+}
+
 export function computeMetrics(gtRooms, aiRooms, pairs) {
   // -----------------------------
   // ROOM DETECTION CONFUSION MATRIX
@@ -193,41 +239,8 @@ export function computeMetrics(gtRooms, aiRooms, pairs) {
 
   const roomF1 = 2 * tp + fp + fn > 0 ? (2 * tp) / (2 * tp + fp + fn) : 0;
 
-  // -----------------------------
-  // DIMENSION EXTRACTION CONFUSION MATRIX
-  // -----------------------------
   const matchedWithGt = pairs.filter((p) => p.gt && p.ai);
-
-  let dimTP = 0;
-  let dimFP = 0;
-  let dimFN = 0;
-
-  for (const pair of matchedWithGt) {
-    const gtHasDims = pair.gt.lengthFt != null && pair.gt.widthFt != null;
-
-    const aiHasDims = pair.ai.lengthFt != null && pair.ai.widthFt != null;
-
-    if (pair.dimensionsMatch) {
-      dimTP++;
-    } else if (gtHasDims && aiHasDims) {
-      dimFP++;
-    } else if (gtHasDims && !aiHasDims) {
-      dimFN++;
-    } else if (!gtHasDims && aiHasDims) {
-      dimFP++;
-    }
-  }
-
-  const dimensionPrecision = dimTP + dimFP > 0 ? dimTP / (dimTP + dimFP) : 0;
-
-  const dimensionRecall = dimTP + dimFN > 0 ? dimTP / (dimTP + dimFN) : 0;
-
-  const dimensionF1 =
-    2 * dimTP + dimFP + dimFN > 0
-      ? (2 * dimTP) / (2 * dimTP + dimFP + dimFN)
-      : 0;
-
-  const dimensionAccuracy = gtCount > 0 ? dimTP / gtCount : 0;
+  const dimensionErrors = computeDimensionErrors(pairs);
 
   // -----------------------------
   // AREA METRICS
@@ -250,17 +263,8 @@ export function computeMetrics(gtRooms, aiRooms, pairs) {
     roomAccuracy,
     roomF1,
 
-    // DIMENSION METRICS
-    dimensionTP: dimTP,
-    dimensionFP: dimFP,
-    dimensionFN: dimFN,
-
-    dimensionPrecision,
-    dimensionRecall,
-    dimensionF1,
-    dimensionAccuracy,
-
-    dimCorrect: dimTP,
+    // DIMENSION REGRESSION METRICS
+    ...dimensionErrors,
 
     // AREA METRICS
     areaAccuracy,
@@ -283,11 +287,94 @@ export function evaluateAgainstGroundTruth(groundTruthJson, aiJson) {
     throw new Error('Ground truth contains no rooms.')
   }
   if (!aiRooms.length) {
-    throw new Error('AI response contains no rooms to compare.')
+    throw new Error(
+      describeAnalyzeEvalBlocker(aiJson) ??
+        'AI response contains no rooms to compare.',
+    )
   }
 
   const pairs = matchRooms(gtRooms, aiRooms)
   const metrics = computeMetrics(gtRooms, aiRooms, pairs)
 
   return { gtRooms, aiRooms, ...metrics }
+}
+
+/**
+ * Pool metrics across multiple per-file evaluations (micro-average for rooms/dims).
+ * @param {ReturnType<typeof evaluateAgainstGroundTruth>[]} evaluations
+ */
+export function aggregateEvaluations(evaluations) {
+  const valid = evaluations.filter(Boolean)
+  if (!valid.length) return null
+
+  let tp = 0
+  let fp = 0
+  let fn = 0
+  let gtCount = 0
+  let aiCount = 0
+  let areaCorrect = 0
+  const squaredErrors = []
+  const absoluteErrors = []
+  let dimensionSampleCount = 0
+  let missingDimensionPairs = 0
+
+  for (const ev of valid) {
+    tp += ev.truePositives
+    fp += ev.falsePositives
+    fn += ev.falseNegatives
+    gtCount += ev.gtCount
+    aiCount += ev.aiCount
+    areaCorrect += ev.areaCorrect
+    missingDimensionPairs += ev.missingDimensionPairs ?? 0
+
+    if (ev.dimensionSampleCount > 0 && ev.dimensionMSE != null) {
+      dimensionSampleCount += ev.dimensionSampleCount
+      for (const pair of ev.pairs.filter((p) => p.gt && p.ai)) {
+        const gtPair = sortedDimensionPair(pair.gt.lengthFt, pair.gt.widthFt)
+        const aiPair = sortedDimensionPair(pair.ai.lengthFt, pair.ai.widthFt)
+        if (!gtPair || !aiPair) continue
+        for (let i = 0; i < 2; i += 1) {
+          const diff = gtPair[i] - aiPair[i]
+          squaredErrors.push(diff * diff)
+          absoluteErrors.push(Math.abs(diff))
+        }
+      }
+    }
+  }
+
+  const roomPrecision = tp + fp > 0 ? tp / (tp + fp) : 0
+  const roomRecall = tp + fn > 0 ? tp / (tp + fn) : 0
+  const roomAccuracy = gtCount > 0 ? tp / gtCount : 0
+  const roomF1 = 2 * tp + fp + fn > 0 ? (2 * tp) / (2 * tp + fp + fn) : 0
+  const areaAccuracy = gtCount > 0 ? areaCorrect / gtCount : 0
+
+  const dimensionMSE =
+    squaredErrors.length > 0
+      ? squaredErrors.reduce((sum, v) => sum + v, 0) / squaredErrors.length
+      : null
+  const dimensionRMSE = dimensionMSE != null ? Math.sqrt(dimensionMSE) : null
+  const dimensionMAE =
+    absoluteErrors.length > 0
+      ? absoluteErrors.reduce((sum, v) => sum + v, 0) / absoluteErrors.length
+      : null
+
+  return {
+    caseCount: valid.length,
+    gtCount,
+    aiCount,
+    truePositives: tp,
+    falsePositives: fp,
+    falseNegatives: fn,
+    roomPrecision,
+    roomRecall,
+    roomAccuracy,
+    roomF1,
+    dimensionMSE,
+    dimensionRMSE,
+    dimensionMAE,
+    dimensionSampleCount,
+    missingDimensionPairs,
+    areaAccuracy,
+    areaCorrect,
+  }
 }

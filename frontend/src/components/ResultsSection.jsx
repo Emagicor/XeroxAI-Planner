@@ -7,6 +7,7 @@ import {
   downloadTableXLSX,
 } from '../utils/exportTable'
 import { downloadGroundTruthJson } from '../utils/testSuite/exportGroundTruth'
+import DocumentPagesPanel from './DocumentPagesPanel'
 import AnnotatedPagesPanel from './AnnotatedPagesPanel'
 import ResultActions from './ResultActions'
 import ReviewTable from './ReviewTable'
@@ -102,13 +103,35 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
         roomCount={visibleRows.length}
       />
 
+      {doc.pageSummaries?.length > 1 && (
+        <DocumentPagesPanel
+          pageSummaries={doc.pageSummaries}
+          activePage={activePage}
+          onSelectPage={(page) => {
+            const target = doc.rows.find(
+              (r) => r.page === page && r.eligible && r.included !== false,
+            )
+            if (target) selectRow(target)
+            else selectRow(doc.rows.find((r) => r.page === page))
+          }}
+        />
+      )}
+
       {doc.ineligibleList?.length > 0 && (
         <div className="mb-4 p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 text-sm text-amber-200/90">
-          <p className="font-medium mb-1">Ineligible pages</p>
-          <ul className="list-disc list-inside space-y-0.5">
+          <p className="font-medium mb-1">Skipped pages (not floor plans)</p>
+          <p className="text-xs text-amber-200/70 mb-2">
+            Title sheets, notes, schedules, and elevations are ignored automatically.
+            Only floor plan pages are measured and included in totals.
+          </p>
+          <ul className="space-y-1">
             {doc.ineligibleList.map((p) => (
-              <li key={p.page}>
-                Page {p.page}: {p.reason}
+              <li key={p.page} className="text-xs">
+                <span className="font-mono text-amber-100/90">Page {p.page}</span>
+                {p.label && (
+                  <span className="text-amber-200/60"> · {p.label}</span>
+                )}
+                <span className="text-amber-200/50"> — {p.reason}</span>
               </li>
             ))}
           </ul>
@@ -119,6 +142,7 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
         <AnnotatedPagesPanel
           jobId={doc.jobId}
           annotatedPages={doc.annotatedPages}
+          pageSummaries={doc.pageSummaries}
           defaultPage={doc.defaultPage}
           activePage={activePage}
           activeRoom={activeRoom}
@@ -127,7 +151,7 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
             selectRow(
               doc.rows.find(
                 (r) => r.page === page && r.eligible && r.included !== false,
-              ),
+              ) ?? doc.rows.find((r) => r.page === page),
             )
           }
           onSelectRoom={selectRoomOnPage}

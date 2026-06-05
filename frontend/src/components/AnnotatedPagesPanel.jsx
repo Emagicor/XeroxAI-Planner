@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import AnnotatedImagePanel from './AnnotatedImagePanel'
 import { resolveAnnotatedSrc } from '../utils/annotatedImage'
+import { pageTypeLabel } from '../utils/pageTypes'
 
 export default function AnnotatedPagesPanel({
   jobId,
   annotatedPages,
+  pageSummaries,
   defaultPage,
   activePage,
   activeRoom,
@@ -12,25 +14,91 @@ export default function AnnotatedPagesPanel({
   onPageChange,
   onSelectRoom,
 }) {
+  const tabs = useMemo(() => {
+    if (pageSummaries?.length) {
+      return pageSummaries.map((p) => ({
+        page: p.page,
+        eligible: p.eligible,
+        pageType: p.pageType,
+        hasAnnotated: annotatedPages?.some(
+          (a) => a.page === p.page && (a.hasAnnotated || a.annotatedImage),
+        ),
+      }))
+    }
+    return (annotatedPages ?? [])
+      .filter((p) => p.hasAnnotated || p.annotatedImage)
+      .map((p) => ({
+        page: p.page,
+        eligible: p.eligible !== false,
+        pageType: 'floorplan',
+        hasAnnotated: true,
+      }))
+  }, [pageSummaries, annotatedPages])
+
   const eligible = useMemo(
     () => (annotatedPages ?? []).filter((p) => p.hasAnnotated || p.annotatedImage),
     [annotatedPages],
   )
 
   const [selectedPage, setSelectedPage] = useState(
-    activePage ?? defaultPage ?? eligible[0]?.page ?? 1,
+    activePage ?? defaultPage ?? tabs.find((t) => t.eligible)?.page ?? tabs[0]?.page ?? 1,
   )
 
   useEffect(() => {
     if (activePage != null) setSelectedPage(activePage)
   }, [activePage])
 
+  const currentTab = tabs.find((t) => t.page === selectedPage) ?? tabs[0]
   const current = eligible.find((p) => p.page === selectedPage) ?? eligible[0]
 
-  if (!eligible.length) {
+  if (!tabs.length) {
     return (
       <div className="lg:w-[58%] rounded-xl border border-line bg-card/50 p-8 text-center text-[#8B8A82] text-sm">
-        No annotated preview for this document. Check the API logs or re-run analysis.
+        No pages in this document.
+      </div>
+    )
+  }
+
+  const handlePage = (page) => {
+    setSelectedPage(page)
+    onPageChange?.(page)
+  }
+
+  if (!currentTab?.eligible || !current) {
+    return (
+      <div className="lg:w-[58%]">
+        {tabs.length > 1 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {tabs.map((t) => (
+              <button
+                key={t.page}
+                type="button"
+                onClick={() => handlePage(t.page)}
+                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  selectedPage === t.page
+                    ? 'border-accent bg-accent/15 text-[#F0EEE8]'
+                    : t.eligible
+                      ? 'border-line text-[#8B8A82] hover:border-accent/40'
+                      : 'border-line/60 text-[#8B8A82]/70 hover:border-amber-500/30'
+                }`}
+              >
+                Page {t.page}
+                {!t.eligible && (
+                  <span className="ml-1 opacity-70">· skipped</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="rounded-xl border border-line bg-card/50 p-8 text-center">
+          <p className="text-sm font-medium text-[#F0EEE8] mb-1">
+            Page {selectedPage} — {pageTypeLabel(currentTab?.pageType)}
+          </p>
+          <p className="text-xs text-[#8B8A82]">
+            This page was skipped because it is not a floor plan layout (e.g. cover sheet,
+            notes, or schedule). Select an analyzed page to view annotations.
+          </p>
+        </div>
       </div>
     )
   }
@@ -42,27 +110,25 @@ export default function AnnotatedPagesPanel({
     hasAnnotated: current.hasAnnotated,
   })
 
-  const handlePage = (page) => {
-    setSelectedPage(page)
-    onPageChange?.(page)
-  }
-
   return (
     <div className="lg:w-[58%]">
-      {eligible.length > 1 && (
+      {tabs.length > 1 && (
         <div className="flex flex-wrap gap-2 mb-3">
-          {eligible.map((p) => (
+          {tabs.map((t) => (
             <button
-              key={p.page}
+              key={t.page}
               type="button"
-              onClick={() => handlePage(p.page)}
+              onClick={() => handlePage(t.page)}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                selectedPage === p.page
+                selectedPage === t.page
                   ? 'border-accent bg-accent/15 text-[#F0EEE8]'
-                  : 'border-line text-[#8B8A82] hover:border-accent/40'
+                  : t.eligible
+                    ? 'border-line text-[#8B8A82] hover:border-accent/40'
+                    : 'border-line/60 text-[#8B8A82]/70 hover:border-amber-500/30'
               }`}
             >
-              Page {p.page}
+              Page {t.page}
+              {!t.eligible && <span className="ml-1 opacity-70">· skipped</span>}
             </button>
           ))}
         </div>

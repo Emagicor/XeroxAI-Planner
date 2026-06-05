@@ -13,12 +13,8 @@ from domain.exceptions import ZeroxError
 from providers.vision.base import VisionProvider
 
 
-@lru_cache(maxsize=1)
-def get_vision_provider() -> VisionProvider:
-    """
-    Singleton factory — provider is constructed once and reused.
-    Swap providers by changing VISION_PROVIDER in .env.
-    """
+def _build_provider() -> VisionProvider:
+    """Construct a new provider instance (no shared request state)."""
     settings = get_settings()
     provider = settings.vision_provider.lower()
 
@@ -34,3 +30,20 @@ def get_vision_provider() -> VisionProvider:
         code="UNKNOWN_PROVIDER",
         message=f"Unknown vision provider '{provider}'. Set VISION_PROVIDER=gemini or openai.",
     )
+
+
+@lru_cache(maxsize=1)
+def get_vision_provider() -> VisionProvider:
+    """
+    Cached singleton for long-lived processes (e.g. health checks).
+    Pipeline uses create_vision_provider() for per-request isolation.
+    """
+    return _build_provider()
+
+
+def create_vision_provider() -> VisionProvider:
+    """
+    Fresh provider per analyze request — same isolation as uploading once in Analyze tab.
+    Avoids any cross-request state when the test suite runs many cases back-to-back.
+    """
+    return _build_provider()

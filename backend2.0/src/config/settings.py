@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,7 +24,7 @@ class Settings(BaseSettings):
     max_pdf_pages: int = 100
 
     # ── PDF rendering ─────────────────────────────────────────────────────────
-    pdf_render_dpi: int = 150          # match legacy backend (poppler default)
+    pdf_render_dpi: int = 200          # higher DPI improves line clarity on multi-page PDFs
 
     # ── Preprocessing ─────────────────────────────────────────────────────────
     min_image_dimension: int = 1500    # upscale if smaller
@@ -39,8 +38,12 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     openai_api_key: str = ""
 
-    # ── Analysis ─────────────────────────────────────────────────────────────
-    max_analysis_attempts: int = 3     # matches legacy backend retry budget
+    # ── Analysis / vision API usage ───────────────────────────────────────────
+    # Each page: 1 Gemini call by default; +1 only when pass-1 JSON needs correction.
+    max_analysis_attempts: int = 1     # full re-runs only on validation failure
+    vision_two_pass: bool = False      # true = always run extract + correction (2 calls/page)
+    vision_correction_pass: bool = True  # when two_pass false: 2nd call only if pass-1 weak
+    gemini_transient_retries: int = 0  # retries on 503 only; never retries quota (429)
 
     # ── Benchmarking ─────────────────────────────────────────────────────────
     benchmark_mode: bool = False       # logs token/image usage when True

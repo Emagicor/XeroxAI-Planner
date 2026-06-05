@@ -20,7 +20,7 @@ ROOM_HEX_COLORS = [
     "#888780",
 ]
 
-GEMINI_MODEL = "gemini-3.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash"
 MAX_ANALYSIS_ATTEMPTS = 3
 PDF_RENDER_DPI = 150
 

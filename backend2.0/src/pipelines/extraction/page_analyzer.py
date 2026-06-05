@@ -7,37 +7,116 @@ annotations drawn on the same image the model saw, spec-based validation.
 from __future__ import annotations
 
 import base64
+import gc
 
 import structlog
 
 from config.settings import get_settings
+from domain.exceptions import ProviderError
 from engines.area.total_area import apply_total_area
 from engines.dimensions.sanitize import sanitize_vision_rooms
 from engines.validation.analysis_validator import is_valid
 from infrastructure.annotations.renderer import draw_annotations
 from infrastructure.preprocessing.image_preprocessor import preprocess_image
-from prompts.floor_plan import CORRECTION_PROMPT_TEMPLATE, FLOOR_PLAN_PROMPT
+from infrastructure.vision_session import VISION_API_LOCK
+from prompts.floor_plan import isolated_correction_prompt, isolated_floor_plan_prompt
 from providers.vision.base import VisionProvider
+from providers.vision.factory import create_vision_provider
 from providers.vision.gemini import parse_provider_json
 
 log = structlog.get_logger(__name__)
 
-# Preprocess always outputs JPEG — must match Gemini mime_type
 VISION_MIME = "image/jpeg"
 
+_NON_PLAN_PAGE_TYPES = frozenset(
+    {"cover", "notes", "schedule", "elevation", "section", "other", "title", "text", "index"}
+)
 
-def _two_pass_analyze(
+
+def _vision_rejects_page(data: dict) -> str | None:
+    pc = data.get("page_classification") or {}
+    if pc.get("is_floor_plan") is False:
+        return pc.get("reason") or "Vision model: not a floor plan page"
+
+    page_type = str(pc.get("page_type") or "").lower()
+    if page_type in _NON_PLAN_PAGE_TYPES:
+        return pc.get("reason") or f"Vision model: page type '{page_type}'"
+
+    return None
+
+
+def _ineligible_payload(reason: str, data: dict | None = None) -> dict:
+    pc = (data or {}).get("page_classification") or {}
+    return {
+        "eligible": False,
+        "reason": reason,
+        "page_classification": pc,
+        "rooms": [],
+        "total_area_sqft": 0.0,
+        "total_area_source": "none",
+        "overall_confidence": 0,
+        "units_detected": "unknown",
+    }
+
+
+def _result_needs_correction(data: dict) -> bool:
+    """True when a second vision call may fix empty/invalid extraction."""
+    if _vision_rejects_page(data):
+        return False
+    if not is_valid(data):
+        return True
+    measurable = [
+        r for r in (data.get("rooms") or [])
+        if r.get("area_sqft") and float(r["area_sqft"]) > 0
+    ]
+    return not measurable
+
+
+def _vision_analyze(
     provider: VisionProvider,
     preprocessed_bytes: bytes,
+    *,
+    session_id: str,
+    page_number: int,
 ) -> dict:
-    r1 = provider.analyze_image(preprocessed_bytes, VISION_MIME, FLOOR_PLAN_PROMPT)
-    _log_usage(r1, pass_num=1)
+    """
+    Run 1–2 Gemini calls per page (settings-controlled):
+      - Default: 1 call; optional correction pass only if pass-1 is weak.
+      - vision_two_pass=true: always 2 calls (legacy quality mode).
+    """
+    settings = get_settings()
+    prompt1 = isolated_floor_plan_prompt(session_id, page_number)
+    api_calls = 0
 
-    correction_prompt = CORRECTION_PROMPT_TEMPLATE.format(first_response=r1.text)
-    r2 = provider.analyze_image(preprocessed_bytes, VISION_MIME, correction_prompt)
-    _log_usage(r2, pass_num=2)
+    with VISION_API_LOCK:
+        r1 = provider.analyze_image(preprocessed_bytes, VISION_MIME, prompt1)
+        api_calls += 1
+        _log_usage(r1, pass_num=1)
 
-    return parse_provider_json(r2.text)
+        data = parse_provider_json(r1.text)
+        run_correction = settings.vision_two_pass
+        if not run_correction and settings.vision_correction_pass:
+            run_correction = _result_needs_correction(data)
+
+        if run_correction:
+            correction_prompt = isolated_correction_prompt(
+                session_id, page_number, r1.text
+            )
+            r2 = provider.analyze_image(
+                preprocessed_bytes, VISION_MIME, correction_prompt
+            )
+            api_calls += 1
+            _log_usage(r2, pass_num=2)
+            data = parse_provider_json(r2.text)
+
+    log.info(
+        "page_analyzer.vision_calls",
+        page=page_number,
+        api_calls=api_calls,
+        two_pass=settings.vision_two_pass,
+        correction_pass=settings.vision_correction_pass,
+    )
+    return data
 
 
 def _log_usage(response, pass_num: int) -> None:
@@ -53,7 +132,6 @@ def _log_usage(response, pass_num: int) -> None:
 
 
 def _attach_annotated_image(display_bytes: bytes, data: dict) -> dict:
-    """Draw overlays on the same raster the model analyzed (aligned 0–1000 coords)."""
     rooms = data.get("rooms") or []
     if not rooms:
         return data
@@ -71,10 +149,24 @@ def _attach_annotated_image(display_bytes: bytes, data: dict) -> dict:
 def analyze_single_page(
     provider: VisionProvider,
     image_bytes: bytes,
-    mime_type: str,  # noqa: ARG001 — kept for API compatibility
+    mime_type: str,  # noqa: ARG001
+    *,
+    session_id: str,
+    page_number: int,
 ) -> dict:
-    preprocessed = preprocess_image(image_bytes)
-    data = _two_pass_analyze(provider, preprocessed)
+    preprocessed = preprocess_image(bytes(image_bytes))
+    data = _vision_analyze(
+        provider,
+        preprocessed,
+        session_id=session_id,
+        page_number=page_number,
+    )
+
+    reject_reason = _vision_rejects_page(data)
+    if reject_reason:
+        log.info("page_analyzer.rejected_non_plan", reason=reject_reason)
+        return _ineligible_payload(reject_reason, data)
+
     data = sanitize_vision_rooms(data)
     data = apply_total_area(data)
     data = _attach_annotated_image(preprocessed, data)
@@ -83,19 +175,36 @@ def analyze_single_page(
 
 
 def analyze_page_safe(
-    provider: VisionProvider,
+    provider: VisionProvider | None,
     image_bytes: bytes,
     mime_type: str,
     page_number: int,
     max_attempts: int | None = None,
+    *,
+    session_id: str,
 ) -> dict:
     settings = get_settings()
     attempts = max_attempts or settings.max_analysis_attempts
     last_error: Exception | None = None
 
     for attempt in range(1, attempts + 1):
+        vision = provider or create_vision_provider()
         try:
-            result = analyze_single_page(provider, image_bytes, mime_type)
+            result = analyze_single_page(
+                vision,
+                image_bytes,
+                mime_type,
+                session_id=session_id,
+                page_number=page_number,
+            )
+
+            if not result.get("eligible", True):
+                log.info(
+                    "page_analyzer.skipped",
+                    page=page_number,
+                    reason=result.get("reason"),
+                )
+                return result
 
             if not is_valid(result):
                 log.warning(
@@ -106,7 +215,6 @@ def analyze_page_safe(
                 last_error = ValueError("Model returned invalid room data")
                 continue
 
-            # Need at least one room with usable dimensions for a useful page
             measurable = [
                 r for r in (result.get("rooms") or [])
                 if r.get("area_sqft") and float(r["area_sqft"]) > 0
@@ -124,10 +232,23 @@ def analyze_page_safe(
                 "page_analyzer.success",
                 page=page_number,
                 attempt=attempt,
+                session_id=session_id,
                 has_annotation=bool(result.get("annotated_image")),
             )
             return result
 
+        except ProviderError as exc:
+            # Quota / auth — do not burn more API calls retrying the page
+            if exc.code in ("QUOTA_EXCEEDED", "MISSING_API_KEY"):
+                raise
+            log.warning(
+                "page_analyzer.provider_error",
+                page=page_number,
+                attempt=attempt,
+                code=exc.code,
+                error=exc.message,
+            )
+            last_error = exc
         except Exception as exc:
             log.warning(
                 "page_analyzer.attempt_failed",
@@ -136,6 +257,9 @@ def analyze_page_safe(
                 error=str(exc),
             )
             last_error = exc
+        finally:
+            del vision
+            gc.collect()
 
     log.error(
         "page_analyzer.all_attempts_failed",

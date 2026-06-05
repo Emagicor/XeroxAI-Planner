@@ -39,11 +39,13 @@ class PageSchema(BaseModel):
     overall_confidence:     int
     units_detected:         str
     has_annotated_image:    bool = False
+    annotated_image:        str | None = None  # base64 JPEG; set for single-page responses
 
 
 class AnalyzeResponseSchema(BaseModel):
     job_id:             str
     filename:           str
+    content_sha256:     str = ""
     status:             str
     total_pages:        int | None
     pages:              list[PageSchema]

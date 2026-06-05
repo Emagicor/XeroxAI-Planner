@@ -1,73 +1,86 @@
-import UploadSection from '../UploadSection'
-import GroundTruthUpload from './GroundTruthUpload'
+import ErrorBanner from '../ErrorBanner'
+import TestSuiteCaseBuilder from './TestSuiteCaseBuilder'
 
 export default function TestSuiteUploadSection({
-  file,
-  preview,
+  cases,
+  casesLoading,
+  casesLoadError,
   loading,
-  loadingStep,
-  loadingSteps,
+  readyCount,
   error,
-  fileInputRef,
-  onFileSelect,
-  onDrop,
-  onUpload,
-  onRetry,
-  groundTruthFileName,
-  groundTruthError,
-  onGroundTruthSelect,
-  onGroundTruthClear,
+  bulkInputRef,
+  onAddEmptyCase,
+  onAddInputFiles,
+  onBulkDrop,
+  onCaseInputSelect,
+  onCaseGroundTruthSelect,
+  onCaseGroundTruthClear,
+  onSaveCase,
+  onRemoveCase,
+  onReloadCases,
   canRun,
+  unsavedCount,
+  onRun,
+  onRetry,
 }) {
   return (
     <section>
-      <div className="mb-4 text-center max-w-xl mx-auto">
-        <h2 className="text-lg font-medium text-[#F0EEE8]">Test suite mode</h2>
-        <p className="text-sm text-[#8B8A82] mt-1">
-          Upload a floor plan and ground truth JSON. After analysis, metrics compare
-          AI output to your labels mathematically.
+      <div className="mb-8 text-center max-w-2xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/25 bg-accent/10 text-xs text-accent mb-4">
+          Evaluation mode
+        </div>
+        <h2 className="text-2xl font-medium text-[#F0EEE8]">Test suite</h2>
+        <p className="text-sm text-[#8B8A82] mt-2 leading-relaxed">
+          Saved cases preload from <span className="font-mono">test-suite/manifest.json</span>.
+          Click <span className="text-[#F0EEE8]">Save to suite</span> to create a folder under{' '}
+          <span className="font-mono">test-suite/cases/</span> and register it in the manifest.
         </p>
       </div>
 
-      <UploadSection
-        file={file}
-        preview={preview}
+      <TestSuiteCaseBuilder
+        cases={cases}
+        casesLoading={casesLoading}
+        casesLoadError={casesLoadError}
         loading={loading}
-        loadingStep={loadingStep}
-        loadingSteps={loadingSteps}
-        error={error}
-        fileInputRef={fileInputRef}
-        onFileSelect={onFileSelect}
-        onDrop={onDrop}
-        onUpload={onUpload}
-        onRetry={onRetry}
-        hidePrimaryButton
+        readyCount={readyCount}
+        bulkInputRef={bulkInputRef}
+        onAddEmptyCase={onAddEmptyCase}
+        onAddInputFiles={onAddInputFiles}
+        onBulkDrop={onBulkDrop}
+        onCaseInputSelect={onCaseInputSelect}
+        onCaseGroundTruthSelect={onCaseGroundTruthSelect}
+        onCaseGroundTruthClear={onCaseGroundTruthClear}
+        onSaveCase={onSaveCase}
+        onRemoveCase={onRemoveCase}
+        onReloadCases={onReloadCases}
       />
 
-      <GroundTruthUpload
-        fileName={groundTruthFileName}
-        error={groundTruthError}
-        onSelect={onGroundTruthSelect}
-        onClear={onGroundTruthClear}
-      />
-
-      {file && !loading && (
-        <div className="mt-6 flex flex-col items-center gap-2">
+      {cases.length > 0 && !loading && !casesLoading && (
+        <div className="mt-8 flex flex-col items-center gap-3">
           <button
             type="button"
             disabled={!canRun}
-            onClick={onUpload}
-            className="px-8 py-3 rounded-lg bg-accent text-white font-medium hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20 disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={onRun}
+            className="px-10 py-3.5 rounded-xl bg-accent text-white font-medium hover:bg-accent/90 transition-all shadow-lg shadow-accent/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
           >
-            Run analysis & evaluate
+            Run {readyCount || 0} test case{readyCount !== 1 ? 's' : ''}
           </button>
-          {!groundTruthFileName && (
-            <p className="text-xs text-amber-400/90">
-              Ground truth JSON is required in test suite mode.
+          {unsavedCount > 0 ? (
+            <p className="text-xs text-amber-400/90 text-center max-w-md">
+              {unsavedCount} case{unsavedCount !== 1 ? 's' : ''} need saving before they can run
+              or preload next session.
             </p>
+          ) : readyCount === 0 ? (
+            <p className="text-xs text-amber-400/90 text-center max-w-md">
+              Add and save at least one case to run the batch.
+            </p>
+          ) : (
+            <p className="text-xs text-emerald-400/90">All saved cases ready to run</p>
           )}
         </div>
       )}
+
+      {error && <ErrorBanner message={error} onRetry={onRetry} />}
     </section>
   )
 }

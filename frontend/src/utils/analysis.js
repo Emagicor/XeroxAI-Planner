@@ -2,6 +2,8 @@
  * Normalize backend2.0 analyze responses into review rows + annotated pages.
  */
 
+import { pageTypeLabel } from './pageTypes'
+
 let _rowId = 0
 function nextRowId() {
   _rowId += 1
@@ -13,11 +15,23 @@ export function normalizeAnalyzeResponse(data) {
   const rows = []
   const ineligiblePages = []
   const annotatedPages = []
+  const pageSummaries = []
 
   for (const page of pages) {
     const pageNum = page.page_number ?? page.page ?? 0
     const eligible = page.eligible !== false
+    const pageType = page.page_type ?? page.pageType ?? (eligible ? 'floorplan' : 'unknown')
     const pageRooms = page.rooms ?? []
+
+    pageSummaries.push({
+      page: pageNum,
+      eligible,
+      pageType,
+      reason: page.ineligible_reason ?? page.reason ?? null,
+      roomCount: eligible ? pageRooms.length : 0,
+      totalAreaSqft: eligible ? Number(page.total_area_sqft ?? 0) : 0,
+      label: pageTypeLabel(pageType),
+    })
 
     const hasAnnotated =
       Boolean(page.has_annotated_image) || Boolean(page.annotated_image)
@@ -39,6 +53,8 @@ export function normalizeAnalyzeResponse(data) {
     if (!eligible) {
       ineligiblePages.push({
         page: pageNum,
+        pageType,
+        label: pageTypeLabel(pageType),
         reason: page.ineligible_reason ?? page.reason ?? 'Ineligible',
       })
       rows.push({
@@ -56,6 +72,7 @@ export function normalizeAnalyzeResponse(data) {
         eligible: false,
         included: false,
         roomIndex: null,
+        pageType,
       })
       continue
     }
@@ -94,6 +111,7 @@ export function normalizeAnalyzeResponse(data) {
     eligiblePages: data.eligible_pages ?? 0,
     ineligiblePages: data.ineligible_pages ?? ineligiblePages.length,
     ineligibleList: ineligiblePages,
+    pageSummaries,
     annotatedPages,
     defaultPage: firstAnnotated?.page ?? annotatedPages[0]?.page ?? 1,
     rows,

@@ -1,60 +1,62 @@
-import { useMemo } from 'react'
-import { evaluateAgainstGroundTruth } from '../../utils/testSuite/compare'
+import { useMemo, useState } from 'react'
+import {
+  aggregateEvaluations,
+  evaluateAgainstGroundTruth,
+} from '../../utils/testSuite/compare'
 
 function pct(n) {
+  if (n == null || !Number.isFinite(n)) return '—'
   return `${(n * 100).toFixed(1)}%`
 }
 
-function MetricCard({ label, value, hint }) {
+function ft(n) {
+  if (n == null || !Number.isFinite(n)) return '—'
+  return `${n.toFixed(2)} ft`
+}
+
+function ftSq(n) {
+  if (n == null || !Number.isFinite(n)) return '—'
+  return `${n.toFixed(3)} ft²`
+}
+
+function MetricTile({ label, value, sub }) {
   return (
-    <div className="bg-card border border-line rounded-lg p-4">
-      <p className="text-xs text-[#8B8A82] mb-1">{label}</p>
-      <p className="font-mono text-xl font-semibold text-[#F0EEE8]">{value}</p>
-      {hint && <p className="text-[10px] text-[#8B8A82] mt-1">{hint}</p>}
+    <div className="rounded-lg border border-line/60 bg-surface/40 px-3 py-2.5">
+      <p className="text-[10px] uppercase tracking-wide text-[#8B8A82]">{label}</p>
+      <p className="font-mono text-base font-semibold text-[#F0EEE8] mt-0.5">{value}</p>
+      {sub && <p className="text-[10px] text-[#8B8A82] mt-0.5">{sub}</p>}
     </div>
   )
 }
 
-function ConfusionMatrixCard({ title, tp, fp, fn }) {
+function SummaryStat({ label, value, accent }) {
   return (
-    <div className="bg-card border border-line rounded-lg p-4">
-      <p className="text-sm text-[#8B8A82] mb-4">{title}</p>
-
-      <div className="grid grid-cols-3 gap-2 text-center text-sm">
-        <div />
-        <div className="text-[#8B8A82] font-medium">Pred +</div>
-        <div className="text-[#8B8A82] font-medium">Pred -</div>
-
-        <div className="text-[#8B8A82] font-medium">GT +</div>
-
-        <div className="rounded-md bg-emerald-500/15 border border-emerald-500/30 p-3">
-          <div className="text-xs text-emerald-300">TP</div>
-          <div className="font-mono text-xl">{tp}</div>
-        </div>
-
-        <div className="rounded-md bg-red-500/15 border border-red-500/30 p-3">
-          <div className="text-xs text-red-300">FN</div>
-          <div className="font-mono text-xl">{fn}</div>
-        </div>
-
-        <div className="text-[#8B8A82] font-medium">GT -</div>
-
-        <div className="rounded-md bg-amber-500/15 border border-amber-500/30 p-3">
-          <div className="text-xs text-amber-200">FP</div>
-          <div className="font-mono text-xl">{fp}</div>
-        </div>
-
-        <div className="rounded-md bg-surface border border-line p-3">
-          <div className="text-xs text-[#8B8A82]">TN</div>
-          <div className="font-mono text-xl">—</div>
-        </div>
-      </div>
-
-      <p className="mt-3 text-[11px] text-[#8B8A82]">
-        TN is undefined for room extraction tasks.
+    <div className="text-center px-4 py-2">
+      <p className="text-[10px] uppercase tracking-wider text-[#8B8A82] mb-1">{label}</p>
+      <p className={`font-mono text-2xl font-semibold ${accent ?? 'text-[#F0EEE8]'}`}>
+        {value}
       </p>
     </div>
-  );
+  )
+}
+
+function ConfusionMini({ tp, fp, fn }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 text-center text-xs">
+      <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/25 px-2 py-2">
+        <p className="text-emerald-400/80">TP</p>
+        <p className="font-mono text-lg text-emerald-300">{tp}</p>
+      </div>
+      <div className="rounded-lg bg-amber-500/10 border border-amber-500/25 px-2 py-2">
+        <p className="text-amber-300/80">FP</p>
+        <p className="font-mono text-lg text-amber-200">{fp}</p>
+      </div>
+      <div className="rounded-lg bg-red-500/10 border border-red-500/25 px-2 py-2">
+        <p className="text-red-400/80">FN</p>
+        <p className="font-mono text-lg text-red-300">{fn}</p>
+      </div>
+    </div>
+  )
 }
 
 function statusBadge(status) {
@@ -68,7 +70,365 @@ function statusBadge(status) {
   return map[status] ?? map.weak
 }
 
-export default function TestSuiteMetrics({ groundTruth, aiResult, evalError }) {
+function caseOutcome(row) {
+  if (row.error) return { label: 'Analysis failed', tone: 'border-red-500/30 bg-red-950/20 text-red-300' }
+  if (row.evalError) return { label: 'Eval failed', tone: 'border-amber-500/30 bg-amber-950/20 text-amber-200' }
+  const m = row.evaluation
+  if (!m) return { label: 'No data', tone: 'border-line bg-surface/40 text-[#8B8A82]' }
+  const score = m.roomF1 ?? 0
+  if (score >= 0.85) return { label: 'Pass', tone: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300' }
+  if (score >= 0.6) return { label: 'Partial', tone: 'border-amber-500/30 bg-amber-950/20 text-amber-200' }
+  return { label: 'Needs review', tone: 'border-red-500/30 bg-red-950/20 text-red-300' }
+}
+
+function PerRoomTable({ evaluation }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-line/50">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-left text-[#8B8A82] bg-surface/50 border-b border-line">
+            <th className="px-3 py-2.5 font-medium">Status</th>
+            <th className="px-3 py-2.5 font-medium">Page</th>
+            <th className="px-3 py-2.5 font-medium">Ground truth</th>
+            <th className="px-3 py-2.5 font-medium">GT dims</th>
+            <th className="px-3 py-2.5 font-medium">AI name</th>
+            <th className="px-3 py-2.5 font-medium">AI dims</th>
+            <th className="px-3 py-2.5 font-medium">Dim error</th>
+            <th className="px-3 py-2.5 font-medium">Area</th>
+          </tr>
+        </thead>
+        <tbody>
+          {evaluation.pairs.map((row, i) => {
+            const gtPair =
+              row.gt?.lengthFt != null && row.gt?.widthFt != null
+                ? [row.gt.lengthFt, row.gt.widthFt]
+                : null
+            const aiPair =
+              row.ai?.lengthFt != null && row.ai?.widthFt != null
+                ? [row.ai.lengthFt, row.ai.widthFt]
+                : null
+            let dimError = '—'
+            if (gtPair && aiPair) {
+              const sortedGt = [Math.min(...gtPair), Math.max(...gtPair)]
+              const sortedAi = [Math.min(...aiPair), Math.max(...aiPair)]
+              const err = Math.sqrt(
+                ((sortedGt[0] - sortedAi[0]) ** 2 + (sortedGt[1] - sortedAi[1]) ** 2) / 2,
+              )
+              dimError = `${err.toFixed(2)} ft`
+            }
+
+            return (
+              <tr key={i} className="border-b border-line/30 last:border-0">
+                <td className="px-3 py-2">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full text-xs border capitalize ${statusBadge(row.status)}`}
+                  >
+                    {row.status.replace('_', ' ')}
+                  </span>
+                </td>
+                <td className="px-3 py-2 font-mono text-[#8B8A82]">
+                  {row.gt?.page ?? row.ai?.page ?? '—'}
+                </td>
+                <td className="px-3 py-2">{row.gt?.name ?? '—'}</td>
+                <td className="px-3 py-2 font-mono text-xs">
+                  {gtPair ? `${gtPair[0]}×${gtPair[1]} ft` : '—'}
+                </td>
+                <td className="px-3 py-2">{row.ai?.name ?? '—'}</td>
+                <td className="px-3 py-2 font-mono text-xs">
+                  {aiPair ? `${aiPair[0]}×${aiPair[1]} ft` : '—'}
+                </td>
+                <td className="px-3 py-2 font-mono text-xs text-[#8B8A82]">{dimError}</td>
+                <td className="px-3 py-2">
+                  {row.areaMatch ? (
+                    <span className="text-emerald-400 text-xs">Match</span>
+                  ) : (
+                    <span className="text-[#8B8A82] text-xs">—</span>
+                  )}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function CaseResultCard({ index, row, expanded, onToggle }) {
+  const m = row.evaluation
+  const outcome = caseOutcome(row)
+  const isPdf = row.inputFileName?.toLowerCase().endsWith('.pdf')
+
+  const summaryLine = m
+    ? `F1 ${pct(m.roomF1)} · RMSE ${ft(m.dimensionRMSE)} · ${m.gtCount} GT / ${m.aiCount} AI rooms`
+    : row.error || row.evalError || 'No metrics available'
+
+  return (
+    <div className="rounded-xl border border-line bg-card/70 overflow-hidden transition-shadow hover:shadow-lg hover:shadow-black/10">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full text-left px-4 sm:px-5 py-4 flex items-start gap-4 hover:bg-surface/30 transition-colors"
+      >
+        {row.preview && !isPdf ? (
+          <img
+            src={row.preview}
+            alt=""
+            className="w-12 h-12 object-cover rounded-lg border border-line shrink-0 hidden sm:block"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-lg border border-line bg-surface flex items-center justify-center shrink-0 hidden sm:block">
+            <span className="text-[10px] font-mono text-accent">{isPdf ? 'PDF' : 'IMG'}</span>
+          </div>
+        )}
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2 mb-1">
+            <span className="text-xs font-mono text-[#8B8A82]">Case {index + 1}</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full border ${outcome.tone}`}>
+              {outcome.label}
+            </span>
+          </div>
+          <p className="text-sm font-medium text-[#F0EEE8] truncate" title={row.inputFileName}>
+            {row.inputFileName}
+          </p>
+          <p className="text-xs text-[#8B8A82] truncate mt-0.5" title={row.groundTruthFileName}>
+            Ground truth: {row.groundTruthFileName}
+          </p>
+          <p className="text-xs font-mono text-[#8B8A82] mt-2">{summaryLine}</p>
+        </div>
+
+        <div className="shrink-0 flex items-center gap-2 pt-1">
+          {m && (
+            <div className="hidden md:grid grid-cols-3 gap-3 mr-2">
+              <div className="text-right">
+                <p className="text-[10px] text-[#8B8A82]">Precision</p>
+                <p className="font-mono text-sm text-[#F0EEE8]">{pct(m.roomPrecision)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-[#8B8A82]">Recall</p>
+                <p className="font-mono text-sm text-[#F0EEE8]">{pct(m.roomRecall)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-[#8B8A82]">Dim MAE</p>
+                <p className="font-mono text-sm text-[#F0EEE8]">{ft(m.dimensionMAE)}</p>
+              </div>
+            </div>
+          )}
+          <svg
+            className={`w-5 h-5 text-[#8B8A82] transition-transform ${expanded ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="px-4 sm:px-5 pb-5 border-t border-line/50 bg-surface/20">
+          {(row.error || row.evalError) && (
+            <div className="mt-4 p-3 rounded-lg border border-red-500/25 bg-red-950/20 text-red-300 text-sm">
+              {row.error || row.evalError}
+            </div>
+          )}
+
+          {m && (
+            <>
+              <p className="text-xs font-medium text-[#8B8A82] uppercase tracking-wide mt-4 mb-3">
+                Case metrics
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 mb-4">
+                <MetricTile label="Room P" value={pct(m.roomPrecision)} />
+                <MetricTile label="Room R" value={pct(m.roomRecall)} />
+                <MetricTile label="Room F1" value={pct(m.roomF1)} />
+                <MetricTile label="Area Acc" value={pct(m.areaAccuracy)} />
+                <MetricTile label="Dim MSE" value={ftSq(m.dimensionMSE)} />
+                <MetricTile label="Dim RMSE" value={ft(m.dimensionRMSE)} />
+                <MetricTile label="Dim MAE" value={ft(m.dimensionMAE)} />
+                <MetricTile
+                  label="Rooms"
+                  value={`${m.gtCount} / ${m.aiCount}`}
+                  sub="GT / AI"
+                />
+              </div>
+
+              <p className="text-xs font-medium text-[#8B8A82] uppercase tracking-wide mb-2">
+                Detection matrix
+              </p>
+              <div className="max-w-xs mb-5">
+                <ConfusionMini tp={m.truePositives} fp={m.falsePositives} fn={m.falseNegatives} />
+              </div>
+
+              <p className="text-xs font-medium text-[#8B8A82] uppercase tracking-wide mb-2">
+                Per-room comparison
+              </p>
+              <PerRoomTable evaluation={m} />
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function TestSuiteMetrics({ results, onNewBatch }) {
+  const [expandedIds, setExpandedIds] = useState(new Set())
+
+  const aggregate = useMemo(() => {
+    const evals = results.filter((r) => r.evaluation).map((r) => r.evaluation)
+    return aggregateEvaluations(evals)
+  }, [results])
+
+  const passedCount = results.filter((r) => {
+    const o = caseOutcome(r)
+    return o.label === 'Pass'
+  }).length
+
+  const toggleCase = (caseId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(caseId)) next.delete(caseId)
+      else next.add(caseId)
+      return next
+    })
+  }
+
+  const expandAll = () => {
+    setExpandedIds(new Set(results.map((r) => r.caseId ?? r.inputFileName)))
+  }
+
+  const collapseAll = () => setExpandedIds(new Set())
+
+  if (!results.length) {
+    return (
+      <div className="mb-6 p-4 rounded-xl border border-line bg-card/50 text-[#8B8A82] text-sm text-center">
+        Run the batch to see evaluation metrics.
+      </div>
+    )
+  }
+
+  return (
+    <section className="mb-8 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-medium text-[#F0EEE8]">Test suite report</h2>
+          <p className="text-sm text-[#8B8A82] mt-1">
+            {results.length} cases evaluated · expand any row for full metrics and room-level
+            comparison
+          </p>
+        </div>
+        {onNewBatch && (
+          <button
+            type="button"
+            onClick={onNewBatch}
+            className="shrink-0 px-4 py-2 rounded-lg border border-line bg-surface text-sm text-[#F0EEE8] hover:border-accent/50 transition-colors"
+          >
+            Run new batch
+          </button>
+        )}
+      </div>
+
+      {aggregate && (
+        <div className="rounded-2xl border border-line bg-gradient-to-br from-card/90 to-surface/40 overflow-hidden">
+          <div className="px-6 py-4 border-b border-line/60 bg-surface/20">
+            <h3 className="text-sm font-medium text-[#F0EEE8]">Overall summary</h3>
+            <p className="text-xs text-[#8B8A82] mt-0.5">
+              Pooled metrics across all {aggregate.caseCount} test cases
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-line/40 border-b border-line/40">
+            <SummaryStat label="Room recall" value={pct(aggregate.roomRecall)} accent="text-emerald-400" />
+            <SummaryStat label="Room precision" value={pct(aggregate.roomPrecision)} accent="text-emerald-400" />
+            <SummaryStat label="Room F1" value={pct(aggregate.roomF1)} />
+            <SummaryStat label="Cases passed" value={`${passedCount}/${results.length}`} />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line/30">
+            <div className="bg-card/80 px-4 py-4">
+              <MetricTile
+                label="Dimension RMSE"
+                value={ft(aggregate.dimensionRMSE)}
+                sub={`${aggregate.dimensionSampleCount} values`}
+              />
+            </div>
+            <div className="bg-card/80 px-4 py-4">
+              <MetricTile label="Dimension MAE" value={ft(aggregate.dimensionMAE)} />
+            </div>
+            <div className="bg-card/80 px-4 py-4">
+              <MetricTile label="Dimension MSE" value={ftSq(aggregate.dimensionMSE)} />
+            </div>
+            <div className="bg-card/80 px-4 py-4">
+              <MetricTile label="Area accuracy" value={pct(aggregate.areaAccuracy)} />
+            </div>
+          </div>
+
+          <div className="px-6 py-4 grid md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-xs font-medium text-[#8B8A82] uppercase tracking-wide mb-3">
+                Pooled detection matrix
+              </p>
+              <ConfusionMini
+                tp={aggregate.truePositives}
+                fp={aggregate.falsePositives}
+                fn={aggregate.falseNegatives}
+              />
+            </div>
+            <div className="flex flex-col justify-center text-sm text-[#8B8A82] space-y-1">
+              <p>
+                <span className="text-[#F0EEE8] font-mono">{aggregate.truePositives}</span> true
+                positives across all cases
+              </p>
+              <p>
+                <span className="text-amber-200 font-mono">{aggregate.falsePositives}</span> false
+                positives ·{' '}
+                <span className="text-red-300 font-mono">{aggregate.falseNegatives}</span> false
+                negatives
+              </p>
+              <p>
+                <span className="text-[#F0EEE8] font-mono">{aggregate.missingDimensionPairs}</span>{' '}
+                matched rooms with missing dimensions
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-medium text-[#F0EEE8]">Individual test cases</h3>
+          <div className="flex gap-3 text-xs">
+            <button type="button" onClick={expandAll} className="text-accent hover:underline">
+              Expand all
+            </button>
+            <button type="button" onClick={collapseAll} className="text-[#8B8A82] hover:text-[#F0EEE8]">
+              Collapse all
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {results.map((row, i) => {
+            const id = row.caseId ?? `${row.inputFileName}-${i}`
+            return (
+              <CaseResultCard
+                key={id}
+                index={i}
+                row={row}
+                expanded={expandedIds.has(id)}
+                onToggle={() => toggleCase(id)}
+              />
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function TestSuiteSingleMetrics({ groundTruth, aiResult, evalError }) {
   const evaluation = useMemo(() => {
     if (!groundTruth || !aiResult) return null
     try {
@@ -78,13 +438,19 @@ export default function TestSuiteMetrics({ groundTruth, aiResult, evalError }) {
     }
   }, [groundTruth, aiResult])
 
-  if (evalError) {
-    return (
-      <div className="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-950/20 text-red-300 text-sm">
-        {evalError}
-      </div>
-    )
-  }
+  const results = useMemo(() => {
+    if (!evaluation) return []
+    return [
+      {
+        caseId: 'session',
+        inputFileName: 'Current session',
+        groundTruthFileName: 'Ground truth',
+        evaluation,
+        evalError: null,
+        error: null,
+      },
+    ]
+  }, [evaluation])
 
   if (!groundTruth) {
     return (
@@ -97,150 +463,11 @@ export default function TestSuiteMetrics({ groundTruth, aiResult, evalError }) {
   if (!evaluation) {
     return (
       <div className="mb-6 p-4 rounded-xl border border-amber-500/30 bg-amber-950/20 text-amber-200/90 text-sm">
-        Could not evaluate — ensure the AI run completed and ground truth has rooms.
+        {evalError ||
+          'Could not evaluate — ensure the AI run completed and ground truth has rooms.'}
       </div>
     )
   }
 
-  const m = evaluation
-
-  return (
-    <section className="mb-8">
-      <h3 className="text-lg font-medium text-[#F0EEE8] mb-1">
-        Test suite evaluation
-      </h3>
-      <p className="text-xs text-[#8B8A82] mb-4">
-        Compared {m.gtCount} ground-truth rooms vs {m.aiCount} AI rooms (±0.5 ft
-        on dimensions; length/width swap allowed).
-      </p>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <MetricCard
-          label="Room Recall"
-          value={pct(m.roomRecall)}
-          hint={`${m.truePositives} of ${m.gtCount} GT rooms found`}
-        />
-
-        <MetricCard
-          label="Room Precision"
-          value={pct(m.roomPrecision)}
-          hint={`${m.truePositives} correct of ${m.aiCount} AI rooms`}
-        />
-
-        <MetricCard
-          label="Room F1"
-          value={pct(m.roomF1)}
-          hint="Detection quality"
-        />
-
-        <MetricCard label="Room Accuracy" value={pct(m.roomAccuracy)} />
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <MetricCard
-          label="Dimension Precision"
-          value={pct(m.dimensionPrecision)}
-          hint={`${m.dimensionTP} correct dimensions`}
-        />
-
-        <MetricCard
-          label="Dimension Recall"
-          value={pct(m.dimensionRecall)}
-          hint={`${m.dimensionTP}/${m.dimensionTP + m.dimensionFN}`}
-        />
-
-        <MetricCard
-          label="Dimension F1"
-          value={pct(m.dimensionF1)}
-          hint="Dimension extraction quality"
-        />
-
-        <MetricCard
-          label="Dimension Accuracy"
-          value={pct(m.dimensionAccuracy)}
-          hint={`${m.dimensionTP} of ${m.gtCount} GT rooms`}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <MetricCard
-          label="Area Accuracy"
-          value={pct(m.areaAccuracy)}
-          hint={`${m.areaCorrect} rooms with correct area`}
-        />
-
-        <ConfusionMatrixCard
-          title="Room Detection Matrix"
-          tp={m.truePositives}
-          fp={m.falsePositives}
-          fn={m.falseNegatives}
-        />
-
-        <ConfusionMatrixCard
-          title="Dimension Extraction Matrix"
-          tp={m.dimensionTP}
-          fp={m.dimensionFP}
-          fn={m.dimensionFN}
-        />
-      </div>
-
-      <div className="bg-card border border-line rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-line">
-          <p className="text-sm font-medium text-[#F0EEE8]">
-            Per-room comparison
-          </p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-[#8B8A82] border-b border-line">
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Page</th>
-                <th className="px-3 py-2">Ground truth</th>
-                <th className="px-3 py-2">GT dimensions</th>
-                <th className="px-3 py-2">AI name</th>
-                <th className="px-3 py-2">AI dimensions</th>
-                <th className="px-3 py-2">Dims OK</th>
-              </tr>
-            </thead>
-            <tbody>
-              {m.pairs.map((row, i) => (
-                <tr key={i} className="border-b border-line/40">
-                  <td className="px-3 py-2">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-xs border capitalize ${statusBadge(row.status)}`}
-                    >
-                      {row.status.replace("_", " ")}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 font-mono text-[#8B8A82]">
-                    {row.gt?.page ?? row.ai?.page ?? "—"}
-                  </td>
-                  <td className="px-3 py-2">{row.gt?.name ?? "—"}</td>
-                  <td className="px-3 py-2 font-mono text-xs">
-                    {row.gt?.lengthFt != null && row.gt?.widthFt != null
-                      ? `${row.gt.lengthFt} × ${row.gt.widthFt} ft`
-                      : "—"}
-                  </td>
-                  <td className="px-3 py-2">{row.ai?.name ?? "—"}</td>
-                  <td className="px-3 py-2 font-mono text-xs">
-                    {row.ai?.lengthFt != null && row.ai?.widthFt != null
-                      ? `${row.ai.lengthFt} × ${row.ai.widthFt} ft`
-                      : "—"}
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.dimensionsMatch ? (
-                      <span className="text-emerald-400">Yes</span>
-                    ) : (
-                      <span className="text-[#8B8A82]">No</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  );
+  return <TestSuiteMetrics results={results} />
 }

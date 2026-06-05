@@ -1,35 +1,29 @@
 """
-infrastructure/rasterizer/pdf_rasterizer.py
-
 Converts PDF pages to JPEG bytes using PyMuPDF (fitz).
-No poppler dependency — works on all platforms without PATH configuration.
-
-FIX vs original pdf.py:
-  - Removed hardcoded Windows poppler path
-  - Replaced pdf2image with PyMuPDF (faster, zero system dep)
-  - DPI comes from settings, not a magic number
-  - Proper error wrapping
-  - Returns all pages, not just first
+Extracts embedded text per page for sheet-type classification.
 """
 from __future__ import annotations
 
-from io import BytesIO
-
-import fitz  # PyMuPDF
+import fitz
 
 from config.settings import get_settings
 from domain.exceptions import RasterizationError
+from infrastructure.rasterizer.page_raster import RasterizedPage
 
 
-def rasterize_pdf(pdf_bytes: bytes) -> list[tuple[bytes, str]]:
+def _extract_page_text(page: fitz.Page) -> str:
+    try:
+        return page.get_text("text") or ""
+    except Exception:
+        return ""
+
+
+def rasterize_pdf(pdf_bytes: bytes) -> list[RasterizedPage]:
     """
-    Convert every page of a PDF to JPEG bytes.
+    Convert every page of a PDF to JPEG bytes plus embedded text.
 
     Returns:
-        List of (jpeg_bytes, "image/jpeg") — one per page, preserving page order.
-
-    Raises:
-        RasterizationError: if the PDF cannot be opened or a page fails to render.
+        List of RasterizedPage — one per page, preserving order (1-based page_number).
     """
     settings = get_settings()
     dpi = settings.pdf_render_dpi
@@ -43,20 +37,27 @@ def rasterize_pdf(pdf_bytes: bytes) -> list[tuple[bytes, str]]:
             details={"detail": str(exc)},
         ) from exc
 
-    results: list[tuple[bytes, str]] = []
+    results: list[RasterizedPage] = []
 
     for page_num in range(doc.page_count):
         try:
             page = doc.load_page(page_num)
+            pdf_text = _extract_page_text(page)
 
-            # Respect embedded page rotation (deskew handles scan rotation separately)
-            mat = fitz.Matrix(dpi / 72, dpi / 72)   # 72 pt/inch → target DPI
+            mat = fitz.Matrix(dpi / 72, dpi / 72)
             pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB, alpha=False)
-
             jpeg_bytes = pix.tobytes(output="jpeg")
-            results.append((jpeg_bytes, "image/jpeg"))
 
+            results.append(
+                RasterizedPage(
+                    page_number=page_num + 1,
+                    jpeg_bytes=jpeg_bytes,
+                    mime_type="image/jpeg",
+                    pdf_text=pdf_text,
+                )
+            )
         except Exception as exc:
+            doc.close()
             raise RasterizationError(
                 code="PAGE_RENDER_FAILED",
                 message=f"Failed to render page {page_num + 1}: {exc}",
@@ -74,8 +75,18 @@ def rasterize_pdf(pdf_bytes: bytes) -> list[tuple[bytes, str]]:
     return results
 
 
-def rasterize_single_image(image_bytes: bytes, mime_type: str) -> list[tuple[bytes, str]]:
-    """
-    Wraps a single uploaded image as a one-page list for uniform pipeline handling.
-    """
-    return [(image_bytes, mime_type)]
+def rasterize_single_image(image_bytes: bytes, mime_type: str) -> list[RasterizedPage]:
+    """Wrap a single uploaded image as a one-page list for uniform pipeline handling."""
+    return [
+        RasterizedPage(
+            page_number=1,
+            jpeg_bytes=image_bytes,
+            mime_type=mime_type,
+            pdf_text="",
+        )
+    ]
+
+
+def rasterize_pdf_legacy_tuples(pdf_bytes: bytes) -> list[tuple[bytes, str]]:
+    """Backward-compatible tuple API for callers expecting (bytes, mime)."""
+    return [(p.jpeg_bytes, p.mime_type) for p in rasterize_pdf(pdf_bytes)]

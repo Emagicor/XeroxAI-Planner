@@ -1,5 +1,5 @@
 import GroundTruthUpload from './GroundTruthUpload'
-import TestSuiteMetrics from './TestSuiteMetrics'
+import { TestSuiteSingleMetrics } from './TestSuiteMetrics'
 
 /**
  * Shown on Test Suite tab when an analysis result already exists (e.g. from Analyze tab).
@@ -19,11 +19,12 @@ export default function TestSuitePanel({
     <div className="mb-8">
       <div className="mb-4 p-4 rounded-xl border border-accent/25 bg-accent/5">
         <p className="text-sm font-medium text-[#F0EEE8]">
-          Using your current analysis session
+          Score your current Analyze tab run
         </p>
         <p className="text-xs text-[#8B8A82] mt-1">
-          Results are shared across Analyze and Test Suite. Upload ground truth JSON
-          below to score this run — no need to analyze again.
+          Upload ground truth JSON to compare against this session. Batch runs reuse
+          the same result when the file hash matches; otherwise each case calls /analyze
+          again (model output may differ slightly between runs).
         </p>
       </div>
 
@@ -36,7 +37,7 @@ export default function TestSuitePanel({
 
       {groundTruth && (
         <div className="mt-6">
-          <TestSuiteMetrics
+          <TestSuiteSingleMetrics
             groundTruth={groundTruth}
             aiResult={aiResult}
             evalError={groundTruthError}

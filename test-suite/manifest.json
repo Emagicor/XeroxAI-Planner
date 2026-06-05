@@ -1,0 +1,28 @@
+{
+  "cases": [
+    {
+      "id": "data18",
+      "label": "Data18",
+      "inputFile": "Data18.jpg",
+      "groundTruthFile": "Data18_ground_truth (3).json",
+      "permanent": true,
+      "createdAt": "2026-06-05T05:30:00+00:00"
+    },
+    {
+      "id": "data20",
+      "label": "Data20",
+      "inputFile": "Data20.pdf",
+      "groundTruthFile": "Data20_ground_truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-05T05:30:00+00:00"
+    },
+    {
+      "id": "data27",
+      "label": "Data27",
+      "inputFile": "Data27.jpg",
+      "groundTruthFile": "Data27_ground_truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-05T05:30:00+00:00"
+    }
+  ]
+}

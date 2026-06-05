@@ -106,6 +106,7 @@ class PageResult:
 class AnalyzeJob:
     filename: str
     file_size_bytes: int
+    content_sha256: str = ""
     job_id: str = field(default_factory=lambda: str(uuid4()))
     status: JobStatus = JobStatus.PENDING
     total_pages: int | None = None

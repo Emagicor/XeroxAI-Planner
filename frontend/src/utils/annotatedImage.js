@@ -16,8 +16,10 @@ export function annotatedImageApiUrl(jobId, pageNumber) {
 }
 
 export function resolveAnnotatedSrc({ jobId, page, inlineBase64, hasAnnotated }) {
+  const inline = inlineAnnotatedSrc(inlineBase64)
+  if (inline) return inline
   if (hasAnnotated && jobId && page) {
     return annotatedImageApiUrl(jobId, page)
   }
-  return inlineAnnotatedSrc(inlineBase64)
+  return null
 }

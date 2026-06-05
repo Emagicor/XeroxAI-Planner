@@ -25,7 +25,8 @@ export default function SummaryCards({ doc, displayTotal, unit, roomCount }) {
         <p className="font-mono text-lg font-medium text-[#F0EEE8]">
           {doc.pageCount}{' '}
           <span className="text-sm text-[#8B8A82]">
-            ({doc.eligiblePages} ok, {doc.ineligiblePages} skip)
+            ({doc.eligiblePages} plan{doc.eligiblePages !== 1 ? 's' : ''},{' '}
+            {doc.ineligiblePages} skipped)
           </span>
         </p>
       </StatCard>

@@ -2,6 +2,16 @@
   "pages": [
     {
       "page_number": 1,
+      "eligible": false,
+      "comment": "Cover/title sheet — omit rooms or set eligible false"
+    },
+    {
+      "page_number": 2,
+      "eligible": false,
+      "comment": "Drawing index — not a floor plan"
+    },
+    {
+      "page_number": 3,
       "rooms": [
         {
           "name": "Living Room",

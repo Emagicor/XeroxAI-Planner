@@ -53,7 +53,7 @@ export function useFloorPlanAnalysis() {
     setResult(null)
 
     try {
-      const data = await analyzeFloorPlan(file)
+      const data = await analyzeFloorPlan(file, { isolateUpload: true })
       setResult(data)
     } catch (err) {
       setError(err.message)

@@ -60,7 +60,7 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
 
@@ -72,7 +72,12 @@ def create_app() -> FastAPI:
     app.include_router(analyze.router, tags=["analyze"])
     app.include_router(export.router, tags=["export"])
 
-    log.info("app.created", env=settings.app_env, provider=settings.vision_provider)
+    log.info(
+        "app.created",
+        env=settings.app_env,
+        provider=settings.vision_provider,
+        gemini_model=settings.gemini_model if settings.vision_provider == "gemini" else None,
+    )
     return app
 
 

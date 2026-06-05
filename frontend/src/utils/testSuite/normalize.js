@@ -2,10 +2,11 @@
  * Normalize ground-truth or AI analyze responses into comparable room records.
  */
 
+/** Match analyze tab row parsing — keep 0, only drop non-finite values. */
 function parseNum(v) {
   if (v == null || v === '') return null
   const n = Number(v)
-  return Number.isFinite(n) && n > 0 ? n : null
+  return Number.isFinite(n) ? n : null
 }
 
 function normalizeName(name) {
@@ -53,6 +54,7 @@ export function extractRoomsFromPayload(data) {
   const pages = data.pages ?? []
   for (const page of pages) {
     const pageNum = page.page_number ?? page.page ?? 1
+    // Same rule as normalizeAnalyzeResponse: only skip explicitly ineligible pages.
     if (page.eligible === false) continue
     for (const room of page.rooms ?? []) {
       pushRoom(room, pageNum)
@@ -60,6 +62,37 @@ export function extractRoomsFromPayload(data) {
   }
 
   return out
+}
+
+/**
+ * Human-readable reason when analyze JSON cannot be evaluated (no extractable rooms).
+ * @param {object} aiJson
+ * @returns {string|null}
+ */
+export function describeAnalyzeEvalBlocker(aiJson) {
+  if (extractRoomsFromPayload(aiJson).length) return null
+
+  const pages = aiJson?.pages ?? []
+  if (!pages.length) {
+    const detail = aiJson?.detail
+    const msg =
+      (typeof detail === 'object' && detail?.message) ||
+      (typeof detail === 'string' ? detail : null) ||
+      aiJson?.error_message ||
+      aiJson?.message
+    return msg ? `Analysis failed: ${msg}` : 'Analyze response has no pages.'
+  }
+
+  const reason = pages
+    .filter((p) => p.eligible === false)
+    .map((p) => p.ineligible_reason)
+    .find(Boolean)
+
+  if (reason) {
+    return `Analysis produced no rooms: ${reason}`
+  }
+
+  return 'AI response contains no rooms to compare.'
 }
 
 export function parseGroundTruthFile(text) {

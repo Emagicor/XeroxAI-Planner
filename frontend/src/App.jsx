@@ -5,8 +5,11 @@ import ResultsSection from './components/ResultsSection'
 import UploadSection from './components/UploadSection'
 import VantaBackground from './components/VantaBackground'
 import TestSuitePanel from './components/testSuite/TestSuitePanel'
+import TestSuiteMetrics from './components/testSuite/TestSuiteMetrics'
+import TestSuiteProgressPanel from './components/testSuite/TestSuiteProgressPanel'
 import TestSuiteUploadSection from './components/testSuite/TestSuiteUploadSection'
 import { useFloorPlanAnalysis } from './hooks/useFloorPlanAnalysis'
+import { useTestSuiteBatch } from './hooks/useTestSuiteBatch'
 import { parseGroundTruthFile } from './utils/testSuite/normalize'
 
 function App() {
@@ -21,17 +24,19 @@ function App() {
     file,
     preview,
     result,
-    loading,
-    loadingStep,
-    loadingSteps,
-    error,
-    fileInputRef,
+    loading: analyzeLoading,
+    loadingStep: analyzeLoadingStep,
+    loadingSteps: analyzeLoadingSteps,
+    error: analyzeError,
+    fileInputRef: analyzeFileInputRef,
     handleFileSelect,
     handleDrop,
     handleUpload,
-    resetAll,
+    resetAll: resetAnalyze,
     retryUpload,
   } = analysis
+
+  const testSuite = useTestSuiteBatch({ cachedAnalyzeResult: result })
 
   const isTestSuite = appMode === 'testSuite'
 
@@ -55,20 +60,17 @@ function App() {
     setGroundTruthError(null)
   }, [])
 
-  const handleModeChange = (mode) => {
-    setAppMode(mode)
-  }
-
   const handleReset = () => {
-    resetAll()
+    resetAnalyze()
+    testSuite.clearRunState()
     handleGroundTruthClear()
   }
 
-  const canRunTestSuite = Boolean(file && groundTruth)
-
   const showAnalyzeUpload = !result && !isTestSuite
-  const showTestSuiteUpload = !result && isTestSuite
-  const showResults = Boolean(result)
+  const showTestSuiteSetup = isTestSuite && !testSuite.loading && !testSuite.batchComplete
+  const showTestSuiteProgress = isTestSuite && testSuite.loading
+  const showBatchResults = isTestSuite && testSuite.batchComplete
+  const showAnalyzeResults = Boolean(result) && !isTestSuite
 
   return (
     <div className="relative min-h-screen font-sans antialiased">
@@ -78,17 +80,17 @@ function App() {
         <Header />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <AppModeTabs mode={appMode} onChange={handleModeChange} />
+          <AppModeTabs mode={appMode} onChange={setAppMode} />
 
           {showAnalyzeUpload && (
             <UploadSection
               file={file}
               preview={preview}
-              loading={loading}
-              loadingStep={loadingStep}
-              loadingSteps={loadingSteps}
-              error={error}
-              fileInputRef={fileInputRef}
+              loading={analyzeLoading}
+              loadingStep={analyzeLoadingStep}
+              loadingSteps={analyzeLoadingSteps}
+              error={analyzeError}
+              fileInputRef={analyzeFileInputRef}
               onFileSelect={handleFileSelect}
               onDrop={handleDrop}
               onUpload={handleUpload}
@@ -96,46 +98,66 @@ function App() {
             />
           )}
 
-          {showTestSuiteUpload && (
+          {showTestSuiteSetup && (
             <TestSuiteUploadSection
-              file={file}
-              preview={preview}
-              loading={loading}
-              loadingStep={loadingStep}
-              loadingSteps={loadingSteps}
-              error={error}
-              fileInputRef={fileInputRef}
-              onFileSelect={handleFileSelect}
-              onDrop={handleDrop}
-              onUpload={handleUpload}
-              onRetry={retryUpload}
+              cases={testSuite.cases}
+              casesLoading={testSuite.casesLoading}
+              casesLoadError={testSuite.casesLoadError}
+              loading={testSuite.loading}
+              readyCount={testSuite.readyCount}
+              error={testSuite.error}
+              bulkInputRef={testSuite.bulkInputRef}
+              onAddEmptyCase={testSuite.addEmptyCase}
+              onAddInputFiles={testSuite.addInputFiles}
+              onBulkDrop={testSuite.handleBulkInputDrop}
+              onCaseInputSelect={testSuite.setCaseInputFile}
+              onCaseGroundTruthSelect={testSuite.setCaseGroundTruth}
+              onCaseGroundTruthClear={testSuite.clearCaseGroundTruth}
+              onSaveCase={testSuite.saveCase}
+              onRemoveCase={testSuite.removeCase}
+              onReloadCases={testSuite.reloadCases}
+              canRun={testSuite.canRun}
+              unsavedCount={testSuite.unsavedCount}
+              onRun={testSuite.runBatch}
+              onRetry={testSuite.retryBatch}
+            />
+          )}
+
+          {showTestSuiteProgress && (
+            <TestSuiteProgressPanel
+              runProgress={testSuite.runProgress}
+              currentIndex={testSuite.currentIndex}
+              loadingStep={testSuite.loadingStep}
+              loadingSteps={testSuite.loadingSteps}
+              totalCases={testSuite.cases.length}
+            />
+          )}
+
+          {showBatchResults && (
+            <TestSuiteMetrics
+              results={testSuite.results}
+              onNewBatch={handleReset}
+            />
+          )}
+
+          {result && isTestSuite && !testSuite.batchComplete && !testSuite.loading && (
+            <TestSuitePanel
+              hasResult
+              groundTruth={groundTruth}
               groundTruthFileName={groundTruthFileName}
               groundTruthError={groundTruthError}
+              aiResult={result}
               onGroundTruthSelect={handleGroundTruthSelect}
               onGroundTruthClear={handleGroundTruthClear}
-              canRun={canRunTestSuite}
             />
           )}
 
-          {showResults && (
-            <>
-              <div className={isTestSuite ? '' : 'hidden'} aria-hidden={!isTestSuite}>
-                <TestSuitePanel
-                  hasResult
-                  groundTruth={groundTruth}
-                  groundTruthFileName={groundTruthFileName}
-                  groundTruthError={groundTruthError}
-                  aiResult={result}
-                  onGroundTruthSelect={handleGroundTruthSelect}
-                  onGroundTruthClear={handleGroundTruthClear}
-                />
-              </div>
-              <ResultsSection
-                result={result}
-                onReset={handleReset}
-                showJsonDownload
-              />
-            </>
+          {showAnalyzeResults && (
+            <ResultsSection
+              result={result}
+              onReset={handleReset}
+              showJsonDownload
+            />
           )}
         </main>
       </div>

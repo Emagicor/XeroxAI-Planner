@@ -1,0 +1,46 @@
+{
+  "filename": "Data18.jpg",
+  "exported_at": "2026-06-04T13:23:29.477Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "rooms": [
+        {
+          "name": "Shop",
+          "length_ft": 37,
+          "width_ft": 29,
+          "area_sqft": 1073,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bedroom",
+          "length_ft": 13.75,
+          "width_ft": 10,
+          "area_sqft": 137.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bath",
+          "length_ft": 10,
+          "width_ft": 5,
+          "area_sqft": 50,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bar",
+          "length_ft": 12.25,
+          "width_ft": 10,
+          "area_sqft": 122.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Living Rm.",
+          "length_ft": 17.58,
+          "width_ft": 12.5,
+          "area_sqft": 219.75,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

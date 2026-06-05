@@ -57,6 +57,17 @@ export function buildGroundTruthDocument(doc, { includedOnly = true } = {}) {
     .sort(([a], [b]) => a - b)
     .map(([page_number, rooms]) => ({ page_number, rooms }))
 
+  // Include skipped non-plan pages from analysis so multi-page GT stays aligned
+  if (doc.pageSummaries?.length) {
+    const included = new Set(pages.map((p) => p.page_number))
+    for (const summary of doc.pageSummaries) {
+      if (!summary.eligible && !included.has(summary.page)) {
+        pages.push({ page_number: summary.page, eligible: false, rooms: [] })
+      }
+    }
+    pages.sort((a, b) => a.page_number - b.page_number)
+  }
+
   return {
     filename: doc.filename ?? null,
     exported_at: new Date().toISOString(),

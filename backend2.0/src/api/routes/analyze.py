@@ -19,8 +19,8 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 
 from api.schemas.analyze import AnalyzeResponseSchema, PageSchema, RoomSchema
-from application.orchestrators.analyze_orchestrator import run_analyze_pipeline
-from application.use_cases.job_store import get_job
+from infrastructure.isolated_runner import run_analyze_pipeline_isolated
+from application.use_cases.job_store import get_job, save_job
 from domain.entities.job import AnalyzeJob, JobStatus
 from domain.exceptions import IngestionError
 
@@ -31,6 +31,9 @@ router = APIRouter()
 # ── Mapping helpers ───────────────────────────────────────────────────────────
 
 def _job_to_response(job: AnalyzeJob) -> dict:
+    # Inline annotation in JSON for single-page uploads (no extra GET required)
+    inline_annotation = len(job.pages) == 1
+
     pages = [
         PageSchema(
             page_number=p.page_number,
@@ -59,6 +62,9 @@ def _job_to_response(job: AnalyzeJob) -> dict:
             overall_confidence=p.overall_confidence,
             units_detected=p.units_detected,
             has_annotated_image=bool(p.annotated_image),
+            annotated_image=(
+                p.annotated_image if inline_annotation and p.annotated_image else None
+            ),
         )
         for p in job.pages
     ]
@@ -66,6 +72,7 @@ def _job_to_response(job: AnalyzeJob) -> dict:
     payload = AnalyzeResponseSchema(
         job_id=job.job_id,
         filename=job.filename,
+        content_sha256=job.content_sha256,
         status=job.status.value,
         total_pages=job.total_pages,
         pages=pages,
@@ -128,10 +135,13 @@ async def analyze(file: UploadFile = File(...)):
     """
     file_bytes, filename, mime = await _read_upload(file)
 
-    # Run the blocking pipeline in a thread so we don't block the event loop
+    # Isolated subprocess — no in-process SDK/state bleed between back-to-back uploads
     job: AnalyzeJob = await asyncio.to_thread(
-        run_analyze_pipeline, filename, file_bytes, mime
+        run_analyze_pipeline_isolated, filename, file_bytes, mime
     )
+
+    # Worker subprocess save_job is not visible here — persist for GET .../annotated
+    save_job(job)
 
     if job.status == JobStatus.FAILED:
         # Distinguish ingestion failures (422) from pipeline failures (500)
@@ -140,6 +150,13 @@ async def analyze(file: UploadFile = File(...)):
             "TOO_MANY_PAGES", "CORRUPT_PDF", "PASSWORD_PROTECTED",
             "MALWARE_SUSPECTED", "EMPTY_FILE",
         ) else 500
+        # Surface missing/invalid API keys as 503 so clients show a clear message
+        if job.error_code in (
+            "MISSING_API_KEY",
+            "QUOTA_EXCEEDED",
+            "VISION_PROVIDER_ERROR",
+        ):
+            status_code = 503
         raise HTTPException(
             status_code=status_code,
             detail={"code": job.error_code, "message": job.error_message},
@@ -164,40 +181,36 @@ async def analyze_stream(file: UploadFile = File(...)):
     for each blocking page analysis call so the event loop stays free.
     """
     from infrastructure.rasterizer.pdf_rasterizer import rasterize_pdf, rasterize_single_image
-    from infrastructure.preprocessing.image_preprocessor import preprocess_image
     from pipelines.ingestion.file_validator import validate_upload
-    from pipelines.extraction.page_analyzer import analyze_page_safe
-    from pipelines.processing.page_classifier import classify_page, PageType
-    from providers.vision.factory import get_vision_provider
-    from application.orchestrators.analyze_orchestrator import _build_page_result
+    from pipelines.processing.page_processor import process_rasterized_page
+    from uuid import uuid4
 
     file_bytes, filename, mime = await _read_upload(file)
+    stream_session_id = str(uuid4())
 
     async def _event_stream():
         try:
-            # Validate
             detected_mime, _ = await asyncio.to_thread(
                 validate_upload, filename, file_bytes, mime
             )
 
-            # Rasterize
             if detected_mime == "application/pdf":
                 pages = await asyncio.to_thread(rasterize_pdf, file_bytes)
             else:
                 pages = rasterize_single_image(file_bytes, detected_mime)
 
             total_pages = len(pages)
-            provider = get_vision_provider()
             grand_total = 0.0
             eligible = ineligible = 0
 
-            for idx, (img_bytes, img_mime) in enumerate(pages, start=1):
+            for page in pages:
                 try:
-                    page_type = classify_page(img_bytes, idx)
-                    raw = await asyncio.to_thread(
-                        analyze_page_safe, provider, img_bytes, img_mime, idx
+                    page_result = await asyncio.to_thread(
+                        process_rasterized_page,
+                        page,
+                        total_pages,
+                        session_id=stream_session_id,
                     )
-                    page_result = _build_page_result(idx, page_type, raw)
 
                     if page_result.eligible:
                         eligible += 1
@@ -206,10 +219,10 @@ async def analyze_stream(file: UploadFile = File(...)):
                         ineligible += 1
 
                     event = {
-                        "type":        "progress",
-                        "page":        idx,
+                        "type": "progress",
+                        "page": page.page_number,
                         "total_pages": total_pages,
-                        "data":        PageSchema(
+                        "data": PageSchema(
                             page_number=page_result.page_number,
                             page_type=page_result.page_type.value,
                             eligible=page_result.eligible,
@@ -223,14 +236,17 @@ async def analyze_stream(file: UploadFile = File(...)):
                     }
 
                 except Exception as exc:
-                    # Per-page isolation — log and continue
-                    log.error("stream.page_error", page=idx, error=str(exc))
+                    log.error("stream.page_error", page=page.page_number, error=str(exc))
                     ineligible += 1
                     event = {
-                        "type":        "progress",
-                        "page":        idx,
+                        "type": "progress",
+                        "page": page.page_number,
                         "total_pages": total_pages,
-                        "data":        {"eligible": False, "reason": str(exc)},
+                        "data": {
+                            "page_number": page.page_number,
+                            "eligible": False,
+                            "ineligible_reason": str(exc),
+                        },
                     }
 
                 yield f"data: {json.dumps(event)}\n\n"

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   createEmptyRoom,
   grandTotalSqft,
@@ -24,6 +24,22 @@ export function useReviewState(analyzeData) {
   const [activePage, setActivePage] = useState(() => doc?.defaultPage ?? 1)
   const [activeRoom, setActiveRoom] = useState(null)
   const [activeRowId, setActiveRowId] = useState(null)
+
+  // Keep review table in sync when the parent passes a new /analyze payload (retry, new file).
+  useEffect(() => {
+    if (!analyzeData) {
+      setDoc(null)
+      setActivePage(1)
+      setActiveRoom(null)
+      setActiveRowId(null)
+      return
+    }
+    const next = normalizeAnalyzeResponse(analyzeData)
+    setDoc(next)
+    setActivePage(next.defaultPage ?? 1)
+    setActiveRoom(null)
+    setActiveRowId(null)
+  }, [analyzeData])
 
   const rows = doc?.rows ?? []
 

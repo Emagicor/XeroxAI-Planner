@@ -1,14 +1,13 @@
 """
 Preprocess floor-plan images before sending to the vision model.
 
-Uses the same pipeline as the legacy backend (upscale, contrast, sharpen)
-which benchmarks better than deskew/denoise for architectural drawings.
+Optimized for architectural line drawings: upscale, autocontrast, sharpen.
 """
 from __future__ import annotations
 
 from io import BytesIO
 
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 from config.settings import get_settings
 
@@ -27,9 +26,12 @@ def preprocess_image(image_bytes: bytes) -> bytes:
             Image.Resampling.LANCZOS,
         )
 
+    # Improve line contrast for thin architectural strokes
+    img = ImageOps.autocontrast(img, cutoff=1)
     img = ImageEnhance.Contrast(img).enhance(settings.contrast_factor)
     img = img.filter(ImageFilter.SHARPEN)
+    img = img.filter(ImageFilter.UnsharpMask(radius=1.2, percent=130, threshold=2))
 
     buffer = BytesIO()
-    img.save(buffer, format="JPEG", quality=settings.jpeg_quality)
+    img.save(buffer, format="JPEG", quality=settings.jpeg_quality, optimize=True)
     return buffer.getvalue()
