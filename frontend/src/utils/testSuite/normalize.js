@@ -17,7 +17,7 @@ function normalizeName(name) {
 }
 
 /**
- * @typedef {{ page: number, name: string, normName: string, lengthFt: number|null, widthFt: number|null, areaSqft: number|null, source: string }} NormRoom
+ * @typedef {{ page: number, planNumber: number, sourcePage: number, floorLabel: string|null, name: string, normName: string, lengthFt: number|null, widthFt: number|null, areaSqft: number|null, source: string }} NormRoom
  */
 
 /**
@@ -29,7 +29,7 @@ export function extractRoomsFromPayload(data) {
 
   const out = []
 
-  const pushRoom = (room, page) => {
+  const pushRoom = (room, page, meta = {}) => {
     const name = room.name ?? room.area_name ?? room.room_name ?? 'Unknown'
     const lengthFt = parseNum(room.length_ft ?? room.lengthFt ?? room.length)
     const widthFt = parseNum(room.width_ft ?? room.widthFt ?? room.width ?? room.breadth_ft)
@@ -37,6 +37,9 @@ export function extractRoomsFromPayload(data) {
 
     out.push({
       page,
+      planNumber: meta.planNumber ?? page,
+      sourcePage: meta.sourcePage ?? page,
+      floorLabel: meta.floorLabel ?? null,
       name: String(name),
       normName: normalizeName(name),
       lengthFt,
@@ -47,17 +50,30 @@ export function extractRoomsFromPayload(data) {
   }
 
   if (Array.isArray(data.rooms)) {
-    data.rooms.forEach((r) => pushRoom(r, data.page ?? data.page_number ?? 1))
+    const planNumber = data.plan_number ?? data.page ?? data.page_number ?? 1
+    const sourcePage = data.source_page ?? data.sourcePage ?? data.page_number ?? planNumber
+    data.rooms.forEach((r) =>
+      pushRoom(r, planNumber, {
+        planNumber,
+        sourcePage,
+        floorLabel: data.floor_label ?? data.floorLabel ?? null,
+      }),
+    )
     return out
   }
 
   const pages = data.pages ?? []
   for (const page of pages) {
-    const pageNum = page.page_number ?? page.page ?? 1
+    const pageNum = page.plan_number ?? page.page ?? page.page_number ?? 1
+    const sourcePage = page.source_page ?? page.sourcePage ?? page.page_number ?? pageNum
     // Same rule as normalizeAnalyzeResponse: only skip explicitly ineligible pages.
     if (page.eligible === false) continue
     for (const room of page.rooms ?? []) {
-      pushRoom(room, pageNum)
+      pushRoom(room, pageNum, {
+        planNumber: pageNum,
+        sourcePage,
+        floorLabel: page.floor_label ?? page.floorLabel ?? null,
+      })
     }
   }
 

@@ -17,15 +17,15 @@ def test_classify_floorplan_from_text():
     assert classify_page_from_text(text) == PageType.FLOORPLAN
 
 
-def test_skip_cover_first_page_multi_pdf():
+def test_ambiguous_first_page_multi_pdf_goes_to_vision():
     page_type, reason = classify_page(
         page_number=1,
         total_pages=5,
         pdf_text="ACME RESIDENCE\nPrepared by Architect",
     )
-    assert page_type == PageType.COVER
-    assert should_skip_before_vision(page_type)
-    assert "first page" in reason.lower() or "cover" in reason.lower() or "title" in reason.lower()
+    assert page_type == PageType.UNKNOWN
+    assert not should_skip_before_vision(page_type)
+    assert "vision" in reason.lower()
 
 
 def test_single_page_defaults_to_floorplan():

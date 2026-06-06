@@ -1,0 +1,97 @@
+{
+  "filename": "Data9.png",
+  "exported_at": "2026-06-06T12:04:19.900Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Unit Plan",
+      "rooms": [
+        {
+          "name": "Junior Suite",
+          "length_ft": 17.33,
+          "width_ft": 12.5,
+          "area_sqft": 216.62,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Junior Bath",
+          "length_ft": 9.5,
+          "width_ft": 6.67,
+          "area_sqft": 63.37,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Dining Room",
+          "length_ft": 21.17,
+          "width_ft": 14.17,
+          "area_sqft": 299.98,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Kitchen",
+          "length_ft": 16.5,
+          "width_ft": 9.83,
+          "area_sqft": 162.19,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Covered Deck",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        },
+        {
+          "name": "Staircase",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        },
+        {
+          "name": "Great Room",
+          "length_ft": 21.17,
+          "width_ft": 15,
+          "area_sqft": 317.55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Main Suite",
+          "length_ft": 21.17,
+          "width_ft": 11.5,
+          "area_sqft": 243.46,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Laundry",
+          "length_ft": 9,
+          "width_ft": 8,
+          "area_sqft": 72,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Wardrobe",
+          "length_ft": 11,
+          "width_ft": 9.5,
+          "area_sqft": 104.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Main Bath",
+          "length_ft": 13.33,
+          "width_ft": 9.5,
+          "area_sqft": 126.64,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Sun Deck",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        }
+      ]
+    }
+  ]
+}

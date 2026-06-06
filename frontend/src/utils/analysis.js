@@ -3,6 +3,7 @@
  */
 
 import { pageTypeLabel } from './pageTypes'
+import { planFloorLabel } from './scenarios'
 
 let _rowId = 0
 function nextRowId() {
@@ -18,29 +19,47 @@ export function normalizeAnalyzeResponse(data) {
   const pageSummaries = []
 
   for (const page of pages) {
-    const pageNum = page.page_number ?? page.page ?? 0
+    const pageNum = page.plan_number ?? page.page_number ?? page.page ?? 0
+    const sourcePage = page.source_page ?? page.sourcePage ?? page.page_number ?? pageNum
     const eligible = page.eligible !== false
     const pageType = page.page_type ?? page.pageType ?? (eligible ? 'floorplan' : 'unknown')
     const pageRooms = page.rooms ?? []
+    const floorLabel = page.floor_label ?? planFloorLabel({
+      page: pageNum,
+      source_page: sourcePage,
+      region_index: page.region_index,
+    })
 
     pageSummaries.push({
       page: pageNum,
+      planNumber: pageNum,
+      sourcePage,
+      regionIndex: page.region_index ?? 1,
       eligible,
       pageType,
       reason: page.ineligible_reason ?? page.reason ?? null,
       roomCount: eligible ? pageRooms.length : 0,
       totalAreaSqft: eligible ? Number(page.total_area_sqft ?? 0) : 0,
       label: pageTypeLabel(pageType),
+      floorLabel,
+      regionLabel: page.region_label ?? null,
+      detectionConfidence: page.detection_confidence ?? null,
+      detectionMethod: page.detection_method ?? null,
+      clipPreview: page.clip_preview ?? null,
     })
 
     const hasAnnotated =
       Boolean(page.has_annotated_image) || Boolean(page.annotated_image)
 
-    if (hasAnnotated && eligible) {
+    const clipPreview = page.clip_preview ?? null
+
+    if ((hasAnnotated || clipPreview) && eligible) {
       annotatedPages.push({
         page: pageNum,
+        floorLabel,
         annotatedImage: page.annotated_image ?? null,
-        hasAnnotated: true,
+        clipPreview,
+        hasAnnotated: Boolean(page.annotated_image),
         rooms: pageRooms.map((r, i) => ({
           name: r.name,
           roomIndex: i,
@@ -60,7 +79,9 @@ export function normalizeAnalyzeResponse(data) {
       rows.push({
         id: nextRowId(),
         page: pageNum,
-        floor: `Page ${pageNum}`,
+        planNumber: pageNum,
+        sourcePage,
+        floor: floorLabel,
         name: '—',
         lengthFt: null,
         widthFt: null,
@@ -81,7 +102,9 @@ export function normalizeAnalyzeResponse(data) {
       rows.push({
         id: room.room_id ?? nextRowId(),
         page: pageNum,
-        floor: `Page ${pageNum}`,
+        planNumber: pageNum,
+        sourcePage,
+        floor: floorLabel,
         name: room.name ?? 'Unknown',
         lengthFt: room.length_ft ?? null,
         widthFt: room.width_ft ?? null,
@@ -108,6 +131,9 @@ export function normalizeAnalyzeResponse(data) {
     jobId: data.job_id ?? data.jobId ?? null,
     filename: data.filename ?? '',
     pageCount: data.total_pages ?? data.page_count ?? pages.length,
+    sourcePageCount: data.source_page_count ?? null,
+    totalRegions: data.total_regions ?? pages.length,
+    scenario: data.scenario ?? null,
     eligiblePages: data.eligible_pages ?? 0,
     ineligiblePages: data.ineligible_pages ?? ineligiblePages.length,
     ineligibleList: ineligiblePages,
@@ -165,6 +191,8 @@ export function rowToExportRecord(row, unit, convertAreaFromSqft, unitLabelFn) {
   return {
     page_floor: row.floor,
     page: row.page,
+    plan_number: row.planNumber ?? row.page,
+    source_page: row.sourcePage ?? row.page,
     area_name: row.name,
     length_ft: row.lengthFt,
     width_ft: row.widthFt,

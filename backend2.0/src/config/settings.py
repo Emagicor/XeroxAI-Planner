@@ -45,6 +45,38 @@ class Settings(BaseSettings):
     vision_correction_pass: bool = True  # when two_pass false: 2nd call only if pass-1 weak
     gemini_transient_retries: int = 0  # retries on 503 only; never retries quota (429)
 
+    # ── Grounding DINO detection ──────────────────────────────────────────────
+    # backend: local = IDEA-Research repo on disk; huggingface = transformers hub
+    grounding_dino_backend: str = "local"
+    grounding_dino_enabled: bool = True
+    # Local repo (empty → backend2.0/groundingdino_local)
+    grounding_dino_repo_path: str = ""
+    grounding_dino_config_path: str = ""
+    grounding_dino_weights_path: str = ""
+    grounding_dino_model: str = "IDEA-Research/grounding-dino-tiny"
+    grounding_dino_prompt: str = (
+        "individual floor plan . building floor plan . architectural floor plan ."
+    )
+    grounding_dino_threshold: float = 0.30
+    grounding_dino_threshold_fallback: float = 0.22
+    grounding_dino_text_threshold: float = 0.25
+    grounding_dino_nms_iou: float = 0.6
+    grounding_dino_device: str = "cuda"  # cpu | cuda
+    # Crop padding + refinement (reduce over-tight clips)
+    detection_bbox_padding: float = 0.10
+    detection_bbox_padding_px: int = 44
+    detection_clip_padding_ratio: float = 0.035
+    detection_clip_padding_px: int = 20
+    detection_min_area_ratio: float = 0.04
+    detection_min_plan_area_ratio: float = 0.08
+    detection_wide_aspect_ratio: float = 1.55
+    detection_merge_iou: float = 0.05
+    detection_merge_gap_ratio: float = 0.01
+    detection_duplicate_iou: float = 0.55
+    detection_dominant_plan_ratio: float = 0.50
+    detection_fragment_max_ratio: float = 0.22
+    detection_full_page_snap_ratio: float = 0.82
+
     # ── Benchmarking ─────────────────────────────────────────────────────────
     benchmark_mode: bool = False       # logs token/image usage when True
 

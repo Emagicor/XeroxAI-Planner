@@ -1,19 +1,52 @@
 @import 'tailwindcss';
 
+:root {
+  /* Light theme - Clean & Professional (Govrix-inspired) */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --accent: #0f9f74;        /* Rich emerald-teal */
+  --accent-bright: #10b981;
+  --line: #e2e8f0;
+  --muted: #64748b;         /* Slate gray text */
+  --text: #0f172a;          /* Dark navy/slate text */
+  --grid-color: rgba(15, 23, 42, 0.06);
+  --glow-1: rgba(16, 185, 129, 0.08);
+  --glow-2: rgba(16, 185, 129, 0.04);
+}
+
+:root.dark {
+  /* Dark theme - Original */
+  --bg: #08090d;
+  --surface: #12141c;
+  --card: #1a1d28;
+  --accent: #1d9e75;
+  --accent-bright: #22c48a;
+  --line: #2a2e3d;
+  --muted: #8b8a82;
+  --text: #f0eee8;
+  --grid-color: rgba(255, 255, 255, 0.02);
+  --glow-1: rgba(29, 158, 117, 0.12);
+  --glow-2: rgba(29, 158, 117, 0.06);
+}
+
 @theme {
-  --color-bg: #0f1117;
-  --color-surface: #1a1d27;
-  --color-card: #21242f;
-  --color-accent: #1d9e75;
-  --color-line: #2e3140;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-text: var(--text);
   --font-sans: 'DM Sans', sans-serif;
   --font-mono: 'DM Mono', monospace;
 }
 
 body {
-  background-color: #0f1117;
-  color: #f0eee8;
-  font-family: 'DM Sans', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
@@ -21,4 +54,40 @@ body {
 
 #root {
   min-height: 100vh;
+}
+
+/* Premium dotted background with subtle radial glow (Govrix style) */
+.app-bg {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--glow-1), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, var(--glow-2), transparent),
+    radial-gradient(var(--grid-color) 1.5px, transparent 1.5px);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out forwards;
 }

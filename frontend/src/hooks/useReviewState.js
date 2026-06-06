@@ -78,6 +78,12 @@ export function useReviewState(analyzeData) {
     })
   }, [activePage])
 
+  const selectPlan = useCallback((page) => {
+    setActivePage(page)
+    setActiveRoom(null)
+    setActiveRowId(null)
+  }, [])
+
   const selectRow = useCallback((row) => {
     if (!row || !row.eligible) return
     setActiveRowId(row.id)
@@ -123,6 +129,7 @@ export function useReviewState(analyzeData) {
     activeRoom,
     activeRowId,
     selectRow,
+    selectPlan,
     selectRoomOnPage,
   }
 }

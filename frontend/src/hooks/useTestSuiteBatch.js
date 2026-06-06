@@ -13,6 +13,8 @@ import { evaluateAgainstGroundTruth } from '../utils/testSuite/compare'
 import { cloneFileForUpload, delay } from '../utils/cloneUploadFile'
 import { sha256Hex } from '../utils/fileHash'
 import { parseGroundTruthFile } from '../utils/testSuite/normalize'
+import { toastFromError, toastSuccess, toastWarning } from '../stores/toastStore'
+import { logApiFailure } from '../utils/apiErrors'
 
 /** Gap between cases — full isolation like separate Analyze-tab sessions. */
 const INTER_CASE_DELAY_MS = 2500
@@ -169,7 +171,9 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
         await reloadPersistedCases()
       } catch (err) {
         if (!cancelled) {
-          setCasesLoadError(err.message || 'Could not load saved test cases')
+          const msg = err.message || 'Could not load saved test cases'
+          setCasesLoadError(msg)
+          toastWarning(msg, { title: 'Test suite load failed' })
         }
       } finally {
         if (!cancelled) setCasesLoading(false)
@@ -226,10 +230,13 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
       }
       setCasesLoadError(null)
     } catch (err) {
+      const normalized = logApiFailure(err, { context: 'test-suite/save' })
+      const msg = normalized.userMessage ?? normalized.message
       markCase(caseId, {
         saving: false,
-        saveError: err.message || 'Could not save test case',
+        saveError: msg,
       })
+      toastFromError(normalized, { title: 'Save failed' })
     }
   }
 
@@ -385,7 +392,10 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     try {
       snapshot = await snapshotCasesForBatch(currentCases)
     } catch (err) {
-      setError(err.message || 'Could not read floor plan files')
+      const normalized = logApiFailure(err, { context: 'test-suite/batch' })
+      const msg = normalized.userMessage ?? normalized.message
+      setError(msg)
+      toastFromError(normalized, { title: 'Batch failed to start' })
       setLoading(false)
       return
     }
@@ -484,6 +494,8 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
           ),
         )
       } catch (err) {
+        const normalized = logApiFailure(err, { context: 'test-suite/analyze' })
+        const msg = normalized.userMessage ?? normalized.message
         batchResults.push({
           caseId: testCase.id,
           inputFileName: testCase.inputFileName,
@@ -492,17 +504,35 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
           aiResult: null,
           evaluation: null,
           evalError: null,
-          error: err.message || 'Analysis failed',
+          error: msg,
         })
 
         setRunProgress((prev) =>
           prev.map((item, idx) =>
             idx === i
-              ? { ...item, status: 'error', message: err.message || 'Analysis failed' }
+              ? { ...item, status: 'error', message: msg }
               : item,
           ),
         )
+        toastFromError(normalized, {
+          title: `Case ${i + 1} failed`,
+        })
       }
+    }
+
+    const failed = batchResults.filter((r) => r.error).length
+    if (failed === 0) {
+      toastSuccess(`All ${batchResults.length} test case(s) completed.`, {
+        title: 'Batch complete',
+      })
+    } else if (failed < batchResults.length) {
+      toastWarning(`${failed} of ${batchResults.length} case(s) failed. Expand results for details.`, {
+        title: 'Batch finished with errors',
+      })
+    } else {
+      toastWarning('Every test case failed. Is the backend running?', {
+        title: 'Batch failed',
+      })
     }
 
     setResults(batchResults)

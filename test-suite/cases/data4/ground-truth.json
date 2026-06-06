@@ -1,0 +1,83 @@
+{
+  "filename": "Data4.png",
+  "exported_at": "2026-06-06T11:41:13.118Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Ground Floor",
+      "rooms": [
+        {
+          "name": "BED #1",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Master Bath",
+          "length_ft": 9,
+          "width_ft": 8,
+          "area_sqft": 72,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Closet",
+          "length_ft": 9,
+          "width_ft": 4.5,
+          "area_sqft": 40.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BED #2",
+          "length_ft": 9,
+          "width_ft": 9,
+          "area_sqft": 81,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bath",
+          "length_ft": 8.5,
+          "width_ft": 5,
+          "area_sqft": 42.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "PANTRY",
+          "length_ft": 8.5,
+          "width_ft": 5,
+          "area_sqft": 42.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KIT",
+          "length_ft": 11,
+          "width_ft": 8.67,
+          "area_sqft": 95.37,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DINING",
+          "length_ft": 12.67,
+          "width_ft": 11,
+          "area_sqft": 139.37,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING ROOM",
+          "length_ft": 14,
+          "width_ft": 14,
+          "area_sqft": 196,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "PORCH",
+          "length_ft": 7.33,
+          "width_ft": 7,
+          "area_sqft": 51.31,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

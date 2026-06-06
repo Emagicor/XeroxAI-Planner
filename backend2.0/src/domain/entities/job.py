@@ -79,6 +79,9 @@ class PageResult:
     page_number: int
     page_type: PageType
     eligible: bool
+    plan_number: int | None = None
+    floor_label: str | None = None
+    floor_label_confidence: int | None = None
     rooms: list[RoomResult] = field(default_factory=list)
     ineligible_reason: str | None = None
     total_area_sqft: float = 0.0
@@ -87,6 +90,14 @@ class PageResult:
     overall_confidence: int = 0
     units_detected: str = "feet"
     annotated_image: str | None = None  # base64 JPEG
+    # Grounding DINO region metadata (when a document page yields multiple plans)
+    source_page: int | None = None
+    region_index: int | None = None
+    region_id: str | None = None
+    region_label: str | None = None
+    detection_confidence: float | None = None
+    detection_method: str | None = None
+    clip_preview: str | None = None  # base64 JPEG of clipped region sent to vision
 
     def compute_totals(self) -> None:
         """Recompute total_area_sqft from rooms. Called after all rooms are set."""

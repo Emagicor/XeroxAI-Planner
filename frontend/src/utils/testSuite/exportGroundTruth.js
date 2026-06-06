@@ -46,26 +46,39 @@ export function buildGroundTruthDocument(doc, { includedOnly = true } = {}) {
   const byPage = new Map()
 
   for (const row of source) {
-    const pageNum = row.page ?? 1
+    const pageNum = row.planNumber ?? row.page ?? 1
     if (!byPage.has(pageNum)) {
-      byPage.set(pageNum, [])
+      byPage.set(pageNum, {
+        page_number: row.sourcePage ?? row.page ?? pageNum,
+        plan_number: pageNum,
+        floor_label: row.floor ?? null,
+        rooms: [],
+      })
     }
-    byPage.get(pageNum).push(rowToGroundTruthRoom(row))
+    byPage.get(pageNum).rooms.push(rowToGroundTruthRoom(row))
   }
 
   const pages = [...byPage.entries()]
     .sort(([a], [b]) => a - b)
-    .map(([page_number, rooms]) => ({ page_number, rooms }))
+    .map(([, page]) => page)
 
   // Include skipped non-plan pages from analysis so multi-page GT stays aligned
   if (doc.pageSummaries?.length) {
-    const included = new Set(pages.map((p) => p.page_number))
+    const included = new Set(pages.map((p) => p.plan_number ?? p.page_number))
     for (const summary of doc.pageSummaries) {
-      if (!summary.eligible && !included.has(summary.page)) {
-        pages.push({ page_number: summary.page, eligible: false, rooms: [] })
+      const sourcePage = summary.sourcePage ?? summary.page
+      const planNumber = summary.planNumber ?? summary.page
+      if (!summary.eligible && !included.has(planNumber)) {
+        pages.push({
+          page_number: sourcePage,
+          plan_number: planNumber,
+          floor_label: summary.floorLabel ?? null,
+          eligible: false,
+          rooms: [],
+        })
       }
     }
-    pages.sort((a, b) => a.page_number - b.page_number)
+    pages.sort((a, b) => (a.plan_number ?? a.page_number) - (b.plan_number ?? b.page_number))
   }
 
   return {

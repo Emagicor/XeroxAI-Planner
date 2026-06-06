@@ -6,12 +6,18 @@ Orchestrates the full pipeline for a single uploaded document.
 from __future__ import annotations
 
 import hashlib
+
 import structlog
 
 from domain.entities.job import AnalyzeJob
 from domain.exceptions import ZeroxError
 from infrastructure.rasterizer.pdf_rasterizer import rasterize_pdf, rasterize_single_image
-from pipelines.processing.page_processor import process_rasterized_page
+from pipelines.processing.page_processor import process_analysis_unit
+from application.use_cases.detection_store import get_detection
+from pipelines.processing.region_expander import (
+    expand_to_analysis_units,
+    units_from_document_detection,
+)
 from pipelines.ingestion.file_validator import validate_upload
 from application.use_cases.job_store import save_job
 
@@ -52,10 +58,45 @@ def _finalize_job_status(job: AnalyzeJob) -> None:
     job.mark_complete()
 
 
+def _resolve_analysis_units(
+    pages,
+    *,
+    detection_id: str | None,
+    content_sha256: str,
+    excluded_region_ids: set[str] | None,
+):
+    excluded = excluded_region_ids or set()
+    if detection_id:
+        detection = get_detection(detection_id)
+        if detection is None:
+            raise ZeroxError(
+                "DETECTION_NOT_FOUND",
+                f"Detection '{detection_id}' not found. Re-run detection before analyzing.",
+            )
+        if detection.content_sha256 != content_sha256:
+            raise ZeroxError(
+                "DETECTION_MISMATCH",
+                "Uploaded file does not match the detection session. Re-run detection.",
+            )
+        return units_from_document_detection(
+            detection,
+            pages,
+            excluded_region_ids=excluded,
+        )
+    return expand_to_analysis_units(
+        pages,
+        total_pages=len(pages),
+        excluded_region_ids=excluded,
+    )
+
+
 def run_analyze_pipeline(
     filename: str,
     file_bytes: bytes,
     declared_mime: str | None,
+    *,
+    detection_id: str | None = None,
+    excluded_region_ids: set[str] | None = None,
 ) -> AnalyzeJob:
     """
     Full synchronous pipeline.
@@ -89,21 +130,38 @@ def run_analyze_pipeline(
         else:
             pages = rasterize_single_image(file_bytes, detected_mime)
 
-        job.mark_processing(len(pages))
+        source_page_count = len(pages)
+        units = _resolve_analysis_units(
+            pages,
+            detection_id=detection_id,
+            content_sha256=content_sha256,
+            excluded_region_ids=excluded_region_ids,
+        )
+
+        job.mark_processing(len(units) or source_page_count)
         job.mark_extracting()
 
-        for page in pages:
-            job.advance_page(page.page_number)
+        if not units:
+            log.warning("pipeline.no_analysis_units", job_id=session_id)
+            job.mark_computing()
+            job.mark_complete()
+            save_job(job)
+            return job
+
+        for unit in units:
+            job.advance_page(unit.plan_number)
             log.info(
-                "pipeline.page_start",
+                "pipeline.unit_start",
                 job_id=session_id,
-                page=page.page_number,
-                total=len(pages),
+                plan=unit.plan_number,
+                source_page=unit.source_page,
+                region=unit.region_index,
+                total=len(units),
             )
 
-            page_result = process_rasterized_page(
-                page,
-                len(pages),
+            page_result = process_analysis_unit(
+                unit,
+                len(units),
                 session_id=session_id,
             )
             job.pages.append(page_result)
@@ -116,6 +174,8 @@ def run_analyze_pipeline(
             grand_total=job.grand_total_sqft,
             eligible=len(job.eligible_pages),
             ineligible=len(job.ineligible_pages),
+            source_pages=source_page_count,
+            regions=len(units),
             content_sha256=content_sha256[:16],
         )
 

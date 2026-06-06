@@ -29,8 +29,11 @@ class RoomSchema(BaseModel):
 
 class PageSchema(BaseModel):
     page_number:            int
+    plan_number:            int | None = None
     page_type:              str
     eligible:               bool
+    floor_label:            str | None = None
+    floor_label_confidence: int | None = None
     ineligible_reason:      str | None = None
     rooms:                  list[RoomSchema] = []
     total_area_sqft:        float
@@ -40,6 +43,13 @@ class PageSchema(BaseModel):
     units_detected:         str
     has_annotated_image:    bool = False
     annotated_image:        str | None = None  # base64 JPEG; set for single-page responses
+    source_page:            int | None = None
+    region_index:           int | None = None
+    region_id:              str | None = None
+    region_label:           str | None = None
+    detection_confidence:   float | None = None
+    detection_method:       str | None = None
+    clip_preview:           str | None = None
 
 
 class AnalyzeResponseSchema(BaseModel):
@@ -48,6 +58,9 @@ class AnalyzeResponseSchema(BaseModel):
     content_sha256:     str = ""
     status:             str
     total_pages:        int | None
+    source_page_count:  int | None = None
+    total_regions:      int | None = None
+    scenario:           str | None = None
     pages:              list[PageSchema]
     grand_total_sqft:   float
     eligible_pages:     int

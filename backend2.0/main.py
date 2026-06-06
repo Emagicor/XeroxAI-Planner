@@ -24,7 +24,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.config.settings import get_settings
 from src.api.middleware.error_handler import register_exception_handlers
-from src.api.routes import analyze, export, health
+from src.api.routes import analyze, detect, export, health
 
 
 log = structlog.get_logger(__name__)
@@ -69,6 +69,7 @@ def create_app() -> FastAPI:
 
     # ── Routes ────────────────────────────────────────────────────────────────
     app.include_router(health.router, tags=["health"])
+    app.include_router(detect.router, tags=["detect"])
     app.include_router(analyze.router, tags=["analyze"])
     app.include_router(export.router, tags=["export"])
 

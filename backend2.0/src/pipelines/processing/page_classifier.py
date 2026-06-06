@@ -180,11 +180,12 @@ def classify_page(
                 )
             return page_type, f"Pre-filter: floor plan keywords detected ({page_type.value})."
 
-    # Multi-page PDF: first page with no floor-plan signals is often cover/index
+    # Multi-page PDF: first pages are often covers, but real uploads also place the
+    # ground-floor plan first with weak/no OCR. Keep ambiguous page 1 eligible for
+    # vision instead of silently dropping it.
     if total_pages > 1 and page_number == 1 and not _has_floorplan_signals(combined):
-        return PageType.COVER, (
-            "Pre-filter: first page of multi-page PDF has no floor-plan keywords "
-            "(likely title sheet or drawing index)."
+        return PageType.UNKNOWN, (
+            "Ambiguous first page of multi-page PDF - vision model will verify."
         )
 
     # Last pages in large sets are sometimes notes/schedules without strong OCR

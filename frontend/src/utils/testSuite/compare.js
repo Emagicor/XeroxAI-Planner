@@ -279,6 +279,17 @@ export function computeMetrics(gtRooms, aiRooms, pairs) {
  * @param {object} groundTruthJson
  * @param {object} aiJson - Raw POST /analyze response
  */
+function evaluateRoomSets(gtRooms, aiRooms) {
+  if (!gtRooms.length) {
+    throw new Error('Ground truth contains no rooms for this plan.')
+  }
+  if (!aiRooms.length) {
+    throw new Error('AI response contains no rooms for this plan.')
+  }
+  const pairs = matchRooms(gtRooms, aiRooms)
+  return { gtRooms, aiRooms, ...computeMetrics(gtRooms, aiRooms, pairs) }
+}
+
 export function evaluateAgainstGroundTruth(groundTruthJson, aiJson) {
   const gtRooms = extractRoomsFromPayload(groundTruthJson)
   const aiRooms = extractRoomsFromPayload(aiJson)
@@ -293,10 +304,40 @@ export function evaluateAgainstGroundTruth(groundTruthJson, aiJson) {
     )
   }
 
-  const pairs = matchRooms(gtRooms, aiRooms)
-  const metrics = computeMetrics(gtRooms, aiRooms, pairs)
+  return evaluateRoomSets(gtRooms, aiRooms)
+}
 
-  return { gtRooms, aiRooms, ...metrics }
+/** Per-plan evaluation when a case has multiple floor plans. */
+export function evaluatePlanAgainstGroundTruth(groundTruthJson, aiJson, planPage) {
+  const gtRooms = extractRoomsFromPayload(groundTruthJson).filter(
+    (r) => r.page === planPage,
+  )
+  const aiRooms = extractRoomsFromPayload(aiJson).filter((r) => r.page === planPage)
+  return evaluateRoomSets(gtRooms, aiRooms)
+}
+
+/** Split a full-case evaluation into per-plan chunks (pairs + metrics). */
+export function splitEvaluationByPlan(evaluation, planPages) {
+  if (!evaluation?.pairs) return []
+
+  return planPages.map((planPage) => {
+    const pairs = evaluation.pairs.filter(
+      (p) => (p.gt?.page ?? p.ai?.page) === planPage,
+    )
+    const gtRooms = pairs.filter((p) => p.gt).map((p) => p.gt)
+    const aiRooms = pairs.filter((p) => p.ai).map((p) => p.ai)
+
+    const metrics =
+      pairs.length > 0 ? computeMetrics(gtRooms, aiRooms, pairs) : null
+
+    return {
+      planPage,
+      pairs,
+      metrics,
+      gtCount: gtRooms.length,
+      aiCount: aiRooms.length,
+    }
+  })
 }
 
 /**

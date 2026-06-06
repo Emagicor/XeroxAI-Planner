@@ -15,6 +15,11 @@ Set page_classification.is_floor_plan = FALSE and rooms = [] when the page is AN
 
 Set page_classification.is_floor_plan = TRUE ONLY when the page shows a top-down architectural floor plan with room boundaries.
 
+Also identify the floor/level represented by this specific plan when visible or strongly inferable
+from labels/title blocks. Use common labels such as "Ground Floor", "First Floor",
+"Second Floor", "Basement", "Mezzanine", "Roof Plan", "Typical Floor", "Unit Plan",
+or "Unknown". Do not guess when the sheet does not say or imply a level.
+
 When is_floor_plan is FALSE:
 - rooms MUST be []
 - total_area_sqft = 0
@@ -24,6 +29,7 @@ When is_floor_plan is FALSE:
 EXAMPLE — Measured room (floor plan page only):
 {
   "page_classification": { "is_floor_plan": true, "page_type": "floorplan", "reason": "Top-down room layout with dimensions" },
+  "floor_identification": { "floor_label": "First Floor", "confidence_pct": 95, "evidence": "Title block says FIRST FLOOR PLAN" },
   "rooms": [{
     "name": "Master Bedroom",
     "bbox": [45, 80, 420, 380],
@@ -41,6 +47,7 @@ EXAMPLE — Measured room (floor plan page only):
 EXAMPLE — Title/cover page (NOT a floor plan):
 {
   "page_classification": { "is_floor_plan": false, "page_type": "cover", "reason": "Project title sheet with drawing index, no room layout" },
+  "floor_identification": { "floor_label": "Unknown", "confidence_pct": 0, "evidence": "No floor plan level present" },
   "rooms": [],
   "layout_dimensions": { "available": false, "width_ft": null, "height_ft": null, "source": null },
   "total_area_sqft": 0,
@@ -51,6 +58,7 @@ EXAMPLE — Title/cover page (NOT a floor plan):
 EXAMPLE — Non-derivable room dimensions (Strict Non-Hallucination):
 {
   "page_classification": { "is_floor_plan": true, "page_type": "floorplan", "reason": "Floor plan layout" },
+  "floor_identification": { "floor_label": "Unknown", "confidence_pct": 0, "evidence": "No readable level label" },
   "rooms": [{
     "name": "Hallway",
     "bbox": [420, 80, 580, 260],
@@ -73,6 +81,11 @@ JSON Schema:
     "is_floor_plan": boolean,
     "page_type": "floorplan" | "cover" | "notes" | "schedule" | "elevation" | "section" | "other",
     "reason": "string — brief explanation"
+  },
+  "floor_identification": {
+    "floor_label": "Ground Floor" | "First Floor" | "Second Floor" | "Third Floor" | "Basement" | "Mezzanine" | "Roof Plan" | "Typical Floor" | "Unit Plan" | "Unknown" | "string",
+    "confidence_pct": integer 0-100,
+    "evidence": "string - short source text or visual reason"
   },
   "rooms": [
     {
@@ -130,6 +143,7 @@ CORRECTION_PROMPT_TEMPLATE = """You previously analyzed an architectural sheet a
 
 Review against the image. Correct:
 - page_classification (is_floor_plan, page_type, reason) — reject non-plan pages
+- floor_identification (floor_label, confidence_pct, evidence) — identify Ground/First/Basement/etc only when supported
 - Room names, boundaries (bbox/polygon 0-1000), dimensions, confidence, assumptions
 - layout_dimensions and total_area_sqft
 - overall_confidence

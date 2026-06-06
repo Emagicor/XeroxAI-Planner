@@ -17,5 +17,5 @@ export function pageTypeTone(pageType) {
   const t = String(pageType || '').toLowerCase()
   if (t === 'floorplan') return 'text-emerald-400'
   if (t === 'cover' || t === 'notes') return 'text-amber-300'
-  return 'text-[#8B8A82]'
+  return 'text-muted'
 }
