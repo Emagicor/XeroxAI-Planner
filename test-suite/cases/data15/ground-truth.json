@@ -1,0 +1,139 @@
+{
+  "filename": "Data15.png",
+  "exported_at": "2026-06-08T05:34:51.375Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Ground Floor",
+      "rooms": [
+        {
+          "name": "Rear Porch",
+          "length_ft": 18.67,
+          "width_ft": 10,
+          "area_sqft": 186.7,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Front Porch",
+          "length_ft": 27.67,
+          "width_ft": 8,
+          "area_sqft": 221.36,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bed 2",
+          "length_ft": 12,
+          "width_ft": 11,
+          "area_sqft": 132,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bed 3",
+          "length_ft": 12,
+          "width_ft": 11,
+          "area_sqft": 132,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bath 2",
+          "length_ft": 8.17,
+          "width_ft": 5.33,
+          "area_sqft": 43.55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Kitchen",
+          "length_ft": 18,
+          "width_ft": 10,
+          "area_sqft": 180,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Dining",
+          "length_ft": 18,
+          "width_ft": 8,
+          "area_sqft": 144,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Great Room",
+          "length_ft": 18,
+          "width_ft": 15.33,
+          "area_sqft": 275.94,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "M. Bedroom",
+          "length_ft": 13,
+          "width_ft": 15.5,
+          "area_sqft": 201.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "M. Clos.",
+          "length_ft": 7.67,
+          "width_ft": 6,
+          "area_sqft": 46.02,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "M. Bath.",
+          "length_ft": 7.67,
+          "width_ft": 5.83,
+          "area_sqft": 44.72,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Laundry",
+          "length_ft": 8.67,
+          "width_ft": 7.33,
+          "area_sqft": 63.55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bath 3",
+          "length_ft": 5.33,
+          "width_ft": 8.83,
+          "area_sqft": 47.06,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bed 4",
+          "length_ft": 12,
+          "width_ft": 11,
+          "area_sqft": 132,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Entry",
+          "length_ft": 8,
+          "width_ft": 6.17,
+          "area_sqft": 49.36,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Closet (Bed 2)",
+          "length_ft": 5.83,
+          "width_ft": 2.33,
+          "area_sqft": 13.58,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Closet (Bed 3)",
+          "length_ft": 5.83,
+          "width_ft": 2.33,
+          "area_sqft": 13.58,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Closet (Bath 3)",
+          "length_ft": 3,
+          "width_ft": 5,
+          "area_sqft": 15,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

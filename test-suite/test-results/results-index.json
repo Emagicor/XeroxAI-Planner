@@ -1,0 +1,25 @@
+{
+  "runs": [
+    {
+      "runId": "run-2026-06-08T10-49-18.379Z",
+      "timestamp": "2026-06-08T10:49:18.379Z",
+      "totalTests": 14,
+      "passed": 13,
+      "failed": 1
+    },
+    {
+      "runId": "run-2026-06-08T11-14-44.339Z",
+      "timestamp": "2026-06-08T11:14:44.339Z",
+      "totalTests": 14,
+      "passed": 12,
+      "failed": 2
+    },
+    {
+      "runId": "run-2026-06-08T12-33-33.091Z",
+      "timestamp": "2026-06-08T12:33:33.091Z",
+      "totalTests": 15,
+      "passed": 13,
+      "failed": 2
+    }
+  ]
+}

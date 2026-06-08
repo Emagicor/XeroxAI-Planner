@@ -179,7 +179,7 @@ function TestCaseRow({
               type="button"
               disabled={loading || testCase.saving}
               onClick={onSave}
-              className="text-xs px-3 py-1 rounded-lg bg-accent text-white hover:bg-accent/90 disabled:opacity-40"
+              className="text-sm px-4 py-2 rounded-lg bg-accent text-white hover:bg-accent/90 disabled:opacity-40 font-medium"
             >
               {testCase.persisted ? 'Save changes' : 'Save to suite'}
             </button>
@@ -188,7 +188,7 @@ function TestCaseRow({
             type="button"
             disabled={loading || testCase.saving}
             onClick={onRemove}
-            className="text-xs text-muted hover:text-red-400 disabled:opacity-40"
+            className="text-sm px-3 py-2 text-muted hover:text-red-400 disabled:opacity-40"
           >
             Delete case
           </button>
@@ -245,6 +245,7 @@ export default function TestSuiteCaseBuilder({
   onSaveCase,
   onRemoveCase,
   onReloadCases,
+  hideAddButton = false,
 }) {
   const browseBulk = () => bulkInputRef.current?.click()
 
@@ -298,21 +299,21 @@ export default function TestSuiteCaseBuilder({
             <button
               type="button"
               onClick={onAddEmptyCase}
-              className="px-5 py-2.5 rounded-lg border border-line bg-surface text-sm text-text hover:border-accent/50"
+              className="px-6 py-3 rounded-xl border border-line bg-surface text-base font-medium text-text hover:border-accent/50"
             >
               Add test case
             </button>
             <button
               type="button"
               onClick={browseBulk}
-              className="px-5 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90"
+              className="px-6 py-3 rounded-xl bg-accent text-white text-base font-medium hover:bg-accent/90"
             >
               Add multiple floor plans
             </button>
             <a
               href="/samples/ground-truth.example.json"
               download
-              className="px-5 py-2.5 rounded-lg text-sm text-accent hover:underline"
+              className="px-6 py-3 rounded-xl text-base text-accent hover:underline"
             >
               Example GT format
             </a>
@@ -320,35 +321,27 @@ export default function TestSuiteCaseBuilder({
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">
-            <p className="text-sm text-muted">
-              <span className="text-text font-medium">{readyCount}</span> saved &amp; ready
-              {cases.length !== readyCount && (
-                <>
-                  {' '}
-                  · <span className="text-text font-medium">{cases.length}</span> total
-                </>
-              )}
-            </p>
-            <div className="flex flex-wrap gap-2">
+          {!hideAddButton && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">
+              <p className="text-sm text-muted">
+                <span className="text-text font-medium">{readyCount}</span> saved &amp; ready
+                {cases.length !== readyCount && (
+                  <>
+                    {' '}
+                    · <span className="text-text font-medium">{cases.length}</span> total
+                  </>
+                )}
+              </p>
               <button
                 type="button"
                 disabled={loading}
                 onClick={onAddEmptyCase}
-                className="px-3 py-1.5 rounded-lg border border-line bg-surface text-xs text-text hover:border-accent/50 disabled:opacity-40"
+                className="px-5 py-2.5 rounded-xl border border-line bg-surface text-sm font-medium text-text hover:border-accent/50 disabled:opacity-40"
               >
-                + Add case
-              </button>
-              <button
-                type="button"
-                disabled={loading}
-                onClick={browseBulk}
-                className="px-3 py-1.5 rounded-lg border border-line bg-surface text-xs text-text hover:border-accent/50 disabled:opacity-40"
-              >
-                + Add floor plans
+                + Add test case
               </button>
             </div>
-          </div>
+          )}
 
           <div className="space-y-3">
             {cases.map((testCase, i) => (

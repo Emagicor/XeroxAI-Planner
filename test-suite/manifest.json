@@ -39,6 +39,84 @@
       "groundTruthFile": "ground-truth.json",
       "permanent": true,
       "createdAt": "2026-06-06T12:04:51.142Z"
+    },
+    {
+      "id": "data2",
+      "label": "Data2",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-06T12:50:27.009Z"
+    },
+    {
+      "id": "data13",
+      "label": "Data13",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T05:15:03.090Z"
+    },
+    {
+      "id": "data10",
+      "label": "Data10",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T05:25:29.509Z"
+    },
+    {
+      "id": "data15",
+      "label": "Data15",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T05:35:23.766Z"
+    },
+    {
+      "id": "data8",
+      "label": "Data8",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T06:24:28.275Z"
+    },
+    {
+      "id": "data31",
+      "label": "Data31",
+      "inputFile": "input.pdf",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T06:34:38.415Z"
+    },
+    {
+      "id": "data19",
+      "label": "Data19",
+      "inputFile": "input.jpg",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T06:45:02.473Z"
+    },
+    {
+      "id": "data1-2",
+      "label": "Data1",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "createdAt": "2026-06-08T07:27:19.908Z"
+    },
+    {
+      "id": "data12",
+      "label": "Data12",
+      "inputFile": "input.png",
+      "groundTruthFile": "ground-truth.json",
+      "permanent": true,
+      "createdAt": "2026-06-08T08:13:10.416Z"
+    },
+    {
+      "id": "master-plan",
+      "label": "master-plan",
+      "inputFile": "master-plan.pdf",
+      "groundTruthFile": "master-plan_ground_truth (1).json",
+      "createdAt": "2026-06-08T11:46:00.207Z"
     }
   ]
 }

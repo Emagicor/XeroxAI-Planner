@@ -2,13 +2,16 @@
  * Filesystem helpers for test-suite/ — used by the Vite dev plugin on Save/Delete.
  *
  * Pipeline: Save → test-suite/cases/{id}/ + append entry to manifest.json
+ * Results:  test-suite/test-results/run-<ISO-timestamp>.json + results-index.json
  */
 import fs from 'fs'
 import path from 'path'
 
 const MANIFEST = 'manifest.json'
-const GROUND_TRUTH = 'ground-truth.json'
+const RESULTS_DIR = 'test-results'
+const RESULTS_INDEX = 'results-index.json'
 const INPUT_EXTS = new Set(['.jpg', '.jpeg', '.png', '.pdf'])
+const GT_EXTS = new Set(['.json'])
 
 export function slugify(value, fallback = 'case') {
   const slug = String(value ?? '')
@@ -24,6 +27,33 @@ function manifestPath(root) {
 
 function caseDir(root, caseId) {
   return path.join(root, 'cases', caseId)
+}
+
+function resultsDir(root) {
+  return path.join(root, RESULTS_DIR)
+}
+
+function resultsIndexPath(root) {
+  return path.join(resultsDir(root), RESULTS_INDEX)
+}
+
+/** ISO timestamp safe for filenames (colons → dashes). */
+export function runTimestampSlug(date = new Date()) {
+  return date.toISOString().replace(/:/g, '-')
+}
+
+export function runIdFromTimestamp(timestamp) {
+  return `run-${runTimestampSlug(new Date(timestamp))}`
+}
+
+function safeCaseFileName(uploadName, allowedExts, label = 'file') {
+  const raw = path.basename(String(uploadName ?? '').trim())
+  if (!raw || raw === '.' || raw === '..') throw new Error(`Invalid ${label} name`)
+  const ext = path.extname(raw).toLowerCase()
+  if (!allowedExts.has(ext)) {
+    throw new Error(`${label} must be one of: ${[...allowedExts].join(', ')}`)
+  }
+  return raw
 }
 
 export function loadManifest(root) {
@@ -51,20 +81,18 @@ function uniqueCaseId(root, preferred) {
   return `${base}-${n}`
 }
 
-function inputFileName(uploadName) {
-  const ext = path.extname(uploadName || '').toLowerCase()
-  if (!INPUT_EXTS.has(ext)) throw new Error('Floor plan must be JPG, PNG, or PDF')
-  return `input${ext}`
-}
-
 /**
- * Create test-suite/cases/{id}/ with input file + ground-truth.json, update manifest.
+ * Create test-suite/cases/{id}/ with input + ground-truth files, update manifest.
  */
-export function createCase(root, { label, inputFileName: uploadName, inputBytes, groundTruth }) {
+export function createCase(
+  root,
+  { label, inputFileName: uploadName, groundTruthFileName: gtUploadName, inputBytes, groundTruth },
+) {
   if (!inputBytes?.length) throw new Error('Input file is empty')
   if (!groundTruth || typeof groundTruth !== 'object') throw new Error('Ground truth must be a JSON object')
 
-  const safeInput = inputFileName(uploadName)
+  const safeInput = safeCaseFileName(uploadName, INPUT_EXTS, 'Floor plan')
+  const safeGt = safeCaseFileName(gtUploadName, GT_EXTS, 'Ground truth')
   const caseId = uniqueCaseId(root, path.basename(uploadName, path.extname(uploadName)) || label || 'case')
   const folder = caseDir(root, caseId)
 
@@ -72,13 +100,13 @@ export function createCase(root, { label, inputFileName: uploadName, inputBytes,
 
   fs.mkdirSync(folder, { recursive: true })
   fs.writeFileSync(path.join(folder, safeInput), inputBytes)
-  fs.writeFileSync(path.join(folder, GROUND_TRUTH), `${JSON.stringify(groundTruth, null, 2)}\n`, 'utf8')
+  fs.writeFileSync(path.join(folder, safeGt), `${JSON.stringify(groundTruth, null, 2)}\n`, 'utf8')
 
   const entry = {
     id: caseId,
     label: (label || '').trim() || path.basename(uploadName, path.extname(uploadName)) || caseId,
     inputFile: safeInput,
-    groundTruthFile: GROUND_TRUTH,
+    groundTruthFile: safeGt,
     createdAt: new Date().toISOString(),
   }
 
@@ -91,7 +119,11 @@ export function createCase(root, { label, inputFileName: uploadName, inputBytes,
 /**
  * Update files in an existing case folder and refresh manifest entry.
  */
-export function updateCase(root, caseId, { label, inputFileName: uploadName, inputBytes, groundTruth }) {
+export function updateCase(
+  root,
+  caseId,
+  { label, inputFileName: uploadName, groundTruthFileName: gtUploadName, inputBytes, groundTruth },
+) {
   const manifest = loadManifest(root)
   const idx = (manifest.cases ?? []).findIndex((c) => c.id === caseId)
   if (idx < 0) throw new Error('Test case not found')
@@ -102,7 +134,7 @@ export function updateCase(root, caseId, { label, inputFileName: uploadName, inp
   const entry = { ...manifest.cases[idx] }
 
   if (inputBytes?.length && uploadName) {
-    const safeInput = inputFileName(uploadName)
+    const safeInput = safeCaseFileName(uploadName, INPUT_EXTS, 'Floor plan')
     const oldPath = path.join(folder, entry.inputFile)
     if (fs.existsSync(oldPath) && entry.inputFile !== safeInput) fs.unlinkSync(oldPath)
     fs.writeFileSync(path.join(folder, safeInput), inputBytes)
@@ -110,8 +142,13 @@ export function updateCase(root, caseId, { label, inputFileName: uploadName, inp
   }
 
   if (groundTruth) {
-    fs.writeFileSync(path.join(folder, GROUND_TRUTH), `${JSON.stringify(groundTruth, null, 2)}\n`, 'utf8')
-    entry.groundTruthFile = GROUND_TRUTH
+    const safeGt = gtUploadName
+      ? safeCaseFileName(gtUploadName, GT_EXTS, 'Ground truth')
+      : entry.groundTruthFile
+    const oldGtPath = path.join(folder, entry.groundTruthFile)
+    if (fs.existsSync(oldGtPath) && entry.groundTruthFile !== safeGt) fs.unlinkSync(oldGtPath)
+    fs.writeFileSync(path.join(folder, safeGt), `${JSON.stringify(groundTruth, null, 2)}\n`, 'utf8')
+    entry.groundTruthFile = safeGt
   }
 
   if (label?.trim()) entry.label = label.trim()
@@ -135,4 +172,64 @@ export function deleteCase(root, caseId) {
 
   const folder = caseDir(root, caseId)
   if (fs.existsSync(folder)) fs.rmSync(folder, { recursive: true, force: true })
+}
+
+export function loadResultsIndex(root) {
+  const file = resultsIndexPath(root)
+  if (!fs.existsSync(file)) return { runs: [] }
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'))
+  return { runs: Array.isArray(data.runs) ? data.runs : [] }
+}
+
+function saveResultsIndex(root, index) {
+  fs.mkdirSync(resultsDir(root), { recursive: true })
+  fs.writeFileSync(resultsIndexPath(root), `${JSON.stringify(index, null, 2)}\n`, 'utf8')
+}
+
+/**
+ * Persist a full batch run and append summary to results-index.json.
+ * @param {Array<{ testCaseId, input, output, status, executedAt }>} entries
+ */
+export function saveRunResults(root, entries) {
+  if (!Array.isArray(entries) || !entries.length) {
+    throw new Error('Run results must be a non-empty array')
+  }
+
+  const timestamp = new Date().toISOString()
+  const runId = runIdFromTimestamp(timestamp)
+  const dir = resultsDir(root)
+  fs.mkdirSync(dir, { recursive: true })
+
+  const filePath = path.join(dir, `${runId}.json`)
+  fs.writeFileSync(filePath, `${JSON.stringify(entries, null, 2)}\n`, 'utf8')
+
+  const passed = entries.filter((e) => e.status === 'passed').length
+  const failed = entries.length - passed
+
+  const index = loadResultsIndex(root)
+  index.runs = [
+    ...(index.runs ?? []),
+    {
+      runId,
+      timestamp,
+      totalTests: entries.length,
+      passed,
+      failed,
+    },
+  ]
+  saveResultsIndex(root, index)
+
+  return { runId, timestamp, totalTests: entries.length, passed, failed }
+}
+
+export function loadRunResults(root, runId) {
+  const safeId = path.basename(String(runId ?? ''))
+  if (!safeId.startsWith('run-')) throw new Error('Invalid run id')
+
+  const filePath = path.join(resultsDir(root), `${safeId}.json`)
+  if (!fs.existsSync(filePath)) throw new Error('Run results not found')
+
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  if (!Array.isArray(data)) throw new Error('Invalid run results format')
+  return data
 }

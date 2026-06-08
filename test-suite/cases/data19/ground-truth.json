@@ -1,0 +1,97 @@
+{
+  "filename": "Data19.jpg",
+  "exported_at": "2026-06-08T06:44:37.001Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "First Floor",
+      "rooms": [
+        {
+          "name": "GREAT RM",
+          "length_ft": 20.33,
+          "width_ft": 17.25,
+          "area_sqft": 350.69,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN",
+          "length_ft": 10.17,
+          "width_ft": 12.33,
+          "area_sqft": 125.4,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "PAN",
+          "length_ft": 11,
+          "width_ft": 5,
+          "area_sqft": 55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LNDRY",
+          "length_ft": 11,
+          "width_ft": 7,
+          "area_sqft": 77,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "2 CAR GARAGE",
+          "length_ft": 28.42,
+          "width_ft": 27.25,
+          "area_sqft": 774.45,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "1 CAR GARAGE",
+          "length_ft": 28.42,
+          "width_ft": 12.08,
+          "area_sqft": 343.31,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "PATIO",
+          "length_ft": 26.58,
+          "width_ft": 16,
+          "area_sqft": 425.28,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "M. BED",
+          "length_ft": 13.75,
+          "width_ft": 14.75,
+          "area_sqft": 202.81,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "WIC",
+          "length_ft": 5,
+          "width_ft": 7.5,
+          "area_sqft": 37.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "FOYER",
+          "length_ft": 14.08,
+          "width_ft": 6.5,
+          "area_sqft": 91.52,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DEN",
+          "length_ft": 11.5,
+          "width_ft": 12,
+          "area_sqft": 138,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "COVERED PORCH",
+          "length_ft": 8,
+          "width_ft": 32.5,
+          "area_sqft": 260,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

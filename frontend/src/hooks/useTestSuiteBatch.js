@@ -3,9 +3,12 @@ import { LOADING_STEPS } from '../constants/loading'
 import { analyzeFloorPlan } from '../services/analyzeApi'
 import {
   deleteTestSuiteCase,
+  fetchResultsIndex,
+  fetchRunResults,
   fetchTestCaseGroundTruth,
   fetchTestCaseInput,
   fetchTestSuiteCases,
+  saveRunResults,
   saveTestSuiteCase,
   updateTestSuiteCase,
 } from '../services/testSuiteApi'
@@ -75,6 +78,59 @@ async function loadPersistedCase(meta) {
   }
 }
 
+function resultStatus(row) {
+  if (row.error || row.evalError || !row.evaluation) return 'failed'
+  return (row.evaluation.roomF1 ?? 0) >= 0.85 ? 'passed' : 'failed'
+}
+
+function serializeBatchResult(row, executedAt) {
+  return {
+    testCaseId: row.caseId,
+    input: {
+      fileName: row.inputFileName,
+      sha256: row.inputSha256,
+      groundTruthFileName: row.groundTruthFileName,
+    },
+    output: {
+      aiResult: row.aiResult,
+      evaluation: row.evaluation,
+      evalError: row.evalError,
+      error: row.error,
+    },
+    status: resultStatus(row),
+    executedAt,
+  }
+}
+
+async function hydratePersistedResults(entries, caseMetas) {
+  const metaById = new Map(caseMetas.map((m) => [m.id, m]))
+  return Promise.all(
+    entries.map(async (entry) => {
+      const meta = metaById.get(entry.testCaseId)
+      let preview = null
+      if (meta) {
+        try {
+          const blob = await fetchTestCaseInput(meta)
+          preview = URL.createObjectURL(blob)
+        } catch {
+          /* preview optional for historical runs */
+        }
+      }
+      return {
+        caseId: entry.testCaseId,
+        inputFileName: entry.input?.fileName,
+        inputSha256: entry.input?.sha256,
+        groundTruthFileName: entry.input?.groundTruthFileName,
+        preview,
+        aiResult: entry.output?.aiResult ?? null,
+        evaluation: entry.output?.evaluation ?? null,
+        evalError: entry.output?.evalError ?? null,
+        error: entry.output?.error ?? null,
+      }
+    }),
+  )
+}
+
 async function snapshotCasesForBatch(caseList) {
   return Promise.all(
     caseList.map(async (c) => {
@@ -101,6 +157,9 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
   const [casesLoading, setCasesLoading] = useState(true)
   const [casesLoadError, setCasesLoadError] = useState(null)
   const [results, setResults] = useState([])
+  const [runHistory, setRunHistory] = useState([])
+  const [selectedRunId, setSelectedRunId] = useState(null)
+  const [historyLoading, setHistoryLoading] = useState(true)
   const [runProgress, setRunProgress] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
@@ -128,11 +187,36 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
 
   const clearRunState = () => {
     setResults([])
+    setSelectedRunId(null)
     setRunProgress([])
     setLoading(false)
     setCurrentIndex(-1)
     setError(null)
   }
+
+  const loadRunById = useCallback(async (runId, caseMetas) => {
+    const entries = await fetchRunResults(runId)
+    const hydrated = await hydratePersistedResults(entries, caseMetas)
+    setResults(hydrated)
+    setSelectedRunId(runId)
+    setRunProgress([])
+    setError(null)
+  }, [])
+
+  const selectRun = useCallback(
+    async (runId) => {
+      if (!runId || runId === selectedRunId) return
+      try {
+        const metas = await fetchTestSuiteCases()
+        await loadRunById(runId, metas)
+      } catch (err) {
+        const msg = err.message || 'Could not load run results'
+        setError(msg)
+        toastWarning(msg, { title: 'Run history' })
+      }
+    },
+    [loadRunById, selectedRunId],
+  )
 
   const reloadPersistedCases = useCallback(async (excludeDraftIds = []) => {
     const exclude = new Set(excludeDraftIds)
@@ -164,11 +248,23 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
   useEffect(() => {
     let cancelled = false
 
-    async function loadCases() {
+    async function loadCasesAndHistory() {
       setCasesLoading(true)
+      setHistoryLoading(true)
       setCasesLoadError(null)
       try {
         await reloadPersistedCases()
+        const index = await fetchResultsIndex()
+        if (cancelled) return
+        setRunHistory(index)
+
+        if (index.length > 0) {
+          const latest = index[index.length - 1]
+          const metas = await fetchTestSuiteCases()
+          if (!cancelled) {
+            await loadRunById(latest.runId, metas)
+          }
+        }
       } catch (err) {
         if (!cancelled) {
           const msg = err.message || 'Could not load saved test cases'
@@ -176,15 +272,18 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
           toastWarning(msg, { title: 'Test suite load failed' })
         }
       } finally {
-        if (!cancelled) setCasesLoading(false)
+        if (!cancelled) {
+          setCasesLoading(false)
+          setHistoryLoading(false)
+        }
       }
     }
 
-    loadCases()
+    loadCasesAndHistory()
     return () => {
       cancelled = true
     }
-  }, [reloadPersistedCases])
+  }, [reloadPersistedCases, loadRunById])
 
   useEffect(() => {
     if (!loading) return
@@ -217,6 +316,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
           label,
           inputFile: current.inputFile,
           groundTruth: current.groundTruth.raw,
+          groundTruthFileName: current.groundTruth.fileName,
         })
         await reloadPersistedCases()
       } else {
@@ -224,6 +324,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
           label,
           inputFile: current.inputFile,
           groundTruth: current.groundTruth.raw,
+          groundTruthFileName: current.groundTruth.fileName,
         })
         revokePreview(current.preview)
         await reloadPersistedCases([caseId])
@@ -241,14 +342,14 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
   }
 
   const addEmptyCase = () => {
-    setCases((prev) => [...prev, createDraftCase()])
+    setCases((prev) => [createDraftCase(), ...prev])
     clearRunState()
   }
 
   const addInputFiles = (files) => {
     const arr = Array.from(files ?? []).filter(isFloorPlanFile)
     if (!arr.length) return
-    setCases((prev) => [...prev, ...arr.map((f) => createDraftCase(f))])
+    setCases((prev) => [...arr.map((f) => createDraftCase(f)), ...prev])
     clearRunState()
   }
 
@@ -372,11 +473,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     !loading &&
     !casesLoading
 
-  const batchComplete =
-    !loading &&
-    results.length > 0 &&
-    cases.length > 0 &&
-    results.length === runnableCases.length
+  const hasResults = !loading && results.length > 0
 
   const runBatch = useCallback(async () => {
     const currentCases = casesRef.current.filter(canRunCase)
@@ -538,6 +635,19 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     setResults(batchResults)
     setCurrentIndex(-1)
     setLoading(false)
+
+    const executedAt = new Date().toISOString()
+    try {
+      const summary = await saveRunResults(
+        batchResults.map((row) => serializeBatchResult(row, executedAt)),
+      )
+      setRunHistory((prev) => [...prev, summary])
+      setSelectedRunId(summary.runId)
+    } catch (err) {
+      toastWarning(err.message || 'Results were not saved to disk', {
+        title: 'Run persistence failed',
+      })
+    }
   }, [loading])
 
   const retryBatch = () => {
@@ -559,7 +669,11 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     readyCount,
     unsavedCount,
     canRun,
-    batchComplete,
+    hasResults,
+    runHistory,
+    selectedRunId,
+    historyLoading,
+    selectRun,
     bulkInputRef,
     addEmptyCase,
     addInputFiles,

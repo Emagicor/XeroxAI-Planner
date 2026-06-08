@@ -1,13 +1,8 @@
 """
 engines/validation/analysis_validator.py
 
-FIX vs original validators/analysis.py:
-  - Original rejected rooms with null area_sqft — this violates the spec.
-    The spec explicitly requires null dims for assumed/undeivable rooms.
-  - Now: null area is only invalid when dimension_source == "measured"
-  - BBox validation checks integer types properly
-  - Returns a structured ValidationReport instead of bare bool
-  - Added polygon validation
+Validates sanitized vision output. Null area is allowed when length×width or
+area-only annotations are present; assumed rooms with no data are dropped in sanitize.
 """
 from __future__ import annotations
 
@@ -31,14 +26,18 @@ class ValidationReport:
         self.valid = False
 
 
+def _has_positive_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and float(value) > 0
+
+
 def validate_analysis_result(data: dict) -> ValidationReport:
     """
-    Validate the raw dict returned by the vision model.
+    Validate the sanitized dict returned by the vision model.
 
     Rules:
     - rooms must be a non-empty list
-    - Each room needs: name, bbox (4 ints 0–1000), confidence_pct (0–100)
-    - area_sqft may be null ONLY when dimension_source == "assumed"
+    - Each room needs: name, bbox (4 values 0–1000), confidence_pct (0–100)
+    - Each room needs area_sqft > 0 OR both length_ft and width_ft > 0
     - polygon must be a list of [x,y] pairs if present
     """
     report = ValidationReport(valid=True)
@@ -50,32 +49,35 @@ def validate_analysis_result(data: dict) -> ValidationReport:
 
     for room in rooms:
         name = room.get("name", "(unnamed)")
-        source = room.get("dimension_source", "")
 
-        # bbox
         bbox = room.get("bbox")
         if not isinstance(bbox, list) or len(bbox) != 4:
             report.add(name, "bbox", "bbox must be a list of 4 numbers")
         elif not all(isinstance(v, (int, float)) and 0 <= v <= 1000 for v in bbox):
             report.add(name, "bbox", f"bbox values must be 0–1000, got {bbox}")
 
-        # area_sqft — null is ONLY valid for assumed rooms
+        length = room.get("length_ft")
+        width = room.get("width_ft")
         area = room.get("area_sqft")
-        if area is None:
-            if source != "assumed":
-                report.add(
-                    name, "area_sqft",
-                    f"area_sqft is null but dimension_source is '{source}' (not 'assumed')"
-                )
-        elif not isinstance(area, (int, float)) or area < 0:
-            report.add(name, "area_sqft", f"area_sqft must be a non-negative number, got {area!r}")
+        has_dims = _has_positive_number(length) and _has_positive_number(width)
+        has_area = _has_positive_number(area)
 
-        # confidence_pct
+        if not has_dims and not has_area:
+            report.add(
+                name,
+                "area_sqft",
+                "room must have area_sqft > 0 or both length_ft and width_ft > 0",
+            )
+
+        if area is not None and not isinstance(area, (int, float)):
+            report.add(name, "area_sqft", f"area_sqft must be numeric, got {area!r}")
+        elif isinstance(area, (int, float)) and area < 0:
+            report.add(name, "area_sqft", f"area_sqft must be non-negative, got {area!r}")
+
         conf = room.get("confidence_pct")
         if not isinstance(conf, (int, float)) or not (0 <= conf <= 100):
             report.add(name, "confidence_pct", f"confidence_pct must be 0–100, got {conf!r}")
 
-        # polygon (optional but validated if present)
         polygon = room.get("polygon")
         if polygon is not None:
             if not isinstance(polygon, list) or len(polygon) < 3:

@@ -55,7 +55,10 @@ def clip_region(
 
     crop = img.crop((padded.x1, padded.y1, padded.x2, padded.y2))
     buf = io.BytesIO()
-    crop.save(buf, format="JPEG", quality=settings.jpeg_quality, optimize=True)
+    if settings.vision_image_format.lower().strip() == "jpeg":
+        crop.save(buf, format="JPEG", quality=settings.jpeg_quality, optimize=True)
+    else:
+        crop.save(buf, format="PNG", optimize=True)
 
     return DetectedRegion(
         region_id=DetectedRegion.new_id(),

@@ -1,0 +1,104 @@
+{
+  "filename": "Data1.png",
+  "exported_at": "2026-06-06T11:34:18.349Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Ground Floor",
+      "rooms": [
+        {
+          "name": "Bedroom 1",
+          "length_ft": 12.83,
+          "width_ft": 12,
+          "area_sqft": 153.96,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bedroom 2",
+          "length_ft": 10.5,
+          "width_ft": 11.83,
+          "area_sqft": 124.22,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bath 1",
+          "length_ft": 9,
+          "width_ft": 5,
+          "area_sqft": 45,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Bath 2",
+          "length_ft": 9,
+          "width_ft": 5,
+          "area_sqft": 45,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Pantry",
+          "length_ft": 5.75,
+          "width_ft": 4.25,
+          "area_sqft": 24.44,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Closet",
+          "length_ft": 5.75,
+          "width_ft": 7.5,
+          "area_sqft": 43.12,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Utility",
+          "length_ft": 5.75,
+          "width_ft": 6,
+          "area_sqft": 34.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Kitchen",
+          "length_ft": 12.58,
+          "width_ft": 12.67,
+          "area_sqft": 159.39,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Dining",
+          "length_ft": 12.58,
+          "width_ft": 8.83,
+          "area_sqft": 111.08,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Living Room",
+          "length_ft": 18.58,
+          "width_ft": 16.5,
+          "area_sqft": 306.57,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Optional Covered Porch (Top)",
+          "length_ft": 32.58,
+          "width_ft": 5,
+          "area_sqft": 162.9,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Optional Covered Porch (Bottom)",
+          "length_ft": 32.58,
+          "width_ft": 5,
+          "area_sqft": 162.9,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Hall",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        }
+      ]
+    }
+  ]
+}

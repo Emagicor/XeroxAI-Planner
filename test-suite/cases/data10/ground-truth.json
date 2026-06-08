@@ -1,0 +1,48 @@
+{
+  "filename": "Data10.png",
+  "exported_at": "2026-06-08T05:25:00.818Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Ground Floor",
+      "rooms": [
+        {
+          "name": "Garage 3-Car",
+          "length_ft": 30.5,
+          "width_ft": 27,
+          "area_sqft": 823.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Veranda",
+          "length_ft": 26,
+          "width_ft": 8,
+          "area_sqft": 208,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Foyer",
+          "length_ft": 20,
+          "width_ft": 18,
+          "area_sqft": 360,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Entry Porch",
+          "length_ft": 18,
+          "width_ft": 14,
+          "area_sqft": 252,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Gallery Garage",
+          "length_ft": 30.5,
+          "width_ft": 21,
+          "area_sqft": 640.5,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

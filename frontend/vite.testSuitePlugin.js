@@ -1,7 +1,14 @@
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
-import { createCase, deleteCase, updateCase } from './testSuiteStorage.js'
+import {
+  createCase,
+  deleteCase,
+  loadResultsIndex,
+  loadRunResults,
+  saveRunResults,
+  updateCase,
+} from './testSuiteStorage.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export const TEST_SUITE_DIR = path.resolve(__dirname, '../test-suite')
@@ -58,12 +65,37 @@ function registerTestSuiteApi(middlewares) {
         const entry = createCase(TEST_SUITE_DIR, {
           label: body.label ?? '',
           inputFileName: body.inputFileName,
+          groundTruthFileName: body.groundTruthFileName,
           inputBytes,
           groundTruth: body.groundTruth,
         })
         sendJson(res, 201, entry)
       } catch (err) {
         sendJson(res, 400, { message: err.message || 'Save failed' })
+      }
+      return
+    }
+
+    if (req.method === 'POST' && subpath === '/results') {
+      try {
+        const body = await readJsonBody(req)
+        const summary = saveRunResults(TEST_SUITE_DIR, body.entries ?? body.results ?? [])
+        sendJson(res, 201, summary)
+      } catch (err) {
+        sendJson(res, 400, { message: err.message || 'Save results failed' })
+      }
+      return
+    }
+
+    const resultsMatch = subpath.match(/^\/results\/([^/]+)\/?$/)
+    if (resultsMatch && req.method === 'GET') {
+      try {
+        const runId = decodeURIComponent(resultsMatch[1])
+        const entries = loadRunResults(TEST_SUITE_DIR, runId)
+        sendJson(res, 200, entries)
+      } catch (err) {
+        const status = err.message === 'Run results not found' ? 404 : 400
+        sendJson(res, status, { message: err.message || 'Load results failed' })
       }
       return
     }
@@ -79,6 +111,7 @@ function registerTestSuiteApi(middlewares) {
           const entry = updateCase(TEST_SUITE_DIR, caseId, {
             label: body.label,
             inputFileName: body.inputFileName,
+            groundTruthFileName: body.groundTruthFileName,
             inputBytes,
             groundTruth: body.groundTruth,
           })

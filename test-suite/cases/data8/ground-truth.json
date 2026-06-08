@@ -1,0 +1,146 @@
+{
+  "filename": "Data8.png",
+  "exported_at": "2026-06-08T06:23:47.687Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Ground Floor",
+      "rooms": [
+        {
+          "name": "M. BEDRM",
+          "length_ft": 15,
+          "width_ft": 14,
+          "area_sqft": 210,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "M. BATH",
+          "length_ft": 13.42,
+          "width_ft": 11,
+          "area_sqft": 147.62,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "m. closet",
+          "length_ft": 15,
+          "width_ft": 6,
+          "area_sqft": 90,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DINING",
+          "length_ft": 11.17,
+          "width_ft": 11,
+          "area_sqft": 122.87,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN",
+          "length_ft": 20.17,
+          "width_ft": 12.17,
+          "area_sqft": 245.47,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "GREAT ROOM",
+          "length_ft": 19.5,
+          "width_ft": 18,
+          "area_sqft": 351,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "REAR PORCH",
+          "length_ft": 22.67,
+          "width_ft": 13.67,
+          "area_sqft": 309.9,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDRM #2",
+          "length_ft": 12,
+          "width_ft": 10,
+          "area_sqft": 120,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDRM #3",
+          "length_ft": 12,
+          "width_ft": 10,
+          "area_sqft": 120,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDRM #4",
+          "length_ft": 11.33,
+          "width_ft": 11,
+          "area_sqft": 124.63,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "FRONT PORCH",
+          "length_ft": 10.67,
+          "width_ft": 10.67,
+          "area_sqft": 113.85,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "PANTRY",
+          "length_ft": 7.33,
+          "width_ft": 6,
+          "area_sqft": 43.98,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "Storage",
+          "length_ft": 5,
+          "width_ft": 5,
+          "area_sqft": 25,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "2 CAR GARAGE",
+          "length_ft": 24,
+          "width_ft": 22,
+          "area_sqft": 528,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "OPEN STORAGE",
+          "length_ft": 13,
+          "width_ft": 4,
+          "area_sqft": 52,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "UTILITY",
+          "length_ft": 9.08,
+          "width_ft": 7.33,
+          "area_sqft": 66.56,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATH 2",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        },
+        {
+          "name": "FOYER",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        },
+        {
+          "name": "Powder",
+          "dimension_source": "assumed",
+          "assumptions": [
+            "Dimensions not mentioned or geometrically derivable."
+          ]
+        }
+      ]
+    }
+  ]
+}

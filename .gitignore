@@ -4,3 +4,4 @@ __pycache__
 .venv
 __pycache__
 backend2.0/groundingdino_local/weights/groundingdino_swint_ogc.pth
+groundingdino_local

@@ -7,8 +7,8 @@
       "rooms": [
         {
           "name": "Shop",
-          "length_ft": 37,
-          "width_ft": 29,
+          "length_ft": 37.08,
+          "width_ft": 29.08,
           "area_sqft": 1073,
           "dimension_source": "measured"
         },
@@ -29,7 +29,7 @@
         {
           "name": "Bar",
           "length_ft": 12.25,
-          "width_ft": 10,
+          "width_ft": 10.33,
           "area_sqft": 122.5,
           "dimension_source": "measured"
         },

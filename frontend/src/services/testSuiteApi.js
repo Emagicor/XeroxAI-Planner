@@ -5,6 +5,8 @@
  * Save:  POST /api/test-suite/save → creates test-suite/cases/{id}/ + updates manifest.json
  * Update: PUT /api/test-suite/cases/{id}
  * Delete: DELETE /api/test-suite/cases/{id}
+ * Results: POST /api/test-suite/results, GET /api/test-suite/results/{runId}
+ *          GET /test-suite/test-results/results-index.json (static)
  */
 export const TEST_SUITE_STATIC_BASE = '/test-suite'
 
@@ -53,14 +55,49 @@ export async function fetchTestCaseGroundTruth(meta) {
   return res.text()
 }
 
+/** Load run history index from test-suite/test-results/results-index.json. */
+export async function fetchResultsIndex() {
+  const res = await fetch(
+    `${TEST_SUITE_STATIC_BASE}/test-results/results-index.json?t=${Date.now()}`,
+    { cache: 'no-store' },
+  )
+  if (res.status === 404) return []
+  if (!res.ok) {
+    throw new Error(`Could not load results index (${res.status})`)
+  }
+  const data = await res.json()
+  return data.runs ?? []
+}
+
+/** Load persisted entries for a single run. */
+export async function fetchRunResults(runId) {
+  const res = await fetch(`/api/test-suite/results/${encodeURIComponent(runId)}`, {
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(await parseError(res))
+  return res.json()
+}
+
+/** Persist a completed batch run. */
+export async function saveRunResults(entries) {
+  const res = await fetch('/api/test-suite/results', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ entries }),
+  })
+  if (!res.ok) throw new Error(await parseError(res))
+  return res.json()
+}
+
 /** Save new case → test-suite/cases/{id}/ + manifest.json entry. */
-export async function saveTestSuiteCase({ label, inputFile, groundTruth }) {
+export async function saveTestSuiteCase({ label, inputFile, groundTruth, groundTruthFileName }) {
   const res = await fetch('/api/test-suite/save', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       label: label ?? '',
       inputFileName: inputFile.name,
+      groundTruthFileName: groundTruthFileName ?? 'ground-truth.json',
       inputBase64: await fileToBase64(inputFile),
       groundTruth,
     }),
@@ -70,13 +107,16 @@ export async function saveTestSuiteCase({ label, inputFile, groundTruth }) {
 }
 
 /** Update existing case folder + manifest entry. */
-export async function updateTestSuiteCase(caseId, { label, inputFile, groundTruth }) {
+export async function updateTestSuiteCase(caseId, { label, inputFile, groundTruth, groundTruthFileName }) {
   const body = { label }
   if (inputFile) {
     body.inputFileName = inputFile.name
     body.inputBase64 = await fileToBase64(inputFile)
   }
-  if (groundTruth) body.groundTruth = groundTruth
+  if (groundTruth) {
+    body.groundTruth = groundTruth
+    if (groundTruthFileName) body.groundTruthFileName = groundTruthFileName
+  }
 
   const res = await fetch(`/api/test-suite/cases/${encodeURIComponent(caseId)}`, {
     method: 'PUT',
@@ -94,3 +134,4 @@ export async function deleteTestSuiteCase(caseId) {
   })
   if (!res.ok) throw new Error(await parseError(res))
 }
+

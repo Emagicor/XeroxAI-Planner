@@ -55,23 +55,26 @@ EXAMPLE — Title/cover page (NOT a floor plan):
   "units_detected": "unknown"
 }
 
-EXAMPLE — Non-derivable room dimensions (Strict Non-Hallucination):
+EXAMPLE — Area-only annotation (no separate L×W):
 {
   "page_classification": { "is_floor_plan": true, "page_type": "floorplan", "reason": "Floor plan layout" },
   "floor_identification": { "floor_label": "Unknown", "confidence_pct": 0, "evidence": "No readable level label" },
   "rooms": [{
-    "name": "Hallway",
+    "name": "LIVING/DINING",
     "bbox": [420, 80, 580, 260],
     "polygon": [[420,80],[580,80],[580,260],[420,260]],
-    "length_ft": null, "width_ft": null, "area_sqft": null,
-    "confidence_pct": 50, "dimension_source": "assumed",
-    "assumptions": ["Dimensions not mentioned or geometrically derivable."]
+    "length_ft": null, "width_ft": null, "area_sqft": 285,
+    "confidence_pct": 95, "dimension_source": "measured",
+    "assumptions": []
   }],
   "layout_dimensions": { "available": false, "width_ft": null, "height_ft": null, "source": null },
-  "total_area_sqft": 0,
-  "overall_confidence": 50,
+  "total_area_sqft": 285,
+  "overall_confidence": 95,
   "units_detected": "feet"
 }
+
+EXAMPLE — Labeled room with NO dimensions (omit from output):
+If "HALLWAY" appears on the plan but has no readable dimensions or area, do NOT add it to rooms[].
 
 Now analyze the uploaded page image. Return ONLY a valid JSON object — no markdown, no backticks, no explanation.
 
@@ -125,13 +128,18 @@ COORDINATE RULES (critical — only when is_floor_plan is true):
 - polygon: clockwise corner points; rectangular rooms = 4 points; L-shaped = 6–8 points
 - Rooms must not overlap
 
-IDENTIFY ALL labeled spaces when is_floor_plan is true:
-Bedrooms, living/dining, kitchen, bathrooms, corridors, balconies, utility, garage, stairs, and any other labeled space.
+ROOM LABEL & DIMENSION RULES (critical — follow exactly):
+1. DIMENSIONS WITHOUT LABEL: If length/width (or area) annotations are readable but the room has NO text label on the plan, INCLUDE the room and infer a descriptive name from shape/context (e.g. "Bedroom", "Kitchen", "Corridor"). Do NOT skip measurable rooms just because a label is missing.
+2. LABEL WITHOUT DIMENSIONS: If a room name/label is visible on the plan but NO readable dimensions AND NO readable area annotation exist for that space, DO NOT include that room in the rooms array at all. Omit it completely.
+3. AREA-ONLY: If only a total area is annotated (e.g. "168 SF", "15.6 m²") without separate length and width, set area_sqft to that value, length_ft = null, width_ft = null, dimension_source = "measured". When BOTH length and width are readable, set length_ft and width_ft and leave area_sqft to be computed server-side from L×W.
+4. EXACT LABELS: When a room label IS visible on the plan, copy the text EXACTLY as printed — same spelling, capitalization, abbreviations, and punctuation (e.g. "M. BEDROOM", "KITCHEN/DINING", "BATH-1"). Never paraphrase or normalize plan labels.
 
-DIMENSION EXTRACTION & ANTI-HALLUCINATION RULES:
-1. Visible readable dimensions: source = "measured", confidence 90–100%.
-2. Geometric inference from parallel walls / arithmetic: source = "derived", confidence 70–89%.
-3. CRITICAL: If dimensions cannot be read or derived, set length_ft, width_ft, area_sqft to null, dimension_source = "assumed", assumptions = ["Dimensions not mentioned or geometrically derivable."]
+INCLUDE ONLY rooms that pass rules 1 or 3 when is_floor_plan is true.
+
+DIMENSION EXTRACTION RULES:
+1. Visible readable dimensions on the plan: dimension_source = "measured", confidence 90–100%.
+2. Geometric inference from parallel walls / arithmetic: dimension_source = "derived", confidence 70–89%.
+3. Never invent numbers. Never output a room that has only a label with no measurable dimensions or area.
 
 ARCHITECTURAL HEURISTICS (structural only — never guess missing numbers):
 - Interior door ≈ 3 ft, wall thickness ≈ 6 in, corridor ≈ 3.5 ft
@@ -144,7 +152,9 @@ CORRECTION_PROMPT_TEMPLATE = """You previously analyzed an architectural sheet a
 Review against the image. Correct:
 - page_classification (is_floor_plan, page_type, reason) — reject non-plan pages
 - floor_identification (floor_label, confidence_pct, evidence) — identify Ground/First/Basement/etc only when supported
-- Room names, boundaries (bbox/polygon 0-1000), dimensions, confidence, assumptions
+- Room names (exact plan labels when visible; infer name only when dimensions exist without a label)
+- Drop any room that has a plan label but no readable dimensions or area
+- Room boundaries (bbox/polygon 0-1000), dimensions, area-only annotations, confidence, assumptions
 - layout_dimensions and total_area_sqft
 - overall_confidence
 

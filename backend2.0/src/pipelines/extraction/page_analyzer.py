@@ -26,8 +26,6 @@ from providers.vision.gemini import parse_provider_json
 
 log = structlog.get_logger(__name__)
 
-VISION_MIME = "image/jpeg"
-
 _NON_PLAN_PAGE_TYPES = frozenset(
     {"cover", "notes", "schedule", "elevation", "section", "other", "title", "text", "index"}
 )
@@ -59,22 +57,27 @@ def _ineligible_payload(reason: str, data: dict | None = None) -> dict:
     }
 
 
+def _has_measurable_rooms(data: dict) -> bool:
+    return bool([
+        r for r in (data.get("rooms") or [])
+        if r.get("area_sqft") and float(r["area_sqft"]) > 0
+    ])
+
+
 def _result_needs_correction(data: dict) -> bool:
     """True when a second vision call may fix empty/invalid extraction."""
     if _vision_rejects_page(data):
         return False
-    if not is_valid(data):
+    sanitized = sanitize_vision_rooms(data)
+    if not is_valid(sanitized):
         return True
-    measurable = [
-        r for r in (data.get("rooms") or [])
-        if r.get("area_sqft") and float(r["area_sqft"]) > 0
-    ]
-    return not measurable
+    return not _has_measurable_rooms(sanitized)
 
 
 def _vision_analyze(
     provider: VisionProvider,
     preprocessed_bytes: bytes,
+    vision_mime: str,
     *,
     session_id: str,
     page_number: int,
@@ -89,7 +92,7 @@ def _vision_analyze(
     api_calls = 0
 
     with VISION_API_LOCK:
-        r1 = provider.analyze_image(preprocessed_bytes, VISION_MIME, prompt1)
+        r1 = provider.analyze_image(preprocessed_bytes, vision_mime, prompt1)
         api_calls += 1
         _log_usage(r1, pass_num=1)
 
@@ -103,7 +106,7 @@ def _vision_analyze(
                 session_id, page_number, r1.text
             )
             r2 = provider.analyze_image(
-                preprocessed_bytes, VISION_MIME, correction_prompt
+                preprocessed_bytes, vision_mime, correction_prompt
             )
             api_calls += 1
             _log_usage(r2, pass_num=2)
@@ -154,10 +157,11 @@ def analyze_single_page(
     session_id: str,
     page_number: int,
 ) -> dict:
-    preprocessed = preprocess_image(bytes(image_bytes))
+    preprocessed, vision_mime = preprocess_image(bytes(image_bytes))
     data = _vision_analyze(
         provider,
         preprocessed,
+        vision_mime,
         session_id=session_id,
         page_number=page_number,
     )
@@ -215,11 +219,7 @@ def analyze_page_safe(
                 last_error = ValueError("Model returned invalid room data")
                 continue
 
-            measurable = [
-                r for r in (result.get("rooms") or [])
-                if r.get("area_sqft") and float(r["area_sqft"]) > 0
-            ]
-            if not measurable:
+            if not _has_measurable_rooms(result):
                 last_error = ValueError("No rooms with computable dimensions")
                 log.warning(
                     "page_analyzer.no_measurable_rooms",

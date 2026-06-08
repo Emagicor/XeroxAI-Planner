@@ -9,6 +9,7 @@ import UploadSection from '@/components/upload/UploadSection'
 import TestSuitePanel from '@/components/test-suite/TestSuitePanel'
 import TestSuiteMetrics from '@/components/test-suite/TestSuiteMetrics'
 import TestSuiteProgressPanel from '@/components/test-suite/TestSuiteProgressPanel'
+import TestSuiteRunHistory from '@/components/test-suite/TestSuiteRunHistory'
 import TestSuiteUploadSection from '@/components/test-suite/TestSuiteUploadSection'
 import SectionHeader from '@/components/ui/SectionHeader'
 import FeaturePills from '@/components/ui/FeaturePills'
@@ -99,9 +100,9 @@ function App() {
     (detecting || (detection && !result))
   const showAnalyzeProgress =
     !isTestSuite && analyzeLoading && analyzeProgress.length > 1
-  const showTestSuiteSetup = isTestSuite && !testSuite.loading && !testSuite.batchComplete
+  const showTestSuiteSetup = isTestSuite && !testSuite.loading && !testSuite.hasResults
   const showTestSuiteProgress = isTestSuite && testSuite.loading
-  const showBatchResults = isTestSuite && testSuite.batchComplete
+  const showBatchResults = isTestSuite && testSuite.hasResults
   const showAnalyzeResults = Boolean(result) && !isTestSuite
 
   return (
@@ -209,6 +210,17 @@ function App() {
             />
           )}
 
+          {isTestSuite && !testSuite.loading && (
+            <div className="mb-6">
+              <TestSuiteRunHistory
+                runs={testSuite.runHistory}
+                selectedRunId={testSuite.selectedRunId}
+                loading={testSuite.historyLoading}
+                onSelectRun={testSuite.selectRun}
+              />
+            </div>
+          )}
+
           {showTestSuiteSetup && (
             <>
               <SectionHeader
@@ -258,7 +270,7 @@ function App() {
             />
           )}
 
-          {result && isTestSuite && !testSuite.batchComplete && !testSuite.loading && (
+          {result && isTestSuite && !testSuite.hasResults && !testSuite.loading && (
             <TestSuitePanel
               hasResult
               groundTruth={groundTruth}
