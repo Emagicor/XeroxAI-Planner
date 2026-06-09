@@ -2,14 +2,22 @@
 Converts PDF pages to raster images using PyMuPDF (fitz).
 Extracts embedded text per page for sheet-type classification.
 
-Default: lossless PNG at 300 DPI to preserve thin dimension lines on multi-page PDFs.
+CAD / architectural PDF color fidelity (PyMuPDF known behavior):
+  - colorspace=fitz.csRGB  — explicit RGB, avoids implicit gamma shifts on cyan-blues
+  - alpha=False            — flatten onto white; alpha=True + manual flatten washes colors
+  - annots=True            — include annotation layers (blue dims are often annots)
+  - dpi >= 216 (3x zoom)   — thin anti-aliased lines fade into white at low resolution
+
+Default settings use 300 DPI + lossless PNG.
 """
 from __future__ import annotations
 
 import fitz
+from PIL import Image
 
 from config.settings import get_settings
 from domain.exceptions import RasterizationError
+from infrastructure.imaging.color_fidelity import open_image, save_image
 from infrastructure.rasterizer.page_raster import RasterizedPage
 
 
@@ -21,15 +29,21 @@ def _extract_page_text(page: fitz.Page) -> str:
 
 
 def _render_page_pixmap(page: fitz.Page, dpi: int) -> fitz.Pixmap:
-    mat = fitz.Matrix(dpi / 72, dpi / 72)
-    return page.get_pixmap(matrix=mat, colorspace=fitz.csRGB, alpha=False)
+    """Render one page with CAD-safe PyMuPDF settings (see module docstring)."""
+    zoom = dpi / 72  # PDF base is 72 pt/in; 300 → ~4.17x
+    mat = fitz.Matrix(zoom, zoom)
+    return page.get_pixmap(
+        matrix=mat,
+        colorspace=fitz.csRGB,
+        alpha=False,
+        annots=True,
+    )
 
 
-def _pixmap_to_bytes(pix: fitz.Pixmap, *, fmt: str, jpeg_quality: int) -> tuple[bytes, str]:
-    normalized = fmt.lower().strip()
-    if normalized == "jpeg":
-        return pix.tobytes(output="jpeg", jpg_quality=jpeg_quality), "image/jpeg"
-    return pix.tobytes(output="png"), "image/png"
+def _render_page_image(page: fitz.Page, dpi: int) -> Image.Image:
+    """PIL RGB image from a CAD-safe pixmap (PNG round-trip for PyMuPDF 1.24+)."""
+    pix = _render_page_pixmap(page, dpi)
+    return open_image(pix.tobytes("png"))
 
 
 def rasterize_pdf(pdf_bytes: bytes) -> list[RasterizedPage]:
@@ -60,11 +74,15 @@ def rasterize_pdf(pdf_bytes: bytes) -> list[RasterizedPage]:
             page = doc.load_page(page_num)
             pdf_text = _extract_page_text(page)
             pix = _render_page_pixmap(page, dpi)
-            image_bytes, mime_type = _pixmap_to_bytes(
-                pix,
-                fmt=raster_fmt,
-                jpeg_quality=jpeg_quality,
-            )
+            if raster_fmt.lower().strip() == "jpeg":
+                image_bytes, mime_type = save_image(
+                    open_image(pix.tobytes("png")),
+                    fmt=raster_fmt,
+                    jpeg_quality=jpeg_quality,
+                )
+            else:
+                image_bytes = pix.tobytes("png")
+                mime_type = "image/png"
 
             results.append(
                 RasterizedPage(
@@ -72,6 +90,7 @@ def rasterize_pdf(pdf_bytes: bytes) -> list[RasterizedPage]:
                     jpeg_bytes=image_bytes,
                     mime_type=mime_type,
                     pdf_text=pdf_text,
+                    from_pdf=True,
                 )
             )
         except Exception as exc:
@@ -101,6 +120,7 @@ def rasterize_single_image(image_bytes: bytes, mime_type: str) -> list[Rasterize
             jpeg_bytes=image_bytes,
             mime_type=mime_type,
             pdf_text="",
+            from_pdf=False,
         )
     ]
 

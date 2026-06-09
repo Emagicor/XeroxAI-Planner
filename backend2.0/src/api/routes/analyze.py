@@ -219,7 +219,11 @@ async def analyze(
         # Surface missing/invalid API keys as 503 so clients show a clear message
         if job.error_code in (
             "MISSING_API_KEY",
+            "INVALID_API_KEY",
             "QUOTA_EXCEEDED",
+            "BILLING_CREDITS_DEPLETED",
+            "MODEL_NOT_FOUND",
+            "GEMINI_ERROR",
             "VISION_PROVIDER_ERROR",
         ):
             status_code = 503

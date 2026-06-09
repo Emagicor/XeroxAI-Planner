@@ -112,11 +112,109 @@
       "createdAt": "2026-06-08T08:13:10.416Z"
     },
     {
-      "id": "master-plan",
-      "label": "master-plan",
-      "inputFile": "master-plan.pdf",
-      "groundTruthFile": "master-plan_ground_truth (1).json",
-      "createdAt": "2026-06-08T11:46:00.207Z"
+      "id": "data14",
+      "label": "Data14",
+      "inputFile": "Data14.jpg",
+      "groundTruthFile": "Data14_ground_truth.json",
+      "createdAt": "2026-06-08T13:28:39.477Z"
+    },
+    {
+      "id": "data21",
+      "label": "Data21",
+      "inputFile": "Data21.pdf",
+      "groundTruthFile": "Data21_ground_truth.json",
+      "createdAt": "2026-06-08T13:38:12.666Z"
+    },
+    {
+      "id": "dermat-clinic-floor-plan",
+      "label": "Dermat Clinic- Floor Plan",
+      "inputFile": "Dermat Clinic- Floor Plan.pdf",
+      "groundTruthFile": "Screenshot 2026-06-09 102821_ground_truth.json",
+      "createdAt": "2026-06-09T06:28:42.679Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-134649",
+      "label": "Screenshot 2026-06-09 134649",
+      "inputFile": "Screenshot 2026-06-09 134649.png",
+      "groundTruthFile": "Screenshot 2026-06-09 134649.json",
+      "createdAt": "2026-06-09T10:02:02.748Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-134720",
+      "label": "Screenshot 2026-06-09 134720",
+      "inputFile": "Screenshot 2026-06-09 134720.png",
+      "groundTruthFile": "Screenshot 2026-06-09 134720.json",
+      "createdAt": "2026-06-09T10:02:16.081Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-150557",
+      "label": "Screenshot 2026-06-09 150557",
+      "inputFile": "Screenshot 2026-06-09 150557.png",
+      "groundTruthFile": "Screenshot 2026-06-09 150557_ground_truth.json",
+      "createdAt": "2026-06-09T10:02:27.701Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-151513",
+      "label": "Screenshot 2026-06-09 151513",
+      "inputFile": "Screenshot 2026-06-09 151513.png",
+      "groundTruthFile": "Screenshot 2026-06-09 151513_ground_truth.json",
+      "createdAt": "2026-06-09T10:02:39.232Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-134627",
+      "label": "Screenshot 2026-06-09 134627",
+      "inputFile": "Screenshot 2026-06-09 134627.png",
+      "groundTruthFile": "Screenshot 2026-06-09 134627_ground_truth (1).json",
+      "createdAt": "2026-06-09T10:02:52.783Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-151555",
+      "label": "Screenshot 2026-06-09 151555",
+      "inputFile": "Screenshot 2026-06-09 151555.png",
+      "groundTruthFile": "Screenshot 2026-06-09 151555_ground_truth.json",
+      "createdAt": "2026-06-09T10:06:30.556Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-134801",
+      "label": "Screenshot 2026-06-09 134801",
+      "inputFile": "Screenshot 2026-06-09 134801.png",
+      "groundTruthFile": "Screenshot 2026-06-09 134801_ground_truth.json",
+      "createdAt": "2026-06-09T10:10:56.007Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-154211",
+      "label": "Screenshot 2026-06-09 154211",
+      "inputFile": "Screenshot 2026-06-09 154211.png",
+      "groundTruthFile": "Screenshot 2026-06-09 154211_ground_truth.json",
+      "createdAt": "2026-06-09T10:14:10.235Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-154814",
+      "label": "Screenshot 2026-06-09 154814",
+      "inputFile": "Screenshot 2026-06-09 154814.png",
+      "groundTruthFile": "Screenshot 2026-06-09 154814_ground_truth.json",
+      "createdAt": "2026-06-09T10:20:17.503Z"
+    },
+    {
+      "id": "the-grand-floor-plans-removed",
+      "label": "THE-GRAND-FLOOR-PLANS_removed",
+      "inputFile": "THE-GRAND-FLOOR-PLANS_removed.pdf",
+      "groundTruthFile": "THE-GRAND-FLOOR-PLANS_removed_ground_truth.json",
+      "createdAt": "2026-06-09T10:45:41.094Z"
+    },
+    {
+      "id": "screenshot-2026-06-09-161617",
+      "label": "Screenshot 2026-06-09 161617",
+      "inputFile": "Screenshot 2026-06-09 161617.png",
+      "groundTruthFile": "Screenshot 2026-06-09 161617_ground_truth.json",
+      "createdAt": "2026-06-09T10:49:17.915Z"
+    },
+    {
+      "id": "0aa90b13a2583521bdfdc4146cf7eec5",
+      "label": "0aa90b13a2583521bdfdc4146cf7eec5",
+      "inputFile": "0aa90b13a2583521bdfdc4146cf7eec5.jpg",
+      "groundTruthFile": "0aa90b13a2583521bdfdc4146cf7eec5_ground_truth (2).json",
+      "createdAt": "2026-06-09T10:55:39.326Z"
     }
   ]
 }

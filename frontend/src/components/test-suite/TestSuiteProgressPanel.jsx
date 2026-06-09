@@ -1,3 +1,4 @@
+import ExpandableImage from '@/components/ui/ExpandableImage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
 
 function StatusIcon({ status }) {
@@ -119,11 +120,14 @@ export default function TestSuiteProgressPanel({
               >
                 <StatusIcon status={item.status} />
                 {item.preview && !isPdf ? (
-                  <img
-                    src={item.preview}
-                    alt=""
-                    className="w-11 h-11 object-cover rounded-lg border border-line shrink-0"
-                  />
+                  <div className="w-11 h-11 shrink-0">
+                    <ExpandableImage
+                      src={item.preview}
+                      alt={item.inputFileName || 'Floor plan preview'}
+                      thumbnail
+                      expandable
+                    />
+                  </div>
                 ) : (
                   <div className="w-11 h-11 rounded-lg border border-line bg-surface flex items-center justify-center shrink-0">
                     <span className="text-[10px] font-mono text-accent">

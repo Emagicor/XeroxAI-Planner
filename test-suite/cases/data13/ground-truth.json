@@ -50,20 +50,6 @@
           "dimension_source": "measured"
         },
         {
-          "name": "MUD.",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
-        },
-        {
-          "name": "FOY.",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
-        },
-        {
           "name": "FRONT PORCH",
           "length_ft": 12.5,
           "width_ft": 6.5,
@@ -76,13 +62,6 @@
           "width_ft": 21,
           "area_sqft": 451.5,
           "dimension_source": "measured"
-        },
-        {
-          "name": "pantry",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
         }
       ]
     }

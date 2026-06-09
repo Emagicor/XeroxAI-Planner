@@ -1,0 +1,55 @@
+{
+  "filename": "Screenshot 2026-06-09 161617.png",
+  "exported_at": "2026-06-09T10:48:43.945Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Unit Plan",
+      "rooms": [
+        {
+          "name": "TERRACE",
+          "length_ft": 40.03,
+          "width_ft": 11.48,
+          "area_sqft": 459.54,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING& DINING",
+          "length_ft": 17.72,
+          "width_ft": 14.76,
+          "area_sqft": 261.55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.48,
+          "width_ft": 10.17,
+          "area_sqft": 116.75,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.86,
+          "width_ft": 6.23,
+          "area_sqft": 55.2,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 4.59,
+          "width_ft": 3.61,
+          "area_sqft": 16.57,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN",
+          "length_ft": 9.84,
+          "width_ft": 8.2,
+          "area_sqft": 80.69,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

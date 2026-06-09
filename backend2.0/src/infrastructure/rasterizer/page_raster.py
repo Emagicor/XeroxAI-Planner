@@ -10,3 +10,4 @@ class RasterizedPage:
     jpeg_bytes: bytes
     mime_type: str
     pdf_text: str
+    from_pdf: bool = False

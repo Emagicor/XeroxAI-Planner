@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import AnnotatedImagePanel from './AnnotatedImagePanel'
-import { resolveAnnotatedSrc } from '@/utils/annotatedImage'
+import { inlineImageSrc, resolveAnnotatedSrc } from '@/utils/annotatedImage'
 import { pageTypeLabel } from '@/utils/pageTypes'
 
 export default function AnnotatedPagesPanel({
@@ -116,7 +116,7 @@ export default function AnnotatedPagesPanel({
       inlineBase64: current.annotatedImage,
       hasAnnotated: current.hasAnnotated,
     }) ??
-    (current.clipPreview ? `data:image/jpeg;base64,${current.clipPreview}` : null)
+    (current.clipPreview ? inlineImageSrc(current.clipPreview) : null)
 
   return (
     <div className="lg:w-[58%]">

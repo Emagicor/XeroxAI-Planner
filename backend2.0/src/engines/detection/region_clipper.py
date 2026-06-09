@@ -1,17 +1,9 @@
 """Crop detected floor-plan regions from rasterized page images."""
 from __future__ import annotations
 
-import io
-
-from PIL import Image
-
 from config.settings import get_settings
 from domain.entities.detection import BoundingBox, DetectedRegion
-
-
-def _load_rgb(jpeg_bytes: bytes) -> Image.Image:
-    img = Image.open(io.BytesIO(jpeg_bytes))
-    return img.convert("RGB")
+from infrastructure.imaging.color_fidelity import load_rgb, save_image
 
 
 def _pad_bbox(
@@ -42,7 +34,7 @@ def clip_region(
     detection_method: str = "grounding_dino",
 ) -> DetectedRegion:
     settings = get_settings()
-    img = _load_rgb(jpeg_bytes)
+    img = load_rgb(jpeg_bytes)
     w, h = img.size
     # Bboxes are pre-expanded in bbox_refinement — add a final safety margin at clip time.
     padded = _pad_bbox(
@@ -54,11 +46,11 @@ def clip_region(
     )
 
     crop = img.crop((padded.x1, padded.y1, padded.x2, padded.y2))
-    buf = io.BytesIO()
-    if settings.vision_image_format.lower().strip() == "jpeg":
-        crop.save(buf, format="JPEG", quality=settings.jpeg_quality, optimize=True)
-    else:
-        crop.save(buf, format="PNG", optimize=True)
+    clip_bytes, _clip_mime = save_image(
+        crop,
+        fmt=settings.vision_image_format,
+        jpeg_quality=settings.jpeg_quality,
+    )
 
     return DetectedRegion(
         region_id=DetectedRegion.new_id(),
@@ -67,7 +59,7 @@ def clip_region(
         label=label,
         confidence=confidence,
         bbox=padded,
-        jpeg_bytes=buf.getvalue(),
+        jpeg_bytes=clip_bytes,
         detection_method=detection_method,
     )
 
@@ -80,7 +72,7 @@ def full_page_region(
     confidence: float = 1.0,
     detection_method: str = "full_page_fallback",
 ) -> DetectedRegion:
-    img = _load_rgb(jpeg_bytes)
+    img = load_rgb(jpeg_bytes)
     w, h = img.size
     bbox = BoundingBox(0, 0, w, h)
     return clip_region(

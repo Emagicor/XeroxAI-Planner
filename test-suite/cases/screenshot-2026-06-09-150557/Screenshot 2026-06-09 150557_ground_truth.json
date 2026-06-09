@@ -1,0 +1,125 @@
+{
+  "filename": "Screenshot 2026-06-09 150557.png",
+  "exported_at": "2026-06-09T12:05:46.076Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "First Floor",
+      "rooms": [
+        {
+          "name": "ROOM - 3",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "ROOM - 2",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "ROOM - 1",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "ROOM - 4",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "ROOM - 5",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "ROOM - 6",
+          "length_ft": 14,
+          "width_ft": 12,
+          "area_sqft": 168,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "TOILET",
+          "length_ft": 8.17,
+          "width_ft": 5.08,
+          "area_sqft": 41.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "TOILET",
+          "length_ft": 8.17,
+          "width_ft": 5.08,
+          "area_sqft": 41.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "TOILET",
+          "length_ft": 8.17,
+          "width_ft": 5.08,
+          "area_sqft": 41.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "TOILET",
+          "length_ft": 8.17,
+          "width_ft": 5.08,
+          "area_sqft": 41.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "TOILET",
+          "length_ft": 8.17,
+          "width_ft": 5.08,
+          "area_sqft": 41.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "TOILET",
+          "length_ft": 8.17,
+          "width_ft": 5.08,
+          "area_sqft": 41.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "ACCOUNTANT/\nMANAGER\nROOM",
+          "length_ft": 7.17,
+          "width_ft": 6.42,
+          "area_sqft": 46.03,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "RECEPTION",
+          "length_ft": 6.83,
+          "width_ft": 6.42,
+          "area_sqft": 43.85,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "WAITING ROOM",
+          "length_ft": 14.5,
+          "width_ft": 13.25,
+          "area_sqft": 192.12,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIFT",
+          "length_ft": 5.92,
+          "width_ft": 5.08,
+          "area_sqft": 30.07,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "filename": "Screenshot 2026-06-09 134720.png",
+  "exported_at": "2026-06-09T14:54:43.000Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "GROUND FLOOR",
+      "rooms": [
+        {
+          "name": "BEDROOM",
+          "length_ft": 16.83,
+          "width_ft": 14,
+          "area_sqft": 235.62,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATH & TOILET",
+          "length_ft": 5,
+          "width_ft": 13.67,
+          "area_sqft": 68.35,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.67,
+          "width_ft": 15.83,
+          "area_sqft": 184.74,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATH & TOILET",
+          "length_ft": 5.67,
+          "width_ft": 9.5,
+          "area_sqft": 53.87,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DOUBLE HEIGHT ENTRANCE VERANDAH",
+          "length_ft": 14.67,
+          "width_ft": 17.83,
+          "area_sqft": 261.57,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING & DINNING",
+          "length_ft": 22.17,
+          "width_ft": 15.83,
+          "area_sqft": 350.95,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN",
+          "length_ft": 3.5,
+          "width_ft": 15.83,
+          "area_sqft": 55.41,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "SWIMMING POOL",
+          "length_ft": 15.17,
+          "width_ft": 25.67,
+          "area_sqft": 389.41,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

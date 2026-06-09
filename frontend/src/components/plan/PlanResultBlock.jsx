@@ -10,6 +10,8 @@ export default function PlanResultBlock({
 
   jobId,
 
+  downloadBaseName = 'floor_plan',
+
   unit,
 
   activeRowId,
@@ -101,6 +103,12 @@ export default function PlanResultBlock({
           activeRoom={activeRoom}
 
           onSelectRoom={onSelectRoom}
+
+          expandable
+
+          allowDownload
+
+          downloadBaseName={downloadBaseName}
 
         />
 

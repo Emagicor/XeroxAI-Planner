@@ -36,6 +36,7 @@ class AnalysisUnit:
     mime_type: str
     pdf_text: str
     skip_classifier: bool
+    from_pdf: bool = False
 
 
 def _dino_found_plans(method: str, boxes: list) -> bool:
@@ -147,6 +148,7 @@ def detect_document_regions(
                 regions=regions,
                 skipped=skipped,
                 skip_reason=skip_reason,
+                page_preview_bytes=page.jpeg_bytes if page.from_pdf else None,
             )
         )
 
@@ -179,6 +181,7 @@ def _region_to_unit(
         mime_type=page.mime_type,
         pdf_text=page.pdf_text,
         skip_classifier=region.detection_method == "grounding_dino",
+        from_pdf=page.from_pdf,
     )
 
 

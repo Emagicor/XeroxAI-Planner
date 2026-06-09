@@ -48,13 +48,6 @@
           "dimension_source": "measured"
         },
         {
-          "name": "DINING",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
-        },
-        {
           "name": "BEDROOM-3",
           "length_ft": 10,
           "width_ft": 10,

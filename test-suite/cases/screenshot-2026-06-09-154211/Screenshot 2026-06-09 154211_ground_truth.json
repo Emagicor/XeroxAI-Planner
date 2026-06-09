@@ -1,0 +1,83 @@
+{
+  "filename": "Screenshot 2026-06-09 154211.png",
+  "exported_at": "2026-06-09T11:53:05.908Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Unknown",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 10.17,
+          "width_ft": 5.91,
+          "area_sqft": 60.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DINING & KITCHEN",
+          "length_ft": 15.09,
+          "width_ft": 11.48,
+          "area_sqft": 173.23,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 15.42,
+          "width_ft": 15.09,
+          "area_sqft": 232.69,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 10.5,
+          "width_ft": 10.17,
+          "area_sqft": 106.78,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.86,
+          "width_ft": 6.23,
+          "area_sqft": 55.2,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 10.17,
+          "width_ft": 3.61,
+          "area_sqft": 36.71,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 18.7,
+          "width_ft": 4.59,
+          "area_sqft": 85.83,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BALCONY",
+          "length_ft": 10.17,
+          "width_ft": 5.91,
+          "area_sqft": 60.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BEDROOM",
+          "length_ft": 11.81,
+          "width_ft": 11.48,
+          "area_sqft": 135.58,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BATH",
+          "length_ft": 8.86,
+          "width_ft": 6.56,
+          "area_sqft": 58.12,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

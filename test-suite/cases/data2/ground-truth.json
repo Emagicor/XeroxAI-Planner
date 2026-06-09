@@ -188,13 +188,6 @@
           "width_ft": 5,
           "area_sqft": 45,
           "dimension_source": "measured"
-        },
-        {
-          "name": "Hallway",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
         }
       ]
     }

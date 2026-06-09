@@ -36,20 +36,6 @@
           "dimension_source": "measured"
         },
         {
-          "name": "Covered Deck",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
-        },
-        {
-          "name": "Staircase",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
-        },
-        {
           "name": "Great Room",
           "length_ft": 21.17,
           "width_ft": 15,
@@ -83,13 +69,6 @@
           "width_ft": 9.5,
           "area_sqft": 126.64,
           "dimension_source": "measured"
-        },
-        {
-          "name": "Sun Deck",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
         }
       ]
     }

@@ -5,8 +5,9 @@ from PIL import Image, ImageDraw
 from config.constants import ROOM_COLORS
 from infrastructure.annotations.geometry import scale_coord, shrink_polygon
 from infrastructure.annotations.room_card import draw_room_card
+from infrastructure.imaging.color_fidelity import composite_on_white, open_image
 
-ANNOTATED_JPEG_QUALITY = 92
+ANNOTATED_JPEG_QUALITY = 95
 
 
 def _draw_polygon_room(draw, room, color, width, height):
@@ -55,7 +56,7 @@ def _draw_bbox_room(draw, room, color, width, height):
 
 def draw_annotations(image_bytes: bytes, rooms: list) -> bytes:
     """Draw colored room overlays on the original page image (0–1000 coords)."""
-    base = Image.open(BytesIO(image_bytes)).convert("RGBA")
+    base = composite_on_white(open_image(image_bytes)).convert("RGBA")
     width, height = base.size
     overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
@@ -71,5 +72,11 @@ def draw_annotations(image_bytes: bytes, rooms: list) -> bytes:
 
     composite = Image.alpha_composite(base, overlay).convert("RGB")
     buffer = BytesIO()
-    composite.save(buffer, format="JPEG", quality=ANNOTATED_JPEG_QUALITY)
+    composite.save(
+        buffer,
+        format="JPEG",
+        quality=ANNOTATED_JPEG_QUALITY,
+        subsampling=0,
+        optimize=True,
+    )
     return buffer.getvalue()

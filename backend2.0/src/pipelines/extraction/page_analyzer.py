@@ -17,11 +17,14 @@ from engines.area.total_area import apply_total_area
 from engines.dimensions.sanitize import sanitize_vision_rooms
 from engines.validation.analysis_validator import is_valid
 from infrastructure.annotations.renderer import draw_annotations
-from infrastructure.preprocessing.image_preprocessor import preprocess_image
+from infrastructure.preprocessing.image_preprocessor import (
+    prepare_display_image,
+    preprocess_image,
+)
 from infrastructure.vision_session import VISION_API_LOCK
 from prompts.floor_plan import isolated_correction_prompt, isolated_floor_plan_prompt
 from providers.vision.base import VisionProvider
-from providers.vision.factory import create_vision_provider
+from providers.vision.factory import create_correction_validator, create_vision_provider
 from providers.vision.gemini import parse_provider_json
 
 log = structlog.get_logger(__name__)
@@ -102,10 +105,11 @@ def _vision_analyze(
             run_correction = _result_needs_correction(data)
 
         if run_correction:
+            validator = create_correction_validator()
             correction_prompt = isolated_correction_prompt(
                 session_id, page_number, r1.text
             )
-            r2 = provider.analyze_image(
+            r2 = validator.analyze_image(
                 preprocessed_bytes, vision_mime, correction_prompt
             )
             api_calls += 1
@@ -156,8 +160,16 @@ def analyze_single_page(
     *,
     session_id: str,
     page_number: int,
+    from_pdf: bool = False,
 ) -> dict:
-    preprocessed, vision_mime = preprocess_image(bytes(image_bytes))
+    preprocessed, vision_mime = preprocess_image(
+        bytes(image_bytes),
+        preserve_colors=from_pdf,
+    )
+    display_bytes, _display_mime = prepare_display_image(
+        bytes(image_bytes),
+        from_pdf=from_pdf,
+    )
     data = _vision_analyze(
         provider,
         preprocessed,
@@ -173,7 +185,7 @@ def analyze_single_page(
 
     data = sanitize_vision_rooms(data)
     data = apply_total_area(data)
-    data = _attach_annotated_image(preprocessed, data)
+    data = _attach_annotated_image(display_bytes, data)
     data["eligible"] = True
     return data
 
@@ -186,6 +198,7 @@ def analyze_page_safe(
     max_attempts: int | None = None,
     *,
     session_id: str,
+    from_pdf: bool = False,
 ) -> dict:
     settings = get_settings()
     attempts = max_attempts or settings.max_analysis_attempts
@@ -200,6 +213,7 @@ def analyze_page_safe(
                 mime_type,
                 session_id=session_id,
                 page_number=page_number,
+                from_pdf=from_pdf,
             )
 
             if not result.get("eligible", True):
@@ -238,17 +252,8 @@ def analyze_page_safe(
             return result
 
         except ProviderError as exc:
-            # Quota / auth — do not burn more API calls retrying the page
-            if exc.code in ("QUOTA_EXCEEDED", "MISSING_API_KEY"):
-                raise
-            log.warning(
-                "page_analyzer.provider_error",
-                page=page_number,
-                attempt=attempt,
-                code=exc.code,
-                error=exc.message,
-            )
-            last_error = exc
+            # Surface the exact API error — do not swallow or rephrase provider failures.
+            raise
         except Exception as exc:
             log.warning(
                 "page_analyzer.attempt_failed",

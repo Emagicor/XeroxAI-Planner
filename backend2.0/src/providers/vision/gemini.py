@@ -35,26 +35,33 @@ from domain.exceptions import ProviderError
 from providers.vision.base import ProviderResponse, VisionProvider
 
 from providers.vision.errors import (
-
+    classify_gemini_error,
     is_quota_exceeded,
-
     is_transient_error,
-
     parse_retry_after_seconds,
-
-    quota_user_message,
-
 )
 
 
 
-SYSTEM_INSTRUCTION = (
+EXTRACTOR_SYSTEM_INSTRUCTION = (
 
     "You analyze ONE architectural sheet image per request. "
 
     "Each request is independent — ignore any prior images, sessions, or JSON outputs. "
 
     "Never reuse room data from another document."
+
+)
+
+VALIDATOR_SYSTEM_INSTRUCTION = (
+
+    "You are a dedicated validation agent for architectural floor plan extraction. "
+
+    "You receive the source image plus a draft JSON from a prior extraction pass. "
+
+    "Your only job is to review that draft against the image and return corrected JSON. "
+
+    "Each request is independent — ignore any prior images, sessions, or JSON except the draft in the prompt."
 
 )
 
@@ -66,7 +73,7 @@ class GeminiProvider(VisionProvider):
 
 
 
-    def __init__(self) -> None:
+    def __init__(self, *, system_instruction: str | None = None) -> None:
 
         settings = get_settings()
 
@@ -85,6 +92,8 @@ class GeminiProvider(VisionProvider):
         self._benchmark = settings.benchmark_mode
 
         self._transient_retries = max(0, settings.gemini_transient_retries)
+
+        self._system_instruction = system_instruction or EXTRACTOR_SYSTEM_INSTRUCTION
 
         genai.configure(api_key=settings.gemini_api_key)
 
@@ -106,7 +115,7 @@ class GeminiProvider(VisionProvider):
 
             model_name=self._model_name,
 
-            system_instruction=SYSTEM_INSTRUCTION,
+            system_instruction=self._system_instruction,
 
             generation_config=genai.GenerationConfig(
 
@@ -181,27 +190,12 @@ class GeminiProvider(VisionProvider):
 
 
     def _raise_provider_error(self, exc: Exception) -> None:
-
-        if is_quota_exceeded(exc):
-
-            raise ProviderError(
-
-                code="QUOTA_EXCEEDED",
-
-                message=quota_user_message(self._model_name),
-
-                details={"model": self._model_name, "detail": str(exc)[:400]},
-
-            ) from exc
-
+        raw = str(exc).strip()
+        code, _ = classify_gemini_error(exc, model=self._model_name)
         raise ProviderError(
-
-            code="GEMINI_ERROR",
-
-            message=str(exc),
-
-            details={"model": self._model_name, "detail": str(exc)[:400]},
-
+            code=code,
+            message=raw,
+            details={"model": self._model_name, "detail": raw[:400]},
         ) from exc
 
 
@@ -264,6 +258,29 @@ class GeminiProvider(VisionProvider):
 
 
 
+
+
+def probe_gemini_api() -> dict:
+    """
+    Live Gemini API check using current settings.
+    Returns raw API response text or the exact error string from Google.
+    """
+    settings = get_settings()
+    if not settings.gemini_api_key:
+        return {"ok": False, "error": "GEMINI_API_KEY is not set"}
+    try:
+        genai.configure(api_key=settings.gemini_api_key)
+        model = genai.GenerativeModel(settings.gemini_model)
+        response = model.generate_content("Reply with exactly: OK")
+        text = (response.text or "").strip()
+        return {"ok": True, "model": settings.gemini_model, "response": text[:200]}
+    except Exception as exc:
+        return {
+            "ok": False,
+            "model": settings.gemini_model,
+            "error": str(exc).strip(),
+            "error_type": type(exc).__name__,
+        }
 
 
 def parse_provider_json(text: str) -> dict:

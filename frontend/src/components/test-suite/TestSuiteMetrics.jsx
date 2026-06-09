@@ -189,6 +189,7 @@ function PlanCaseContent({ plan, planEval }) {
           annotatedImage={plan.annotatedImage}
           hasAnnotated={plan.hasAnnotated}
           rooms={[]}
+          expandable={false}
         />
       </section>
 
@@ -342,6 +343,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
                         annotatedImage={planSections[0].annotatedImage}
                         hasAnnotated={planSections[0].hasAnnotated}
                         rooms={[]}
+                        expandable={false}
                       />
                     </section>
                   )}

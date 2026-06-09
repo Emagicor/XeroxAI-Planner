@@ -219,7 +219,9 @@ def detect_floor_plan_boxes(jpeg_bytes: bytes) -> tuple[list[tuple[BoundingBox, 
     settings = get_settings()
     _ensure_model()
 
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    from infrastructure.imaging.color_fidelity import load_rgb
+
+    img = load_rgb(jpeg_bytes)
     w, h = img.size
     min_area = int(w * h * settings.detection_min_area_ratio)
 

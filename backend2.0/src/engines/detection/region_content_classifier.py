@@ -67,14 +67,16 @@ def classify_region_content(jpeg_bytes: bytes) -> str:
 
     Returns floor_plan | dimension_table | unknown.
     """
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    from infrastructure.imaging.color_fidelity import content_mask_from_rgb, load_rgb
+
+    img = load_rgb(jpeg_bytes)
     w, h = img.size
     if w < 8 or h < 8:
         return REGION_KIND_UNKNOWN
 
     aspect = w / max(h, 1)
     arr = np.asarray(img)
-    ink = (arr < 245).any(axis=2)
+    ink = content_mask_from_rgb(arr)
     ink_ratio = float(ink.mean())
 
     bands, row_var = _row_band_score(ink)

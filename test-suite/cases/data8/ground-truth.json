@@ -120,25 +120,25 @@
           "dimension_source": "measured"
         },
         {
-          "name": "BATH 2",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
+          "name": "CLOSET",
+          "length_ft": 5.67,
+          "width_ft": 3.67,
+          "area_sqft": 20.8,
+          "dimension_source": "measured"
         },
         {
-          "name": "FOYER",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
+          "name": "CLOSET",
+          "length_ft": 6,
+          "width_ft": 3.67,
+          "area_sqft": 22.02,
+          "dimension_source": "measured"
         },
         {
-          "name": "Powder",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
+          "name": "CLOSET",
+          "length_ft": 5.33,
+          "width_ft": 4,
+          "area_sqft": 21.32,
+          "dimension_source": "measured"
         }
       ]
     }

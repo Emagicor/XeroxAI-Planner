@@ -1,3 +1,4 @@
+import { inlineImageSrc } from '@/utils/annotatedImage'
 import { scenarioLabel } from '@/utils/scenarios'
 import { activeRegionCount, regionKindLabel } from '@/utils/detectionRegions'
 import Card, { CardHeader, CardBody } from '@/components/ui/Card'
@@ -5,9 +6,7 @@ import Badge from '@/components/ui/Badge'
 import Button from '@/components/ui/Button'
 // panel to display the clipped images and their status
 function RegionThumb({ region, excluded, onToggle }) {
-  const src = region.preview_image
-    ? `data:image/jpeg;base64,${region.preview_image}`
-    : null
+  const src = region.preview_image ? inlineImageSrc(region.preview_image) : null
   const isTable = region.region_kind === 'dimension_table'
   const isExcluded = excluded
 
@@ -25,7 +24,7 @@ function RegionThumb({ region, excluded, onToggle }) {
         <img
           src={src}
           alt={region.label}
-          className={`w-full h-36 object-contain bg-[#0a0a0c] ${isExcluded ? 'grayscale' : ''}`}
+          className={`w-full min-h-48 max-h-80 object-contain bg-white ${isExcluded ? 'grayscale' : ''}`}
         />
       ) : (
         <div className="h-36 flex items-center justify-center text-xs text-muted">
@@ -145,6 +144,18 @@ export default function DetectionPreviewPanel({
 
           {regionPages.map((page) => (
             <div key={page.page_number}>
+              {/* {page.page_preview_image && (
+                <div className="mb-4">
+                  <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
+                    Rasterized page (PDF)
+                  </p>
+                  <img
+                    src={inlineImageSrc(page.page_preview_image)}
+                    alt={`Page ${page.page_number} raster`}
+                    className="w-full max-h-[min(70vh,640px)] object-contain rounded-xl border border-line bg-white"
+                  />
+                </div>
+              )} */}
               <p className="text-xs font-semibold text-muted mb-3 uppercase tracking-wider">
                 Page {page.page_number}
                 {page.regions.length > 1 && (

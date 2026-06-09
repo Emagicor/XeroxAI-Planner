@@ -90,13 +90,6 @@
           "width_ft": 5,
           "area_sqft": 162.9,
           "dimension_source": "measured"
-        },
-        {
-          "name": "Hall",
-          "dimension_source": "assumed",
-          "assumptions": [
-            "Dimensions not mentioned or geometrically derivable."
-          ]
         }
       ]
     }

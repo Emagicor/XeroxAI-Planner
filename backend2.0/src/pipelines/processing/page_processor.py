@@ -10,6 +10,7 @@ import structlog
 from pipelines.processing.page_result_mapper import build_page_result
 from domain.entities.job import PageResult
 from infrastructure.rasterizer.page_raster import RasterizedPage
+from infrastructure.preprocessing.image_preprocessor import prepare_ui_preview_image
 from pipelines.extraction.page_analyzer import analyze_page_safe
 from pipelines.processing.page_classifier import classify_page, map_vision_page_type, should_skip_before_vision
 from providers.vision.factory import create_vision_provider
@@ -27,7 +28,11 @@ def _attach_region_metadata(result: PageResult, unit: "AnalysisUnit") -> PageRes
     result.region_label = unit.region_label
     result.detection_confidence = unit.detection_confidence
     result.detection_method = unit.detection_method
-    result.clip_preview = base64.b64encode(unit.jpeg_bytes).decode("ascii")
+    preview_bytes, _ = prepare_ui_preview_image(
+        unit.jpeg_bytes,
+        from_pdf=unit.from_pdf,
+    )
+    result.clip_preview = base64.b64encode(preview_bytes).decode("ascii")
     return result
 
 
@@ -68,6 +73,7 @@ def process_analysis_unit(
             unit.mime_type,
             page_number=unit.plan_number,
             session_id=session_id,
+            from_pdf=unit.from_pdf,
         )
     finally:
         del provider
@@ -126,6 +132,7 @@ def process_rasterized_page(
             page.mime_type,
             page_number=page.page_number,
             session_id=session_id,
+            from_pdf=page.from_pdf,
         )
     finally:
         del provider

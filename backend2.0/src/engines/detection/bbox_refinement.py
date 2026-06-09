@@ -18,6 +18,7 @@ from PIL import Image
 from config.settings import get_settings
 from domain.entities.detection import BoundingBox
 from engines.detection.region_content_classifier import is_table_like_bbox
+from infrastructure.imaging.color_fidelity import content_mask_from_rgb, load_rgb
 
 log = structlog.get_logger(__name__)
 
@@ -90,9 +91,9 @@ def _pad_bbox(
 
 def _ink_bounding_box(jpeg_bytes: bytes, threshold: int = 245) -> BoundingBox | None:
     """Axis-aligned bounds of non-white pixels (drawing ink)."""
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    img = load_rgb(jpeg_bytes)
     arr = np.asarray(img)
-    mask = (arr < threshold).any(axis=2)
+    mask = content_mask_from_rgb(arr, threshold=threshold)
     if not mask.any():
         return None
     rows = np.where(mask.any(axis=1))[0]
@@ -109,13 +110,13 @@ def _ink_bounding_box(jpeg_bytes: bytes, threshold: int = 245) -> BoundingBox | 
 
 def _ink_inside_bbox(jpeg_bytes: bytes, bbox: BoundingBox, threshold: int = 245) -> BoundingBox | None:
     """Ink bounds restricted to a region (for multi-plan pages)."""
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    img = load_rgb(jpeg_bytes)
     arr = np.asarray(img)
     x1, y1, x2, y2 = bbox.x1, bbox.y1, bbox.x2, bbox.y2
     crop = arr[y1:y2, x1:x2]
     if crop.size == 0:
         return None
-    mask = (crop < threshold).any(axis=2)
+    mask = content_mask_from_rgb(crop, threshold=threshold)
     if not mask.any():
         return None
     rows = np.where(mask.any(axis=1))[0]
@@ -373,9 +374,9 @@ def _split_wide_sheet_columns(
     if w / max(h, 1) < settings.detection_wide_aspect_ratio:
         return []
 
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    img = load_rgb(jpeg_bytes)
     arr = np.asarray(img)
-    mask = (arr < 245).any(axis=2)
+    mask = content_mask_from_rgb(arr)
     if not mask.any():
         return []
 
@@ -453,9 +454,9 @@ def _split_layout_components(
         return []
 
     settings = get_settings()
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    img = load_rgb(jpeg_bytes)
     arr = np.asarray(img)
-    mask = (arr < 245).any(axis=2).astype(np.uint8) * 255
+    mask = content_mask_from_rgb(arr).astype(np.uint8) * 255
     if not mask.any():
         return []
 
@@ -506,7 +507,7 @@ def refine_floor_plan_boxes(
 
     Returns at least one box (full page) when refinement removes everything.
     """
-    img = Image.open(io.BytesIO(jpeg_bytes)).convert("RGB")
+    img = load_rgb(jpeg_bytes)
     w, h = img.size
     page_area = w * h
 

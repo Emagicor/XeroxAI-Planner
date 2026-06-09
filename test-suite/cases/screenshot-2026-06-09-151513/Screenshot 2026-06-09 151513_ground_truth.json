@@ -1,0 +1,69 @@
+{
+  "filename": "Screenshot 2026-06-09 151513.png",
+  "exported_at": "2026-06-09T12:01:44.394Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Second Floor",
+      "rooms": [
+        {
+          "name": "DINNING AREA",
+          "length_ft": 50.33,
+          "width_ft": 39.83,
+          "area_sqft": 2004.64,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN",
+          "length_ft": 17.83,
+          "width_ft": 13.33,
+          "area_sqft": 237.67,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "STORE",
+          "length_ft": 9.83,
+          "width_ft": 5.33,
+          "area_sqft": 52.39,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "UTILITY",
+          "length_ft": 9.83,
+          "width_ft": 6.67,
+          "area_sqft": 65.57,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "GENTS TOILET",
+          "length_ft": 6.5,
+          "width_ft": 5,
+          "area_sqft": 32.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "GENTS TOILET",
+          "length_ft": 7.17,
+          "width_ft": 4.33,
+          "area_sqft": 31.05,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LADIES TOILET",
+          "length_ft": 7.17,
+          "width_ft": 4.33,
+          "area_sqft": 31.05,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIFT",
+          "length_ft": 5.83,
+          "width_ft": 5,
+          "area_sqft": 29.15,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

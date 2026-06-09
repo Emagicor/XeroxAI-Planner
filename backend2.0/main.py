@@ -16,13 +16,15 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 from dotenv import load_dotenv
-load_dotenv()
+
+_ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(_ENV_PATH, override=True)
 
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.config.settings import get_settings
+from src.config.settings import get_settings, reload_settings
 from src.api.middleware.error_handler import register_exception_handlers
 from src.api.routes import analyze, detect, export, health
 
@@ -31,7 +33,8 @@ log = structlog.get_logger(__name__)
 
 
 def create_app() -> FastAPI:
-    settings = get_settings()
+    # Fresh .env on every process start (clears @lru_cache on settings + vision provider).
+    settings = reload_settings()
 
     # Structured logging
     structlog.configure(
@@ -73,12 +76,41 @@ def create_app() -> FastAPI:
     app.include_router(analyze.router, tags=["analyze"])
     app.include_router(export.router, tags=["export"])
 
+    import hashlib
+
+    gemini_fp = None
+    if settings.vision_provider == "gemini" and settings.gemini_api_key:
+        gemini_fp = hashlib.sha256(settings.gemini_api_key.encode()).hexdigest()[:12]
+
     log.info(
         "app.created",
         env=settings.app_env,
         provider=settings.vision_provider,
         gemini_model=settings.gemini_model if settings.vision_provider == "gemini" else None,
+        gemini_key_configured=bool(settings.gemini_api_key),
+        gemini_key_fingerprint=gemini_fp,
+        env_file=_ENV_PATH,
     )
+
+    if settings.vision_provider.lower() == "gemini":
+        # Temporary debug — user-requested key visibility in terminal.
+        print(f"[startup] GEMINI_API_KEY={settings.gemini_api_key!r}")
+        print(f"[startup] GEMINI_MODEL={settings.gemini_model!r}")
+        from providers.vision.gemini import probe_gemini_api
+
+        probe = probe_gemini_api()
+        if probe.get("ok"):
+            print(f"[startup] Gemini API OK: {probe.get('response')!r}")
+            log.info("gemini.probe_ok", model=probe.get("model"), response=probe.get("response"))
+        else:
+            print(f"[startup] Gemini API error ({probe.get('error_type')}): {probe.get('error')}")
+            log.warning(
+                "gemini.probe_failed",
+                model=probe.get("model"),
+                error_type=probe.get("error_type"),
+                error=probe.get("error"),
+            )
+
     return app
 
 

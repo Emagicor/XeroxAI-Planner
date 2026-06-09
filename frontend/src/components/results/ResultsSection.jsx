@@ -165,6 +165,7 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
               embedded
               plan={plan}
               jobId={doc.jobId}
+              downloadBaseName={exportBase}
               unit={unit}
               activeRowId={activeRowId}
               activeRoom={activePage === plan.planNumber ? activeRoom : null}
@@ -199,6 +200,9 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
                 rooms={legendRooms}
                 activeRoom={activeRoom}
                 onSelectRoom={selectRoomOnPage}
+                expandable
+                allowDownload
+                downloadBaseName={exportBase}
               />
             </section>
           )}

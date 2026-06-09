@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import ExpandableImage from '@/components/ui/ExpandableImage'
 import { formatFileSize } from '@/utils/format'
 
 function ReadyBadge({ ready, saving, persisted, dirty }) {
@@ -70,11 +71,14 @@ function FileSlot({
       ) : (
         <div className="flex items-start gap-3 p-3 rounded-lg border border-line/60 bg-surface/50">
           {preview && !isPdf ? (
-            <img
-              src={preview}
-              alt=""
-              className="w-14 h-14 object-cover rounded border border-line shrink-0"
-            />
+            <div className="w-14 h-14 shrink-0">
+              <ExpandableImage
+                src={preview}
+                alt={fileName || 'Floor plan preview'}
+                thumbnail
+                expandable
+              />
+            </div>
           ) : (
             <div className="w-14 h-14 rounded border border-line bg-surface flex items-center justify-center shrink-0">
               <span className="text-xs font-mono text-accent">

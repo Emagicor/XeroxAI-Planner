@@ -56,6 +56,7 @@ class SourcePageDetection:
     regions: list[DetectedRegion] = field(default_factory=list)
     skipped: bool = False
     skip_reason: str | None = None
+    page_preview_bytes: bytes | None = None
 
 
 @dataclass

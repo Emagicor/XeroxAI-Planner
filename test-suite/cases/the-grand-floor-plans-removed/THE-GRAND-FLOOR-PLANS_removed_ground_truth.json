@@ -1,0 +1,510 @@
+{
+  "filename": "THE-GRAND-FLOOR-PLANS_removed.pdf",
+  "exported_at": "2026-06-09T10:45:03.221Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "Page 1",
+      "eligible": false,
+      "rooms": []
+    },
+    {
+      "page_number": 2,
+      "plan_number": 2,
+      "floor_label": "Second Floor",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 24.93,
+          "width_ft": 5.91,
+          "area_sqft": 147.34,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.15,
+          "width_ft": 10.5,
+          "area_sqft": 117.08,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 13.78,
+          "width_ft": 12.8,
+          "area_sqft": 176.38,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 5.25,
+          "width_ft": 3.61,
+          "area_sqft": 18.95,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.2,
+          "width_ft": 6.56,
+          "area_sqft": 53.79,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 9.84,
+          "width_ft": 6.56,
+          "area_sqft": 64.55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "FOYER",
+          "length_ft": 12.14,
+          "width_ft": 4.27,
+          "area_sqft": 51.84,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "plan_number": 3,
+      "floor_label": "Second Floor",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 24.93,
+          "width_ft": 5.91,
+          "area_sqft": 147.34,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 13.78,
+          "width_ft": 12.79,
+          "area_sqft": 176.25,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.15,
+          "width_ft": 10.5,
+          "area_sqft": 117.08,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 9.84,
+          "width_ft": 6.56,
+          "area_sqft": 64.55,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "FOYER",
+          "length_ft": 12.14,
+          "width_ft": 4.27,
+          "area_sqft": 51.84,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 5.25,
+          "width_ft": 3.61,
+          "area_sqft": 18.95,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.2,
+          "width_ft": 6.56,
+          "area_sqft": 53.79,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "plan_number": 4,
+      "floor_label": "Second Floor",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 16.4,
+          "width_ft": 7.22,
+          "area_sqft": 118.41,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 14.76,
+          "width_ft": 13.12,
+          "area_sqft": 193.65,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 10.83,
+          "width_ft": 6.56,
+          "area_sqft": 71.04,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 12.47,
+          "width_ft": 3.94,
+          "area_sqft": 49.13,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 10.83,
+          "width_ft": 10.5,
+          "area_sqft": 113.72,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.53,
+          "width_ft": 6.56,
+          "area_sqft": 55.96,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BALCONY",
+          "length_ft": 9.84,
+          "width_ft": 5.91,
+          "area_sqft": 58.15,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BEDROOM",
+          "length_ft": 11.15,
+          "width_ft": 11.15,
+          "area_sqft": 124.32,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BATH",
+          "length_ft": 10.5,
+          "width_ft": 6.56,
+          "area_sqft": 68.88,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "plan_number": 5,
+      "floor_label": "Second Floor",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 11.15,
+          "width_ft": 5.91,
+          "area_sqft": 65.9,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 13.45,
+          "width_ft": 14.11,
+          "area_sqft": 189.78,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.81,
+          "width_ft": 11.81,
+          "area_sqft": 139.48,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 6.23,
+          "width_ft": 3.61,
+          "area_sqft": 22.49,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 7.55,
+          "width_ft": 9.51,
+          "area_sqft": 71.8,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 6.56,
+          "width_ft": 9.19,
+          "area_sqft": 60.29,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "plan_number": 6,
+      "floor_label": "Level 3-23",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 11.15,
+          "width_ft": 5.91,
+          "area_sqft": 65.9,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BEDROOM",
+          "length_ft": 13.12,
+          "width_ft": 11.48,
+          "area_sqft": 150.62,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BATH",
+          "length_ft": 11.48,
+          "width_ft": 6.89,
+          "area_sqft": 79.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.15,
+          "width_ft": 10.17,
+          "area_sqft": 113.4,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 13.78,
+          "width_ft": 3.94,
+          "area_sqft": 54.29,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 7.22,
+          "width_ft": 5.91,
+          "area_sqft": 42.67,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BALCONY",
+          "length_ft": 13.45,
+          "width_ft": 5.91,
+          "area_sqft": 79.49,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 13.78,
+          "width_ft": 14.44,
+          "area_sqft": 198.98,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 14.11,
+          "width_ft": 15.42,
+          "area_sqft": 217.58,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 7,
+      "plan_number": 7,
+      "floor_label": "Level 3-23",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 10.17,
+          "width_ft": 5.91,
+          "area_sqft": 60.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DINING & KITCHEN",
+          "length_ft": 11.48,
+          "width_ft": 15.09,
+          "area_sqft": 173.23,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 15.42,
+          "width_ft": 15.09,
+          "area_sqft": 232.69,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 10.17,
+          "width_ft": 10.5,
+          "area_sqft": 106.78,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.86,
+          "width_ft": 6.23,
+          "area_sqft": 55.2,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 10.17,
+          "width_ft": 3.61,
+          "area_sqft": 36.71,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 4.59,
+          "width_ft": 18.7,
+          "area_sqft": 85.83,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BALCONY",
+          "length_ft": 5.91,
+          "width_ft": 10.17,
+          "area_sqft": 60.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BEDROOM",
+          "length_ft": 11.48,
+          "width_ft": 11.81,
+          "area_sqft": 135.58,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BATH",
+          "length_ft": 8.86,
+          "width_ft": 6.56,
+          "area_sqft": 58.12,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 8,
+      "plan_number": 8,
+      "floor_label": "Level 3-23",
+      "rooms": [
+        {
+          "name": "BEDROOM",
+          "length_ft": 12.14,
+          "width_ft": 11.81,
+          "area_sqft": 143.37,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BALCONY",
+          "length_ft": 10.17,
+          "width_ft": 5.91,
+          "area_sqft": 60.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 15.09,
+          "width_ft": 13.78,
+          "area_sqft": 207.94,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 6.23,
+          "width_ft": 3.61,
+          "area_sqft": 22.49,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 9.19,
+          "width_ft": 6.56,
+          "area_sqft": 60.29,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 12.47,
+          "width_ft": 10.83,
+          "area_sqft": 135.05,
+          "dimension_source": "measured"
+        }
+      ]
+    },
+    {
+      "page_number": 9,
+      "plan_number": 9,
+      "floor_label": "Level 3-23",
+      "rooms": [
+        {
+          "name": "BALCONY",
+          "length_ft": 10.17,
+          "width_ft": 5.91,
+          "area_sqft": 60.1,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BEDROOM",
+          "length_ft": 12.14,
+          "width_ft": 11.81,
+          "area_sqft": 143.37,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BEDROOM",
+          "length_ft": 11.81,
+          "width_ft": 10.5,
+          "area_sqft": 124.01,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BALCONY",
+          "length_ft": 13.45,
+          "width_ft": 5.91,
+          "area_sqft": 79.49,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "LIVING",
+          "length_ft": 15.75,
+          "width_ft": 13.45,
+          "area_sqft": 211.84,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "KITCHEN & DINING",
+          "length_ft": 15.42,
+          "width_ft": 10.83,
+          "area_sqft": 167,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "CORRIDOR",
+          "length_ft": 12.14,
+          "width_ft": 3.94,
+          "area_sqft": 47.83,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BATHROOM",
+          "length_ft": 8.86,
+          "width_ft": 6.56,
+          "area_sqft": 58.12,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "MASTER BATH",
+          "length_ft": 10.17,
+          "width_ft": 6.56,
+          "area_sqft": 66.72,
+          "dimension_source": "measured"
+        }
+      ]
+    }
+  ]
+}

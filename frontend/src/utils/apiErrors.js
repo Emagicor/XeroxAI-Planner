@@ -58,7 +58,15 @@ export async function parseApiErrorResponse(res, meta = {}) {
         body.message ||
         `Request failed (${res.status})`
 
-  if (detail?.code === 'QUOTA_EXCEEDED') {
+  if (
+    detail?.code === 'QUOTA_EXCEEDED' ||
+    detail?.code === 'BILLING_CREDITS_DEPLETED' ||
+    detail?.code === 'INVALID_API_KEY' ||
+    detail?.code === 'MODEL_NOT_FOUND' ||
+    detail?.code === 'GEMINI_ERROR' ||
+    detail?.code === 'VISION_PROVIDER_ERROR' ||
+    detail?.code === 'MISSING_API_KEY'
+  ) {
     message = detail.message || message
   } else if (/quota|429|rate limit/i.test(String(message))) {
     message =

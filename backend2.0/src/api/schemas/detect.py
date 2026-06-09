@@ -30,6 +30,7 @@ class SourcePageSchema(BaseModel):
     regions: list[DetectedRegionSchema]
     skipped: bool = False
     skip_reason: str | None = None
+    page_preview_image: str | None = None  # base64 full-page raster (PDF uploads)
 
 
 class DetectResponseSchema(BaseModel):

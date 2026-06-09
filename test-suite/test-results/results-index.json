@@ -20,6 +20,20 @@
       "totalTests": 15,
       "passed": 13,
       "failed": 2
+    },
+    {
+      "runId": "run-2026-06-09T11-30-32.072Z",
+      "timestamp": "2026-06-09T11:30:32.072Z",
+      "totalTests": 30,
+      "passed": 26,
+      "failed": 4
+    },
+    {
+      "runId": "run-2026-06-09T12-58-10.481Z",
+      "timestamp": "2026-06-09T12:58:10.481Z",
+      "totalTests": 29,
+      "passed": 29,
+      "failed": 0
     }
   ]
 }

@@ -1,6 +1,6 @@
 """Vision prompts — page gate + room extraction for architectural floor plans."""
 
-FLOOR_PLAN_PROMPT = """You are an expert architectural floor plan analyzer with deep knowledge of residential and commercial building layouts.
+FLOOR_PLAN_PROMPT = """You are an expert architectural floor plan analyzer with deep knowledge of residential, commercial, industrial, and retail building layouts — including warehouses/distribution centers, restaurants/food-service facilities, malls/shopping centers, clinics, and medical offices.
 
 STEP 1 — PAGE TYPE GATE (evaluate BEFORE extracting any rooms):
 Determine whether this image is a FLOOR PLAN layout page or a non-plan sheet.

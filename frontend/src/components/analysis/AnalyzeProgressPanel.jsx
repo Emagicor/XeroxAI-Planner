@@ -1,3 +1,4 @@
+import { inlineImageSrc } from '@/utils/annotatedImage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
 import Card, { CardBody } from '@/components/ui/Card'
 import SectionHeader from '@/components/ui/SectionHeader'
@@ -78,9 +79,7 @@ export default function AnalyzeProgressPanel({
           <ul className="divide-y divide-line/40">
             {items.map((item, i) => {
               const active = currentIndex === i && item.status === 'running'
-              const thumb = item.clipPreview
-                ? `data:image/jpeg;base64,${item.clipPreview}`
-                : null
+              const thumb = item.clipPreview ? inlineImageSrc(item.clipPreview) : null
               return (
                 <li
                   key={item.id}
@@ -91,7 +90,7 @@ export default function AnalyzeProgressPanel({
                     <img
                       src={thumb}
                       alt=""
-                      className="w-12 h-12 object-contain rounded-lg border border-line bg-[#0a0a0c] shrink-0"
+                      className="w-20 h-20 object-contain rounded-lg border border-line bg-white shrink-0"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-lg border border-line bg-surface shrink-0 flex items-center justify-center text-[10px] text-accent font-mono font-semibold">
