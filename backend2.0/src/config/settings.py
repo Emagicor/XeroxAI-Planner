@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     log_level: str = "INFO"
     temp_dir: str = "/tmp/zerox"
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173", "https://xeroxai-planner-production.up.railway.app"]
 
     # ── Upload limits ─────────────────────────────────────────────────────────
     max_upload_mb: int = 50
