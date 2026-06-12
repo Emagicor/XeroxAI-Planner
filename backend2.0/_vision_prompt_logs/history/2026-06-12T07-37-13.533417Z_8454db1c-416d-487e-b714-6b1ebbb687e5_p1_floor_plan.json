@@ -1,0 +1,157 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Contains a top-down architectural floor plan with room boundaries."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor",
+    "confidence_pct": 100,
+    "evidence": "Label 'FIRST FLOOR PLAN' is clearly visible at the bottom left of the plan."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [
+        100,
+        290,
+        300,
+        470
+      ],
+      "polygon": [
+        [
+          100,
+          470
+        ],
+        [
+          100,
+          290
+        ],
+        [
+          300,
+          290
+        ],
+        [
+          300,
+          470
+        ]
+      ],
+      "length_ft": 15.25,
+      "width_ft": 23.583,
+      "area_sqft": 359.69,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [
+        300,
+        290,
+        490,
+        470
+      ],
+      "polygon": [
+        [
+          300,
+          470
+        ],
+        [
+          300,
+          290
+        ],
+        [
+          490,
+          290
+        ],
+        [
+          490,
+          470
+        ]
+      ],
+      "length_ft": 14.833,
+      "width_ft": 24.333,
+      "area_sqft": 360.96,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [
+        100,
+        580,
+        300,
+        750
+      ],
+      "polygon": [
+        [
+          100,
+          750
+        ],
+        [
+          100,
+          580
+        ],
+        [
+          300,
+          580
+        ],
+        [
+          300,
+          750
+        ]
+      ],
+      "length_ft": 15.25,
+      "width_ft": 9.333,
+      "area_sqft": 142.29,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        300,
+        580,
+        490,
+        750
+      ],
+      "polygon": [
+        [
+          300,
+          750
+        ],
+        [
+          300,
+          580
+        ],
+        [
+          490,
+          580
+        ],
+        [
+          490,
+          750
+        ]
+      ],
+      "length_ft": 13.5,
+      "width_ft": 9.333,
+      "area_sqft": 125.99,
+      "confidence_pct": 80,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Shared vertical extent with WEST PARLOR, which has a measured width of 9'4\"."
+      ]
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 37.917,
+    "height_ft": 43.333,
+    "source": "measured"
+  },
+  "total_area_sqft": 988.93,
+  "overall_confidence": 90,
+  "units_detected": "feet"
+}

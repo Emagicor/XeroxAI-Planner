@@ -1,0 +1,184 @@
+# pass=floor_plan
+# session_id=8012cda6-0d0c-40bd-8196-3c2199713fa7
+# page_number=1
+# model=gemini-2.5-flash
+# timestamp=2026-06-11T09-58-02.353437Z
+
+```json
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The image displays a top-down architectural floor plan with room boundaries and labels."
+  },
+  "floor_identification": {
+    "floor_label": "Unknown",
+    "confidence_pct": 0,
+    "evidence": "No explicit floor level label found on the plan."
+  },
+  "rooms": [
+    {
+      "name": "DINING",
+      "bbox": [40, 139, 240, 260],
+      "polygon": [
+        [40, 139],
+        [240, 139],
+        [240, 260],
+        [40, 260],
+        [40, 139]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 9.0,
+      "area_sqft": 99.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "KIT.",
+      "bbox": [40, 280, 240, 380],
+      "polygon": [
+        [40, 280],
+        [240, 280],
+        [240, 380],
+        [40, 380],
+        [40, 280]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 8.0,
+      "area_sqft": 88.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GREAT ROOM",
+      "bbox": [250, 139, 590, 380],
+      "polygon": [
+        [250, 139],
+        [590, 139],
+        [590, 380],
+        [250, 380],
+        [250, 139]
+      ],
+      "length_ft": 10.5,
+      "width_ft": 17.0,
+      "area_sqft": 178.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "MASTER BEDRM",
+      "bbox": [600, 139, 960, 380],
+      "polygon": [
+        [600, 139],
+        [960, 139],
+        [960, 380],
+        [600, 380],
+        [600, 139]
+      ],
+      "length_ft": 12.0,
+      "width_ft": 13.5,
+      "area_sqft": 162.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDRM 3",
+      "bbox": [40, 400, 240, 540],
+      "polygon": [
+        [40, 400],
+        [240, 400],
+        [240, 540],
+        [40, 540],
+        [40, 400]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 10.0,
+      "area_sqft": 110.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDRM 2",
+      "bbox": [40, 560, 240, 700],
+      "polygon": [
+        [40, 560],
+        [240, 560],
+        [240, 700],
+        [40, 700],
+        [40, 560]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 10.0,
+      "area_sqft": 110.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "PATIO",
+      "bbox": [40, 720, 240, 820],
+      "polygon": [
+        [40, 720],
+        [240, 720],
+        [240, 820],
+        [40, 820],
+        [40, 720]
+      ],
+      "length_ft": null,
+      "width_ft": null,
+      "area_sqft": 104.0,
+      "confidence_pct": 95,
+      "dimension_source": "area-only",
+      "assumptions": []
+    },
+    {
+      "name": "WALK-IN",
+      "bbox": [700, 480, 960, 560],
+      "polygon": [
+        [700, 480],
+        [960, 480],
+        [960, 560],
+        [700, 560],
+        [700, 480]
+      ],
+      "length_ft": 8.5,
+      "width_ft": 4.5,
+      "area_sqft": 38.25,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GARAGE",
+      "bbox": [350, 600, 960, 820],
+      "polygon": [
+        [350, 600],
+        [960, 600],
+        [960, 820],
+        [350, 820],
+        [350, 600]
+      ],
+      "length_ft": 18.0,
+      "width_ft": 19.5,
+      "area_sqft": 351.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": false,
+    "width_ft": null,
+    "height_ft": null,
+    "source": null
+  },
+  "total_area_sqft": 1240.75,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}
+```

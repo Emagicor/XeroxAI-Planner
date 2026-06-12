@@ -1,0 +1,62 @@
+{
+  "room_corrections": [
+    {
+      "room_index": 7,
+      "action": "update",
+      "name": "BED ROOM D",
+      "length_ft": 13.5,
+      "width_ft": 18.5833,
+      "area_sqft": 250.875,
+      "confidence_pct": 85,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Width is 13'6\" as measured. Length is 18'7\" derived from adjacent BED ROOM C."
+      ],
+      "bbox": [
+        745,
+        555,
+        905,
+        770
+      ]
+    }
+  ],
+  "rooms_added": [
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        290,
+        550,
+        415,
+        770
+      ],
+      "polygon": null,
+      "length_ft": 19.0,
+      "width_ft": 13.5,
+      "area_sqft": 256.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [
+        555,
+        455,
+        745,
+        560
+      ],
+      "polygon": null,
+      "length_ft": 17.9167,
+      "width_ft": 9.0,
+      "area_sqft": 161.25,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "floor_identification": {
+    "floor_label": "First and Second Floors",
+    "confidence_pct": 95,
+    "evidence": "Titles 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' are clearly visible at the bottom of each plan."
+  }
+}

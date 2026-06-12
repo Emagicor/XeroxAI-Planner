@@ -1,0 +1,353 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The image shows detailed architectural floor plans for the first and second floors of a building, with walls, room labels, and dimensions."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor",
+    "confidence_pct": 95,
+    "evidence": "The drawing contains labels for 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN'."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [
+        75,
+        280,
+        215,
+        445
+      ],
+      "polygon": [
+        [
+          75,
+          280
+        ],
+        [
+          215,
+          280
+        ],
+        [
+          215,
+          445
+        ],
+        [
+          75,
+          445
+        ]
+      ],
+      "length_ft": 22.583,
+      "width_ft": 15.25,
+      "area_sqft": 344.4,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [
+        295,
+        280,
+        415,
+        445
+      ],
+      "polygon": [
+        [
+          295,
+          280
+        ],
+        [
+          415,
+          280
+        ],
+        [
+          415,
+          445
+        ],
+        [
+          295,
+          445
+        ]
+      ],
+      "length_ft": 24.333,
+      "width_ft": 14.833,
+      "area_sqft": 360.9,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [
+        75,
+        550,
+        215,
+        770
+      ],
+      "polygon": [
+        [
+          75,
+          550
+        ],
+        [
+          215,
+          550
+        ],
+        [
+          215,
+          770
+        ],
+        [
+          75,
+          770
+        ]
+      ],
+      "length_ft": 19.333,
+      "width_ft": 15.25,
+      "area_sqft": 294.9,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        295,
+        550,
+        415,
+        770
+      ],
+      "polygon": [
+        [
+          295,
+          550
+        ],
+        [
+          415,
+          550
+        ],
+        [
+          415,
+          770
+        ],
+        [
+          295,
+          770
+        ]
+      ],
+      "length_ft": 19.0,
+      "width_ft": 13.5,
+      "area_sqft": 256.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM A",
+      "bbox": [
+        550,
+        280,
+        695,
+        455
+      ],
+      "polygon": [
+        [
+          550,
+          280
+        ],
+        [
+          695,
+          280
+        ],
+        [
+          695,
+          455
+        ],
+        [
+          550,
+          455
+        ]
+      ],
+      "length_ft": 15.0,
+      "width_ft": null,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [
+        550,
+        455,
+        740,
+        555
+      ],
+      "polygon": [
+        [
+          550,
+          455
+        ],
+        [
+          740,
+          455
+        ],
+        [
+          740,
+          555
+        ],
+        [
+          550,
+          555
+        ]
+      ],
+      "length_ft": 9.0,
+      "width_ft": 17.917,
+      "area_sqft": 161.3,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [
+        550,
+        555,
+        695,
+        770
+      ],
+      "polygon": [
+        [
+          550,
+          555
+        ],
+        [
+          695,
+          555
+        ],
+        [
+          695,
+          770
+        ],
+        [
+          550,
+          770
+        ]
+      ],
+      "length_ft": 18.583,
+      "width_ft": 15.583,
+      "area_sqft": 289.6,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM D",
+      "bbox": [
+        775,
+        555,
+        905,
+        770
+      ],
+      "polygon": [
+        [
+          775,
+          555
+        ],
+        [
+          905,
+          555
+        ],
+        [
+          905,
+          770
+        ],
+        [
+          775,
+          770
+        ]
+      ],
+      "length_ft": null,
+      "width_ft": 13.5,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GEN. ISRAEL PUTNAM MEMORIAL ROOM",
+      "bbox": [
+        750,
+        280,
+        905,
+        455
+      ],
+      "polygon": [
+        [
+          750,
+          280
+        ],
+        [
+          905,
+          280
+        ],
+        [
+          905,
+          455
+        ],
+        [
+          750,
+          455
+        ]
+      ],
+      "length_ft": 9.917,
+      "width_ft": null,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [
+        775,
+        455,
+        905,
+        555
+      ],
+      "polygon": [
+        [
+          775,
+          455
+        ],
+        [
+          905,
+          455
+        ],
+        [
+          905,
+          555
+        ],
+        [
+          775,
+          555
+        ]
+      ],
+      "length_ft": null,
+      "width_ft": 12.5,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 37.917,
+    "height_ft": 43.333,
+    "source": "measured"
+  },
+  "total_area_sqft": 1707.0,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}

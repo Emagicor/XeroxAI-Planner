@@ -1,0 +1,848 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The image shows a top-down architectural floor plan with room boundaries and labeled spaces."
+  },
+  "floor_identification": {
+    "floor_label": "Unknown",
+    "confidence_pct": 0,
+    "evidence": "No explicit floor label found."
+  },
+  "rooms": [
+    {
+      "name": "M. BEDROOM",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 16,
+      "width_ft": 22,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "M. BATH",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 10,
+      "width_ft": 8,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "M.W.I.C.",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 13,
+      "width_ft": 11,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDROOM#2",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 13,
+      "width_ft": 13,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH#2",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 9,
+      "width_ft": 9,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "W.I.C.#2",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 5,
+      "width_ft": 9,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "MUDROOM",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 9,
+      "width_ft": 9,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "LAUNDRY",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 11,
+      "width_ft": 11,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "PANTRY",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 6,
+      "width_ft": 12,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "KITCHEN",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 19,
+      "width_ft": 23,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "OFFICE",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 12,
+      "width_ft": 11,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 12,
+      "width_ft": 14,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "LIVING",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 23,
+      "width_ft": 21,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "Foyer",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 10,
+      "width_ft": 11,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH#3",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 6,
+      "width_ft": 10,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "W.I.C.#3",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 7,
+      "width_ft": 4,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDROOM#3",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 15,
+      "width_ft": 11,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "FLEX ROOM",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 12,
+      "width_ft": 16,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 9,
+      "width_ft": 8,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "STORAGE",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 9,
+      "width_ft": 5,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "FAMILY ROOM",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 26,
+      "width_ft": 15,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "1-CAR GARAGE",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 14,
+      "width_ft": 21,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "2-CAR GARAGE",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 21,
+      "width_ft": 26,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "COVERED ENTRY",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 10,
+      "width_ft": 11,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "REAR PATIO",
+      "bbox": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "polygon": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          null
+        ]
+      ],
+      "length_ft": 33,
+      "width_ft": 14,
+      "area_sqft": null,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 96.5,
+    "height_ft": 86.42,
+    "source": "measured"
+  },
+  "total_area_sqft": null,
+  "overall_confidence": 100,
+  "units_detected": "feet"
+}

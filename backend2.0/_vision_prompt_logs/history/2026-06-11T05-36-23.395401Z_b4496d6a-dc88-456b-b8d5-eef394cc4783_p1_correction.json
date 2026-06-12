@@ -1,0 +1,353 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Top-down room layout with dimensions"
+  },
+  "floor_identification": {
+    "floor_label": "First and Second Floors",
+    "confidence_pct": 95,
+    "evidence": "Labeled FIRST FLOOR PLAN and SECOND FLOOR PLAN"
+  },
+  "rooms": [
+    {
+      "name": "OLD-KITCHEN",
+      "bbox": [
+        140,
+        100,
+        345,
+        345
+      ],
+      "polygon": [
+        [
+          140,
+          100
+        ],
+        [
+          345,
+          100
+        ],
+        [
+          345,
+          345
+        ],
+        [
+          140,
+          345
+        ]
+      ],
+      "length_ft": 19.75,
+      "width_ft": 16.0,
+      "area_sqft": 316,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING-ROOM",
+      "bbox": [
+        345,
+        100,
+        590,
+        335
+      ],
+      "polygon": [
+        [
+          345,
+          100
+        ],
+        [
+          590,
+          100
+        ],
+        [
+          590,
+          335
+        ],
+        [
+          345,
+          335
+        ]
+      ],
+      "length_ft": 21.0,
+      "width_ft": 14.5,
+      "area_sqft": 304.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST-PARLOR",
+      "bbox": [
+        140,
+        350,
+        345,
+        600
+      ],
+      "polygon": [
+        [
+          140,
+          350
+        ],
+        [
+          345,
+          350
+        ],
+        [
+          345,
+          600
+        ],
+        [
+          140,
+          600
+        ]
+      ],
+      "length_ft": 21.5,
+      "width_ft": 16.0,
+      "area_sqft": 344,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST-PARLOR",
+      "bbox": [
+        345,
+        350,
+        590,
+        600
+      ],
+      "polygon": [
+        [
+          345,
+          350
+        ],
+        [
+          590,
+          350
+        ],
+        [
+          590,
+          600
+        ],
+        [
+          345,
+          600
+        ]
+      ],
+      "length_ft": 21.5,
+      "width_ft": 16.0,
+      "area_sqft": 344,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED-ROOM 'A'",
+      "bbox": [
+        640,
+        100,
+        880,
+        310
+      ],
+      "polygon": [
+        [
+          640,
+          100
+        ],
+        [
+          880,
+          100
+        ],
+        [
+          880,
+          310
+        ],
+        [
+          640,
+          310
+        ]
+      ],
+      "length_ft": 17.0,
+      "width_ft": 13.0,
+      "area_sqft": 221,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "MEMORIAL ROOM",
+      "bbox": [
+        880,
+        100,
+        1120,
+        310
+      ],
+      "polygon": [
+        [
+          880,
+          100
+        ],
+        [
+          1120,
+          100
+        ],
+        [
+          1120,
+          310
+        ],
+        [
+          880,
+          310
+        ]
+      ],
+      "length_ft": 17.5,
+      "width_ft": 13.0,
+      "area_sqft": 227.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED-ROOM 'B'",
+      "bbox": [
+        640,
+        310,
+        880,
+        510
+      ],
+      "polygon": [
+        [
+          640,
+          310
+        ],
+        [
+          880,
+          310
+        ],
+        [
+          880,
+          510
+        ],
+        [
+          640,
+          510
+        ]
+      ],
+      "length_ft": 17.0,
+      "width_ft": 13.0,
+      "area_sqft": 221,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [
+        880,
+        310,
+        1120,
+        510
+      ],
+      "polygon": [
+        [
+          880,
+          310
+        ],
+        [
+          1120,
+          310
+        ],
+        [
+          1120,
+          510
+        ],
+        [
+          880,
+          510
+        ]
+      ],
+      "length_ft": 17.5,
+      "width_ft": 13.0,
+      "area_sqft": 227.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED-ROOM 'C'",
+      "bbox": [
+        640,
+        510,
+        880,
+        700
+      ],
+      "polygon": [
+        [
+          640,
+          510
+        ],
+        [
+          880,
+          510
+        ],
+        [
+          880,
+          700
+        ],
+        [
+          640,
+          700
+        ]
+      ],
+      "length_ft": 17.0,
+      "width_ft": 12.0,
+      "area_sqft": 204,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED-ROOM 'D'",
+      "bbox": [
+        880,
+        510,
+        1120,
+        700
+      ],
+      "polygon": [
+        [
+          880,
+          510
+        ],
+        [
+          1120,
+          510
+        ],
+        [
+          1120,
+          700
+        ],
+        [
+          880,
+          700
+        ]
+      ],
+      "length_ft": 17.5,
+      "width_ft": 12.0,
+      "area_sqft": 210,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": false,
+    "width_ft": null,
+    "height_ft": null,
+    "source": null
+  },
+  "total_area_sqft": 2325,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}

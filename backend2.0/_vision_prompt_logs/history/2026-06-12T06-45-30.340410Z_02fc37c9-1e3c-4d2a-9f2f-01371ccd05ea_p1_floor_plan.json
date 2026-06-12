@@ -1,0 +1,419 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Top-down architectural floor plans with room boundaries and labels are present."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor",
+    "confidence_pct": 100,
+    "evidence": "The page contains two distinct floor plans labeled 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN'. 'First Floor' is chosen as the primary label for the page."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [
+        98,
+        288,
+        253,
+        400
+      ],
+      "polygon": [
+        [
+          98,
+          288
+        ],
+        [
+          253,
+          288
+        ],
+        [
+          253,
+          400
+        ],
+        [
+          98,
+          400
+        ]
+      ],
+      "length_ft": 15.25,
+      "width_ft": 23.5833,
+      "area_sqft": 359.69,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [
+        253,
+        288,
+        400,
+        400
+      ],
+      "polygon": [
+        [
+          253,
+          288
+        ],
+        [
+          400,
+          288
+        ],
+        [
+          400,
+          400
+        ],
+        [
+          253,
+          400
+        ]
+      ],
+      "length_ft": 14.8333,
+      "width_ft": 24.3333,
+      "area_sqft": 361.09,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "TOILETS",
+      "bbox": [
+        290,
+        458,
+        370,
+        550
+      ],
+      "polygon": [
+        [
+          290,
+          458
+        ],
+        [
+          370,
+          458
+        ],
+        [
+          370,
+          550
+        ],
+        [
+          290,
+          550
+        ]
+      ],
+      "length_ft": 7.8333,
+      "width_ft": 9.3333,
+      "area_sqft": 73.1,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [
+        98,
+        550,
+        253,
+        680
+      ],
+      "polygon": [
+        [
+          98,
+          550
+        ],
+        [
+          253,
+          550
+        ],
+        [
+          253,
+          680
+        ],
+        [
+          98,
+          680
+        ]
+      ],
+      "length_ft": 15.25,
+      "width_ft": 19.3333,
+      "area_sqft": 295.09,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        253,
+        550,
+        400,
+        680
+      ],
+      "polygon": [
+        [
+          253,
+          550
+        ],
+        [
+          400,
+          550
+        ],
+        [
+          400,
+          680
+        ],
+        [
+          253,
+          680
+        ]
+      ],
+      "length_ft": 13.5,
+      "width_ft": 19.3333,
+      "area_sqft": 260.99,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM A",
+      "bbox": [
+        500,
+        288,
+        679,
+        400
+      ],
+      "polygon": [
+        [
+          500,
+          288
+        ],
+        [
+          679,
+          288
+        ],
+        [
+          679,
+          400
+        ],
+        [
+          500,
+          400
+        ]
+      ],
+      "length_ft": 17.9166,
+      "width_ft": 15.0,
+      "area_sqft": 268.75,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GEN. ISRAEL PUTNAM MEMORIAL ROOM",
+      "bbox": [
+        700,
+        288,
+        826,
+        400
+      ],
+      "polygon": [
+        [
+          700,
+          288
+        ],
+        [
+          826,
+          288
+        ],
+        [
+          826,
+          400
+        ],
+        [
+          700,
+          400
+        ]
+      ],
+      "length_ft": 12.5,
+      "width_ft": 9.9166,
+      "area_sqft": 123.96,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "HALL",
+      "bbox": [
+        600,
+        458,
+        642,
+        550
+      ],
+      "polygon": [
+        [
+          600,
+          458
+        ],
+        [
+          642,
+          458
+        ],
+        [
+          642,
+          550
+        ],
+        [
+          600,
+          550
+        ]
+      ],
+      "length_ft": 4.1666,
+      "width_ft": 9.0,
+      "area_sqft": 37.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [
+        700,
+        458,
+        826,
+        550
+      ],
+      "polygon": [
+        [
+          700,
+          458
+        ],
+        [
+          826,
+          458
+        ],
+        [
+          826,
+          550
+        ],
+        [
+          700,
+          550
+        ]
+      ],
+      "length_ft": 12.5,
+      "width_ft": 9.0,
+      "area_sqft": 112.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [
+        500,
+        400,
+        679,
+        490
+      ],
+      "polygon": [
+        [
+          500,
+          400
+        ],
+        [
+          679,
+          400
+        ],
+        [
+          679,
+          490
+        ],
+        [
+          500,
+          490
+        ]
+      ],
+      "length_ft": 17.9166,
+      "width_ft": 9.0,
+      "area_sqft": 161.25,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [
+        500,
+        550,
+        656,
+        680
+      ],
+      "polygon": [
+        [
+          500,
+          550
+        ],
+        [
+          656,
+          550
+        ],
+        [
+          656,
+          680
+        ],
+        [
+          500,
+          680
+        ]
+      ],
+      "length_ft": 15.5833,
+      "width_ft": 18.5833,
+      "area_sqft": 289.56,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM D",
+      "bbox": [
+        656,
+        550,
+        826,
+        680
+      ],
+      "polygon": [
+        [
+          656,
+          550
+        ],
+        [
+          826,
+          550
+        ],
+        [
+          826,
+          680
+        ],
+        [
+          656,
+          680
+        ]
+      ],
+      "length_ft": 13.5,
+      "width_ft": 18.5833,
+      "area_sqft": 250.87,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": false,
+    "width_ft": null,
+    "height_ft": null,
+    "source": null
+  },
+  "total_area_sqft": 2594.35,
+  "overall_confidence": 90,
+  "units_detected": "feet"
+}

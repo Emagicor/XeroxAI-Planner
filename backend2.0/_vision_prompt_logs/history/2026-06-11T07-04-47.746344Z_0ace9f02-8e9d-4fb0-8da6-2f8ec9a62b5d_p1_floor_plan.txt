@@ -1,0 +1,175 @@
+# pass=floor_plan
+# session_id=0ace9f02-8e9d-4fb0-8da6-2f8ec9a62b5d
+# page_number=1
+# model=gemini-2.5-flash
+# timestamp=2026-06-11T07-04-47.746344Z
+
+```json
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Top-down room layout with dimensions"
+  },
+  "floor_identification": {
+    "floor_label": "Unknown",
+    "confidence_pct": 0,
+    "evidence": "No readable level label"
+  },
+  "rooms": [
+    {
+      "name": "DINING",
+      "bbox": [45, 130, 240, 260],
+      "polygon": [
+        [45, 130],
+        [240, 130],
+        [240, 260],
+        [45, 260]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 9.0,
+      "area_sqft": 99.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "KIT.",
+      "bbox": [45, 270, 240, 380],
+      "polygon": [
+        [45, 270],
+        [240, 270],
+        [240, 380],
+        [45, 380]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 8.0,
+      "area_sqft": 88.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GREAT ROOM",
+      "bbox": [250, 130, 550, 380],
+      "polygon": [
+        [250, 130],
+        [550, 130],
+        [550, 380],
+        [250, 380]
+      ],
+      "length_ft": 10.5,
+      "width_ft": 17.0,
+      "area_sqft": 178.5,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "MASTER BEDRM",
+      "bbox": [560, 130, 800, 380],
+      "polygon": [
+        [560, 130],
+        [800, 130],
+        [800, 380],
+        [560, 380]
+      ],
+      "length_ft": 12.0,
+      "width_ft": 13.5,
+      "area_sqft": 162.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDRM 3",
+      "bbox": [45, 400, 240, 550],
+      "polygon": [
+        [45, 400],
+        [240, 400],
+        [240, 550],
+        [45, 550]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 10.0,
+      "area_sqft": 110.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDRM 2",
+      "bbox": [45, 570, 240, 720],
+      "polygon": [
+        [45, 570],
+        [240, 570],
+        [240, 720],
+        [45, 720]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 10.0,
+      "area_sqft": 110.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WALK-IN",
+      "bbox": [650, 480, 800, 560],
+      "polygon": [
+        [650, 480],
+        [800, 480],
+        [800, 560],
+        [650, 560]
+      ],
+      "length_ft": 8.5,
+      "width_ft": 4.5,
+      "area_sqft": 38.25,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GARAGE",
+      "bbox": [500, 600, 800, 800],
+      "polygon": [
+        [500, 600],
+        [800, 600],
+        [800, 800],
+        [500, 800]
+      ],
+      "length_ft": 18.0,
+      "width_ft": 19.5,
+      "area_sqft": 351.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "PATIO",
+      "bbox": [45, 730, 240, 800],
+      "polygon": [
+        [45, 730],
+        [240, 730],
+        [240, 800],
+        [45, 800]
+      ],
+      "length_ft": null,
+      "width_ft": null,
+      "area_sqft": 104.0,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": false,
+    "width_ft": null,
+    "height_ft": null,
+    "source": null
+  },
+  "total_area_sqft": 0,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}
+```

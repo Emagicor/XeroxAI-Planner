@@ -1,0 +1,256 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The image shows detailed top-down architectural floor plans of the first and second floors with walls, room labels, and dimensions."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor",
+    "confidence_pct": 95,
+    "evidence": "The sheet contains both 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' labels."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [
+        75,
+        280,
+        215,
+        450
+      ],
+      "polygon": [
+        [
+          75,
+          280
+        ],
+        [
+          215,
+          280
+        ],
+        [
+          215,
+          450
+        ],
+        [
+          75,
+          450
+        ]
+      ],
+      "length_ft": 22.58,
+      "width_ft": 15.25,
+      "area_sqft": 344.3,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [
+        290,
+        280,
+        415,
+        450
+      ],
+      "polygon": [
+        [
+          290,
+          280
+        ],
+        [
+          415,
+          280
+        ],
+        [
+          415,
+          450
+        ],
+        [
+          290,
+          450
+        ]
+      ],
+      "length_ft": 24.33,
+      "width_ft": 14.83,
+      "area_sqft": 360.8,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [
+        75,
+        550,
+        215,
+        770
+      ],
+      "polygon": [
+        [
+          75,
+          550
+        ],
+        [
+          215,
+          550
+        ],
+        [
+          215,
+          770
+        ],
+        [
+          75,
+          770
+        ]
+      ],
+      "length_ft": 19.33,
+      "width_ft": 15.25,
+      "area_sqft": 294.9,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        290,
+        550,
+        415,
+        770
+      ],
+      "polygon": [
+        [
+          290,
+          550
+        ],
+        [
+          415,
+          550
+        ],
+        [
+          415,
+          770
+        ],
+        [
+          290,
+          770
+        ]
+      ],
+      "length_ft": 19.0,
+      "width_ft": 13.5,
+      "area_sqft": 256.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [
+        555,
+        455,
+        715,
+        560
+      ],
+      "polygon": [
+        [
+          555,
+          455
+        ],
+        [
+          715,
+          455
+        ],
+        [
+          715,
+          560
+        ],
+        [
+          555,
+          560
+        ]
+      ],
+      "length_ft": 9.0,
+      "width_ft": 17.92,
+      "area_sqft": 161.3,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [
+        555,
+        560,
+        695,
+        765
+      ],
+      "polygon": [
+        [
+          555,
+          560
+        ],
+        [
+          695,
+          560
+        ],
+        [
+          695,
+          765
+        ],
+        [
+          555,
+          765
+        ]
+      ],
+      "length_ft": 18.58,
+      "width_ft": 15.58,
+      "area_sqft": 289.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [
+        780,
+        455,
+        905,
+        560
+      ],
+      "polygon": [
+        [
+          780,
+          455
+        ],
+        [
+          905,
+          455
+        ],
+        [
+          905,
+          560
+        ],
+        [
+          780,
+          560
+        ]
+      ],
+      "length_ft": 9.0,
+      "width_ft": 12.5,
+      "area_sqft": 112.5,
+      "confidence_pct": 85,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Aligns vertically with BED ROOM B which has a height of 9'0\""
+      ]
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 37.92,
+    "height_ft": 43.33,
+    "source": "measured"
+  },
+  "total_area_sqft": 1820,
+  "overall_confidence": 90,
+  "units_detected": "feet"
+}

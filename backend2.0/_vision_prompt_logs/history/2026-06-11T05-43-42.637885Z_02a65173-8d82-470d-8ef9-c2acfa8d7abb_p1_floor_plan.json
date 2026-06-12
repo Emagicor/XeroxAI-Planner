@@ -1,0 +1,287 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Top-down room layout with dimensions"
+  },
+  "floor_identification": {
+    "floor_label": "First Floor and Second Floor",
+    "confidence_pct": 95,
+    "evidence": "Title block indicates FIRST FLOOR PLAN and SECOND FLOOR PLAN"
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [
+        60,
+        150,
+        310,
+        380
+      ],
+      "polygon": [
+        [
+          60,
+          150
+        ],
+        [
+          310,
+          150
+        ],
+        [
+          310,
+          380
+        ],
+        [
+          60,
+          380
+        ]
+      ],
+      "length_ft": 19.5,
+      "width_ft": 15,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [
+        310,
+        150,
+        560,
+        380
+      ],
+      "polygon": [
+        [
+          310,
+          150
+        ],
+        [
+          560,
+          150
+        ],
+        [
+          560,
+          380
+        ],
+        [
+          310,
+          380
+        ]
+      ],
+      "length_ft": 19.5,
+      "width_ft": 14.75,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [
+        60,
+        380,
+        310,
+        620
+      ],
+      "polygon": [
+        [
+          60,
+          380
+        ],
+        [
+          310,
+          380
+        ],
+        [
+          310,
+          620
+        ],
+        [
+          60,
+          620
+        ]
+      ],
+      "length_ft": 19.5,
+      "width_ft": 19.75,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        310,
+        380,
+        560,
+        620
+      ],
+      "polygon": [
+        [
+          310,
+          380
+        ],
+        [
+          560,
+          380
+        ],
+        [
+          560,
+          620
+        ],
+        [
+          310,
+          620
+        ]
+      ],
+      "length_ft": 19.5,
+      "width_ft": 19.75,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM A",
+      "bbox": [
+        650,
+        150,
+        840,
+        340
+      ],
+      "polygon": [
+        [
+          650,
+          150
+        ],
+        [
+          840,
+          150
+        ],
+        [
+          840,
+          340
+        ],
+        [
+          650,
+          340
+        ]
+      ],
+      "length_ft": 16.5,
+      "width_ft": 12,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [
+        840,
+        150,
+        1000,
+        340
+      ],
+      "polygon": [
+        [
+          840,
+          150
+        ],
+        [
+          1000,
+          150
+        ],
+        [
+          1000,
+          340
+        ],
+        [
+          840,
+          340
+        ]
+      ],
+      "length_ft": 16.5,
+      "width_ft": 12,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [
+        650,
+        340,
+        840,
+        530
+      ],
+      "polygon": [
+        [
+          650,
+          340
+        ],
+        [
+          840,
+          340
+        ],
+        [
+          840,
+          530
+        ],
+        [
+          650,
+          530
+        ]
+      ],
+      "length_ft": 16.5,
+      "width_ft": 12,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM D",
+      "bbox": [
+        840,
+        340,
+        1000,
+        530
+      ],
+      "polygon": [
+        [
+          840,
+          340
+        ],
+        [
+          1000,
+          340
+        ],
+        [
+          1000,
+          530
+        ],
+        [
+          840,
+          530
+        ]
+      ],
+      "length_ft": 16.5,
+      "width_ft": 12,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 60,
+    "height_ft": 44,
+    "source": "measured"
+  },
+  "total_area_sqft": 2640,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}
