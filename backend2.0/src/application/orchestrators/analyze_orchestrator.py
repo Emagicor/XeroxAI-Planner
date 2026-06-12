@@ -13,19 +13,17 @@ from domain.entities.job import AnalyzeJob
 from domain.exceptions import ZeroxError
 from infrastructure.rasterizer.pdf_rasterizer import rasterize_pdf, rasterize_single_image
 from pipelines.processing.page_processor import process_analysis_unit
-from application.use_cases.detection_store import get_detection
-from pipelines.processing.region_expander import (
-    expand_to_analysis_units,
-    units_from_document_detection,
-)
+from pipelines.processing.region_expander import expand_to_analysis_units
 from pipelines.ingestion.file_validator import validate_upload
 from application.use_cases.job_store import save_job
+from providers.vision.request_config import VisionOverride
 
 log = structlog.get_logger(__name__)
 
 _PROVIDER_FAILURE_MARKERS = (
     "gemini",
     "openai",
+    "groq",
     "provider",
     "api_key",
     "quota",
@@ -51,43 +49,17 @@ def _finalize_job_status(job: AnalyzeJob) -> None:
     reasons = [p.ineligible_reason for p in job.pages if p.ineligible_reason]
     if reasons and all(_looks_like_provider_failure(r) for r in reasons):
         first = reasons[0]
-        code = "QUOTA_EXCEEDED" if "quota" in first.lower() else "VISION_PROVIDER_ERROR"
+        lower = first.lower()
+        if "quota" in lower or "429" in lower:
+            code = "QUOTA_EXCEEDED"
+        elif "503" in lower or "unavailable" in lower or "high demand" in lower:
+            code = "GEMINI_ERROR"
+        else:
+            code = "VISION_PROVIDER_ERROR"
         job.mark_failed(code, first[:500])
         return
 
     job.mark_complete()
-
-
-def _resolve_analysis_units(
-    pages,
-    *,
-    detection_id: str | None,
-    content_sha256: str,
-    excluded_region_ids: set[str] | None,
-):
-    excluded = excluded_region_ids or set()
-    if detection_id:
-        detection = get_detection(detection_id)
-        if detection is None:
-            raise ZeroxError(
-                "DETECTION_NOT_FOUND",
-                f"Detection '{detection_id}' not found. Re-run detection before analyzing.",
-            )
-        if detection.content_sha256 != content_sha256:
-            raise ZeroxError(
-                "DETECTION_MISMATCH",
-                "Uploaded file does not match the detection session. Re-run detection.",
-            )
-        return units_from_document_detection(
-            detection,
-            pages,
-            excluded_region_ids=excluded,
-        )
-    return expand_to_analysis_units(
-        pages,
-        total_pages=len(pages),
-        excluded_region_ids=excluded,
-    )
 
 
 def run_analyze_pipeline(
@@ -95,8 +67,7 @@ def run_analyze_pipeline(
     file_bytes: bytes,
     declared_mime: str | None,
     *,
-    detection_id: str | None = None,
-    excluded_region_ids: set[str] | None = None,
+    vision_override: VisionOverride | None = None,
 ) -> AnalyzeJob:
     """
     Full synchronous pipeline.
@@ -131,12 +102,7 @@ def run_analyze_pipeline(
             pages = rasterize_single_image(file_bytes, detected_mime)
 
         source_page_count = len(pages)
-        units = _resolve_analysis_units(
-            pages,
-            detection_id=detection_id,
-            content_sha256=content_sha256,
-            excluded_region_ids=excluded_region_ids,
-        )
+        units = expand_to_analysis_units(pages, total_pages=len(pages))
 
         job.mark_processing(len(units) or source_page_count)
         job.mark_extracting()
@@ -163,6 +129,7 @@ def run_analyze_pipeline(
                 unit,
                 len(units),
                 session_id=session_id,
+                vision_override=vision_override,
             )
             job.pages.append(page_result)
 

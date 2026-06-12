@@ -1,15 +1,11 @@
 export default function SectionHeader({ eyebrow, title, subtitle, action, className = '' }) {
   return (
-    <div className={`mb-6 ${className}`}>
-      {eyebrow && (
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent mb-2">
-          {eyebrow}
-        </p>
-      )}
+    <div className={`mb-8 ${className}`}>
+      {eyebrow && <p className="eyebrow">{eyebrow}</p>}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           {title && (
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+            <h2 className="text-2xl sm:text-[1.75rem] font-semibold tracking-tight text-text leading-tight">
               {title}
             </h2>
           )}

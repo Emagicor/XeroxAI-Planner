@@ -2,8 +2,8 @@ export default function Card({ children, className = '', padding = true, glow = 
   return (
     <div
       className={[
-        'rounded-2xl border border-line/80 bg-card/90 backdrop-blur-md overflow-hidden',
-        glow ? 'shadow-xl shadow-black/20 ring-1 ring-line/5' : '',
+        'rounded-xl border border-line bg-card overflow-hidden',
+        glow ? 'shadow-[var(--shadow-md)]' : 'shadow-[var(--shadow-sm)]',
         padding ? '' : '',
         className,
       ].join(' ')}
@@ -16,7 +16,7 @@ export default function Card({ children, className = '', padding = true, glow = 
 export function CardHeader({ title, subtitle, action, badge, className = '' }) {
   return (
     <div
-      className={`px-5 py-4 border-b border-line/60 bg-surface/30 flex flex-wrap items-start justify-between gap-3 ${className}`}
+      className={`px-5 py-4 border-b border-line flex flex-wrap items-start justify-between gap-3 ${className}`}
     >
       <div>
         {title && <p className="text-sm font-semibold text-text">{title}</p>}

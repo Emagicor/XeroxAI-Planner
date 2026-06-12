@@ -58,7 +58,7 @@ export default function PlanImagesPanel({
         <div className={gridClass}>
           <ExpandableImage
             src={clipSrc}
-            label="Clipped region (detected floor plan)"
+            label="Floor plan region"
             alt="Clipped floor plan region"
             compact={compact}
             expandable={expandable}
@@ -78,7 +78,7 @@ export default function PlanImagesPanel({
       ) : (
         <ExpandableImage
           src={singleSrc}
-          label={isClipOnly ? 'Clipped region (detected floor plan)' : undefined}
+          label={isClipOnly ? 'Floor plan region' : undefined}
           alt={isClipOnly ? 'Clipped floor plan region' : 'Annotated floor plan'}
           compact={compact}
           expandable={expandable}

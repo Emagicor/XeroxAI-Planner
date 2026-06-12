@@ -1,8 +1,9 @@
 import ErrorBanner from '@/components/ui/ErrorBanner'
 import Button from '@/components/ui/Button'
 import TestSuiteCaseBuilder from './TestSuiteCaseBuilder'
+import TestSuiteModelSelector from './TestSuiteModelSelector'
 
-function RunStatusHint({ unsavedCount, readyCount }) {
+function RunStatusHint({ unsavedCount, readyCount, selectedCount }) {
   if (unsavedCount > 0) {
     return (
       <p className="text-sm text-amber-300/90">
@@ -17,7 +18,21 @@ function RunStatusHint({ unsavedCount, readyCount }) {
       </p>
     )
   }
-  return <p className="text-sm text-emerald-400/90">All saved cases ready to run</p>
+  if (selectedCount === 0) {
+    return (
+      <p className="text-sm text-amber-300/90">
+        Select at least one case to run.
+      </p>
+    )
+  }
+  if (selectedCount < readyCount) {
+    return (
+      <p className="text-sm text-emerald-400/90">
+        {selectedCount} of {readyCount} ready case{readyCount !== 1 ? 's' : ''} selected
+      </p>
+    )
+  }
+  return <p className="text-sm text-emerald-400/90">All saved cases selected</p>
 }
 
 export default function TestSuiteUploadSection({
@@ -26,6 +41,7 @@ export default function TestSuiteUploadSection({
   casesLoadError,
   loading,
   readyCount,
+  selectedCount,
   error,
   bulkInputRef,
   onAddEmptyCase,
@@ -41,23 +57,63 @@ export default function TestSuiteUploadSection({
   unsavedCount,
   onRun,
   onRetry,
+  selectedModelId,
+  onModelChange,
+  isCaseSelected,
+  onToggleCaseSelection,
+  onSelectAll,
+  onDeselectAll,
+  canRunCase,
 }) {
   const showToolbar = cases.length > 0 && !loading && !casesLoading
 
   return (
     <section className="space-y-6">
+      <TestSuiteModelSelector
+        value={selectedModelId}
+        onChange={onModelChange}
+        disabled={loading}
+      />
+
       {showToolbar && (
-        <div className="sticky top-4 z-20 rounded-2xl border border-line bg-card/95 backdrop-blur-md shadow-xl shadow-black/25 p-4 sm:p-5">
+        <div className="sticky top-4 z-20 rounded-xl border border-line bg-card shadow-[var(--shadow-md)] p-4 sm:p-5">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="min-w-0">
               <p className="text-base font-medium text-text">Test suite</p>
               <p className="text-sm text-muted mt-0.5">
+                <span className="text-text font-semibold">{selectedCount}</span> selected
+                <span className="mx-2 text-line">·</span>
                 <span className="text-text font-semibold">{readyCount}</span> ready
                 <span className="mx-2 text-line">·</span>
-                <span className="text-text font-semibold">{cases.length}</span> total cases
+                <span className="text-text font-semibold">{cases.length}</span> total
               </p>
-              <div className="mt-2">
-                <RunStatusHint unsavedCount={unsavedCount} readyCount={readyCount} />
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <RunStatusHint
+                  unsavedCount={unsavedCount}
+                  readyCount={readyCount}
+                  selectedCount={selectedCount}
+                />
+                {readyCount > 0 && (
+                  <>
+                    <span className="text-line hidden sm:inline">·</span>
+                    <button
+                      type="button"
+                      disabled={loading || selectedCount === readyCount}
+                      onClick={onSelectAll}
+                      className="text-xs text-accent hover:underline disabled:opacity-40 disabled:no-underline"
+                    >
+                      Select all
+                    </button>
+                    <button
+                      type="button"
+                      disabled={loading || selectedCount === 0}
+                      onClick={onDeselectAll}
+                      className="text-xs text-muted hover:text-text disabled:opacity-40"
+                    >
+                      Clear selection
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -72,7 +128,7 @@ export default function TestSuiteUploadSection({
                 + Add test case
               </Button>
               <Button size="lg" disabled={!canRun} onClick={onRun} className="min-w-[12rem]">
-                Run {readyCount || 0} test case{readyCount !== 1 ? 's' : ''}
+                Run {selectedCount || 0} test case{selectedCount !== 1 ? 's' : ''}
               </Button>
             </div>
           </div>
@@ -96,6 +152,9 @@ export default function TestSuiteUploadSection({
         onRemoveCase={onRemoveCase}
         onReloadCases={onReloadCases}
         hideAddButton={showToolbar}
+        isCaseSelected={isCaseSelected}
+        onToggleCaseSelection={onToggleCaseSelection}
+        canRunCase={canRunCase}
       />
 
       {error && <ErrorBanner message={error} onRetry={onRetry} />}

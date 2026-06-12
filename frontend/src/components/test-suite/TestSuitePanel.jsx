@@ -22,9 +22,9 @@ export default function TestSuitePanel({
           Score your current Analyze tab run
         </p>
         <p className="text-xs text-muted mt-1">
-          Upload ground truth JSON to compare against this session. Batch runs reuse
-          the same result when the file hash matches; otherwise each case calls /analyze
-          again (model output may differ slightly between runs).
+          Upload ground truth JSON to compare against this session. Batch runs with
+          Server default reuse this result when the file hash matches; otherwise each
+          case runs the same analyze pipeline as the Analyze tab.
         </p>
       </div>
 

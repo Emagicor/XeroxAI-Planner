@@ -5,7 +5,7 @@ import Card from '@/components/ui/Card'
 function UploadIcon() {
   return (
     <svg
-      className="w-8 h-8 text-accent"
+      className="w-7 h-7 text-accent"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -22,15 +22,15 @@ function UploadIcon() {
 
 function EmptyState({ onBrowse }) {
   return (
-    <div className="py-4">
-      <div className="mx-auto w-16 h-16 rounded-2xl bg-accent/10 border border-accent/25 flex items-center justify-center mb-5">
+    <div className="py-6">
+      <div className="mx-auto w-14 h-14 rounded-xl bg-accent-subtle border border-accent/20 flex items-center justify-center mb-5">
         <UploadIcon />
       </div>
-      <p className="text-lg font-semibold text-text mb-2">
+      <p className="text-base font-semibold text-text mb-1.5">
         Drop your floor plan here
       </p>
       <p className="text-sm text-muted mb-6 max-w-sm mx-auto">
-        JPG, PNG, or PDF — each floor plan is detected and clipped before AI analysis
+        JPG, PNG, or PDF — upload a floor plan for AI room extraction
       </p>
       <Button onClick={onBrowse} size="lg">
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,18 +51,18 @@ function FilePreview({ file, preview, onChangeFile }) {
         <img
           src={preview}
           alt="Preview"
-          className="w-28 h-28 object-cover rounded-xl border border-line shadow-lg"
+          className="w-24 h-24 object-cover rounded-lg border border-line"
         />
       )}
       {isPdf && (
-        <div className="w-28 h-28 rounded-xl border border-line bg-surface flex items-center justify-center">
-          <span className="text-xl font-mono font-semibold text-accent">PDF</span>
+        <div className="w-24 h-24 rounded-lg border border-line bg-surface flex items-center justify-center">
+          <span className="text-lg font-mono font-medium text-accent">PDF</span>
         </div>
       )}
       <div className="text-left flex-1 min-w-0">
-        <p className="font-semibold text-text truncate">{file.name}</p>
-        <p className="text-sm text-muted font-mono mt-1">{formatFileSize(file.size)}</p>
-        <Button variant="ghost" size="sm" onClick={onChangeFile} className="mt-3">
+        <p className="font-medium text-text truncate">{file.name}</p>
+        <p className="text-sm text-muted font-mono mt-0.5">{formatFileSize(file.size)}</p>
+        <Button variant="ghost" size="sm" onClick={onChangeFile} className="mt-2">
           Change file
         </Button>
       </div>
@@ -86,8 +86,8 @@ export default function FileDropZone({
   return (
     <Card
       glow
-      className={`transition-colors ${
-        loading ? 'border-accent/40 bg-accent/5' : 'hover:border-accent/30'
+      className={`transition-colors duration-150 ${
+        loading ? 'border-accent/30 bg-accent-subtle' : 'hover:border-accent/25'
       }`}
     >
       <div

@@ -22,7 +22,8 @@ from api.schemas.analyze import AnalyzeResponseSchema, PageSchema, RoomSchema
 from infrastructure.isolated_runner import run_analyze_pipeline_isolated
 from application.use_cases.job_store import get_job, save_job
 from domain.entities.job import AnalyzeJob, JobStatus
-from domain.exceptions import IngestionError
+from domain.exceptions import IngestionError, ProviderError, ZeroxError
+from providers.vision.errors import PROVIDER_FAILURE_CODES
 
 log = structlog.get_logger(__name__)
 router = APIRouter()
@@ -159,41 +160,19 @@ async def _read_upload(file: UploadFile) -> tuple[bytes, str, str]:
     return file_bytes, filename, mime
 
 
-def _parse_excluded_region_ids(raw: str | None) -> list[str]:
-    if not raw or not raw.strip():
-        return []
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail="excluded_region_ids must be a JSON array of strings.",
-        ) from exc
-    if not isinstance(parsed, list):
-        raise HTTPException(
-            status_code=400,
-            detail="excluded_region_ids must be a JSON array of strings.",
-        )
-    return [str(item) for item in parsed]
-
-
 # ── POST /analyze — full blocking response ────────────────────────────────────
 
 @router.post("/analyze")
 async def analyze(
     file: UploadFile = File(...),
-    detection_id: str | None = Form(None),
-    excluded_region_ids: str | None = Form(None),
+    vision_provider: str | None = Form(None),
+    vision_model: str | None = Form(None),
 ):
     """
     Process the full document synchronously and return one JSON object.
     Suitable for documents up to ~10 pages; use /analyze/stream for larger ones.
-
-    Optional detection_id + excluded_region_ids reuse a prior /detect session and
-    skip user-removed clippings.
     """
     file_bytes, filename, mime = await _read_upload(file)
-    excluded = _parse_excluded_region_ids(excluded_region_ids)
 
     # Isolated subprocess — no in-process SDK/state bleed between back-to-back uploads
     job: AnalyzeJob = await asyncio.to_thread(
@@ -201,8 +180,8 @@ async def analyze(
         filename,
         file_bytes,
         mime,
-        detection_id=detection_id,
-        excluded_region_ids=excluded,
+        vision_provider=vision_provider.strip() if vision_provider else None,
+        vision_model=vision_model.strip() if vision_model else None,
     )
 
     # Worker subprocess save_job is not visible here — persist for GET .../annotated
@@ -214,18 +193,9 @@ async def analyze(
             "INVALID_EXTENSION", "INVALID_MIME_TYPE", "FILE_TOO_LARGE",
             "TOO_MANY_PAGES", "CORRUPT_PDF", "PASSWORD_PROTECTED",
             "MALWARE_SUSPECTED", "EMPTY_FILE",
-            "DETECTION_NOT_FOUND", "DETECTION_MISMATCH",
         ) else 500
         # Surface missing/invalid API keys as 503 so clients show a clear message
-        if job.error_code in (
-            "MISSING_API_KEY",
-            "INVALID_API_KEY",
-            "QUOTA_EXCEEDED",
-            "BILLING_CREDITS_DEPLETED",
-            "MODEL_NOT_FOUND",
-            "GEMINI_ERROR",
-            "VISION_PROVIDER_ERROR",
-        ):
+        if job.error_code in PROVIDER_FAILURE_CODES:
             status_code = 503
         raise HTTPException(
             status_code=status_code,
@@ -240,8 +210,8 @@ async def analyze(
 @router.post("/analyze/stream")
 async def analyze_stream(
     file: UploadFile = File(...),
-    detection_id: str | None = Form(None),
-    excluded_region_ids: str | None = Form(None),
+    vision_provider: str | None = Form(None),
+    vision_model: str | None = Form(None),
 ):
     """
     Server-Sent Events endpoint.
@@ -260,13 +230,19 @@ async def analyze_stream(
     from uuid import uuid4
 
     file_bytes, filename, mime = await _read_upload(file)
-    excluded = _parse_excluded_region_ids(excluded_region_ids)
     stream_session_id = str(uuid4())
+    from providers.vision.request_config import VisionOverride
+
+    vision_override = None
+    if vision_provider or vision_model:
+        vision_override = VisionOverride(
+            provider=vision_provider.strip() if vision_provider else None,
+            model=vision_model.strip() if vision_model else None,
+        )
 
     async def _event_stream():
         try:
-            from application.orchestrators.analyze_orchestrator import _resolve_analysis_units
-            import hashlib
+            from pipelines.processing.region_expander import expand_to_analysis_units
 
             detected_mime, _ = await asyncio.to_thread(
                 validate_upload, filename, file_bytes, mime
@@ -277,13 +253,10 @@ async def analyze_stream(
             else:
                 pages = rasterize_single_image(file_bytes, detected_mime)
 
-            content_sha256 = hashlib.sha256(file_bytes).hexdigest()
             units = await asyncio.to_thread(
-                _resolve_analysis_units,
+                expand_to_analysis_units,
                 pages,
-                detection_id=detection_id,
-                content_sha256=content_sha256,
-                excluded_region_ids=set(excluded),
+                total_pages=len(pages),
             )
             total_units = len(units)
             grand_total = 0.0
@@ -298,6 +271,7 @@ async def analyze_stream(
                         unit,
                         total_units,
                         session_id=stream_session_id,
+                        vision_override=vision_override,
                     )
 
                     if page_result.eligible:
@@ -315,6 +289,40 @@ async def analyze_stream(
                         "data": _page_schema(page_result, inline_annotation=True).model_dump(),
                     }
 
+                except ProviderError as exc:
+                    log.error(
+                        "stream.provider_error",
+                        plan=unit.plan_number,
+                        source_page=unit.source_page,
+                        code=exc.code,
+                        error=exc.message,
+                    )
+                    yield f"data: {json.dumps({'type': 'error', 'code': exc.code, 'message': exc.message})}\n\n"
+                    return
+                except ZeroxError as exc:
+                    log.error(
+                        "stream.unit_error",
+                        plan=unit.plan_number,
+                        source_page=unit.source_page,
+                        code=exc.code,
+                        error=exc.message,
+                    )
+                    ineligible += 1
+                    event = {
+                        "type": "progress",
+                        "page": unit.plan_number,
+                        "total_pages": total_units,
+                        "source_page": unit.source_page,
+                        "region_index": unit.region_index,
+                        "data": {
+                            "page_number": unit.plan_number,
+                            "plan_number": unit.plan_number,
+                            "source_page": unit.source_page,
+                            "region_index": unit.region_index,
+                            "eligible": False,
+                            "ineligible_reason": exc.message,
+                        },
+                    }
                 except Exception as exc:
                     log.error(
                         "stream.unit_error",
@@ -343,9 +351,17 @@ async def analyze_stream(
 
             yield f"data: {json.dumps({'type': 'done', 'grand_total_sqft': round(grand_total, 2), 'eligible_pages': eligible, 'ineligible_pages': ineligible, 'page_count': total_units, 'source_page_count': len(pages)})}\n\n"
 
+        except ZeroxError as exc:
+            log.error(
+                "stream.fatal_error",
+                code=exc.code,
+                error=exc.message,
+                exc_info=True,
+            )
+            yield f"data: {json.dumps({'type': 'error', 'code': exc.code, 'message': exc.message})}\n\n"
         except Exception as exc:
             log.error("stream.fatal_error", error=str(exc), exc_info=True)
-            yield f"data: {json.dumps({'type': 'error', 'message': str(exc)})}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'code': 'INTERNAL_ERROR', 'message': str(exc)})}\n\n"
 
     return StreamingResponse(
         _event_stream(),

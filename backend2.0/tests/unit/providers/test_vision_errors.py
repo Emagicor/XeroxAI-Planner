@@ -1,5 +1,6 @@
 from providers.vision.errors import (
     classify_gemini_error,
+    classify_openai_compatible_error,
     is_billing_credits_depleted,
     is_quota_exceeded,
     is_transient_error,
@@ -33,3 +34,42 @@ def test_transient_not_quota():
 def test_parse_retry_delay():
     exc = Exception("Please retry in 39.41319235s.")
     assert parse_retry_after_seconds(exc) == 39.41319235
+
+
+def test_gemini_quota_returns_raw_api_message():
+    exc = Exception("429 quota exceeded for free_tier_requests")
+    code, msg = classify_gemini_error(exc, model="gemini-2.5-flash")
+    assert code == "QUOTA_EXCEEDED"
+    assert msg == str(exc)
+
+
+def test_openai_invalid_key_returns_raw():
+    exc = Exception("401 invalid api key")
+    code, msg = classify_openai_compatible_error(exc, provider="openai", model="gpt-4o")
+    assert code == "INVALID_API_KEY"
+    assert msg == str(exc)
+
+
+def test_groq_quota_returns_raw():
+    exc = Exception("429 rate limit exceeded")
+    code, msg = classify_openai_compatible_error(
+        exc, provider="groq", model="meta-llama/llama-4-scout-17b-16e-instruct"
+    )
+    assert code == "QUOTA_EXCEEDED"
+    assert msg == str(exc)
+
+
+def test_openai_unknown_error_returns_raw():
+    exc = Exception("upstream connect error")
+    code, msg = classify_openai_compatible_error(exc, provider="openai", model="gpt-4o")
+    assert code == "OPENAI_ERROR"
+    assert msg == "upstream connect error"
+
+
+def test_provider_failure_codes():
+    from providers.vision.errors import PROVIDER_FAILURE_CODES, is_provider_failure_code
+
+    assert is_provider_failure_code("GEMINI_ERROR")
+    assert is_provider_failure_code("QUOTA_EXCEEDED")
+    assert not is_provider_failure_code("INTERNAL_ERROR")
+    assert "GEMINI_ERROR" in PROVIDER_FAILURE_CODES

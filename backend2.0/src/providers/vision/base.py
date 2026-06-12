@@ -11,12 +11,49 @@ from dataclasses import dataclass
 
 
 @dataclass
+class TokenUsage:
+    """Provider usage metadata — Gemini usageMetadata field names preserved in logs."""
+
+    prompt_token_count: int | None = None
+    candidates_token_count: int | None = None
+    thoughts_token_count: int | None = None
+    total_token_count: int | None = None
+
+    def as_log_fields(self) -> dict[str, int | None]:
+        return {
+            "promptTokenCount": self.prompt_token_count,
+            "candidatesTokenCount": self.candidates_token_count,
+            "thoughtsTokenCount": self.thoughts_token_count,
+            "totalTokenCount": self.total_token_count,
+        }
+
+    def add(self, other: TokenUsage | None) -> TokenUsage:
+        if other is None:
+            return self
+
+        def _sum(a: int | None, b: int | None) -> int | None:
+            if a is None and b is None:
+                return None
+            return (a or 0) + (b or 0)
+
+        return TokenUsage(
+            prompt_token_count=_sum(self.prompt_token_count, other.prompt_token_count),
+            candidates_token_count=_sum(
+                self.candidates_token_count, other.candidates_token_count
+            ),
+            thoughts_token_count=_sum(self.thoughts_token_count, other.thoughts_token_count),
+            total_token_count=_sum(self.total_token_count, other.total_token_count),
+        )
+
+
+@dataclass
 class ProviderResponse:
-    """Raw text back from the model, plus usage metadata for benchmarking."""
+    """Raw text back from the model, plus usage metadata."""
     text: str
     input_tokens: int | None = None
     output_tokens: int | None = None
     model_used: str | None = None
+    usage: TokenUsage | None = None
 
 
 class VisionProvider(ABC):

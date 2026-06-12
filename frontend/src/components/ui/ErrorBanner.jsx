@@ -23,22 +23,22 @@ export default function ErrorBanner({
       : null)
 
   return (
-    <div className="mt-6 p-5 rounded-2xl border border-red-500/30 bg-red-950/30 backdrop-blur-sm">
+    <div className="mt-6 p-5 rounded-xl border alert-error">
       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-        <div className="shrink-0 w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/25 flex items-center justify-center">
-          <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="shrink-0 w-9 h-9 rounded-lg bg-[var(--danger-bg)] border border-[var(--danger-border)] flex items-center justify-center">
+          <svg className="w-4 h-4 text-[var(--danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-sm font-semibold text-red-200">{displayTitle}</p>
-          <p className="text-sm text-red-300/80 mt-1 leading-relaxed">{message}</p>
+          <p className="text-sm font-semibold text-text">{displayTitle}</p>
+          <p className="text-sm text-text-secondary mt-1 leading-relaxed">{message}</p>
           {displayHint && (
-            <p className="text-xs text-red-300/60 mt-2 font-mono leading-relaxed">{displayHint}</p>
+            <p className="text-xs text-muted mt-2 font-mono leading-relaxed">{displayHint}</p>
           )}
         </div>
       </div>
-      <div className="flex flex-wrap gap-3 mt-4">
+      <div className="flex flex-wrap gap-2 mt-4">
         {onRetry && (
           <Button variant="primary" size="sm" onClick={onRetry}>
             {retryLabel}

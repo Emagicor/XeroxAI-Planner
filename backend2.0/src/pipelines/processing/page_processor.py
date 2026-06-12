@@ -14,6 +14,7 @@ from infrastructure.preprocessing.image_preprocessor import prepare_ui_preview_i
 from pipelines.extraction.page_analyzer import analyze_page_safe
 from pipelines.processing.page_classifier import classify_page, map_vision_page_type, should_skip_before_vision
 from providers.vision.factory import create_vision_provider
+from providers.vision.request_config import VisionOverride
 
 if TYPE_CHECKING:
     from pipelines.processing.region_expander import AnalysisUnit
@@ -41,12 +42,13 @@ def process_analysis_unit(
     total_units: int,
     *,
     session_id: str,
+    vision_override: VisionOverride | None = None,
 ) -> PageResult:
-    """Analyze one Grounding-DINO-clipped floor plan region."""
+    """Analyze one floor plan region (full page or clipped)."""
     page_type = __import__(
         "domain.entities.job", fromlist=["PageType"]
     ).PageType.FLOORPLAN
-    classify_reason = "Grounding DINO region"
+    classify_reason = "Detected floor plan region"
 
     if not unit.skip_classifier:
         page_type, classify_reason = classify_page(
@@ -65,7 +67,7 @@ def process_analysis_unit(
             )
             return _attach_region_metadata(result, unit)
 
-    provider = create_vision_provider()
+    provider = create_vision_provider(vision_override)
     try:
         raw = analyze_page_safe(
             provider,
@@ -74,6 +76,7 @@ def process_analysis_unit(
             page_number=unit.plan_number,
             session_id=session_id,
             from_pdf=unit.from_pdf,
+            vision_override=vision_override,
         )
     finally:
         del provider
@@ -96,6 +99,7 @@ def process_rasterized_page(
     total_pages: int,
     *,
     session_id: str,
+    vision_override: VisionOverride | None = None,
 ) -> PageResult:
     """Classify, optionally skip, or analyze one full rasterized page (legacy path)."""
     page_type, classify_reason = classify_page(
@@ -124,7 +128,7 @@ def process_rasterized_page(
             region_index=1,
         )
 
-    provider = create_vision_provider()
+    provider = create_vision_provider(vision_override)
     try:
         raw = analyze_page_safe(
             provider,
@@ -133,6 +137,7 @@ def process_rasterized_page(
             page_number=page.page_number,
             session_id=session_id,
             from_pdf=page.from_pdf,
+            vision_override=vision_override,
         )
     finally:
         del provider

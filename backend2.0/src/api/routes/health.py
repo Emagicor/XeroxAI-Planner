@@ -5,6 +5,7 @@ import hashlib
 
 from fastapi import APIRouter
 
+from config.features import feature_flags
 from config.settings import _ENV_FILE, get_settings
 
 router = APIRouter()
@@ -26,5 +27,6 @@ def health():
         "status": "ok",
         "env": settings.app_env,
         "vision_provider": settings.vision_provider,
+        "features": feature_flags(settings),
         "gemini": gemini,
     }

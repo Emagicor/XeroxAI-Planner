@@ -1,184 +1,181 @@
 """Vision prompts — page gate + room extraction for architectural floor plans."""
+from __future__ import annotations
 
-FLOOR_PLAN_PROMPT = """You are an expert architectural floor plan analyzer with deep knowledge of residential, commercial, industrial, and retail building layouts — including warehouses/distribution centers, restaurants/food-service facilities, malls/shopping centers, clinics, and medical offices.
+import json
 
-STEP 1 — PAGE TYPE GATE (evaluate BEFORE extracting any rooms):
-Determine whether this image is a FLOOR PLAN layout page or a non-plan sheet.
+from engines.confidence.correction_targets import CorrectionTargets
 
-Set page_classification.is_floor_plan = FALSE and rooms = [] when the page is ANY of:
-- Title / cover sheet, drawing index, sheet list, transmittal
-- General notes, specifications, abbreviations, legends (text-heavy pages)
-- Door/window/finish/equipment schedules (tables, not room layouts)
-- Building elevations, sections, details, renderings, site photos
-- Blank, mostly text, project info, legal disclaimers, consultant lists
-- Any page WITHOUT a top-down room layout with walls and labeled spaces
+FLOOR_PLAN_PROMPT = """You are an expert architectural floor plan analyzer.
 
-Set page_classification.is_floor_plan = TRUE ONLY when the page shows a top-down architectural floor plan with room boundaries.
+## STEP 1 — PAGE GATE
+Set is_floor_plan = false and rooms = [] if the page is ANY of:
+title/cover, drawing index, notes, specs, abbreviations, legends, schedules, elevations, sections, details, renderings, site photos, blank, or text-heavy pages WITHOUT a top-down room layout with walls and labeled spaces.
 
-Also identify the floor/level represented by this specific plan when visible or strongly inferable
-from labels/title blocks. Use common labels such as "Ground Floor", "First Floor",
-"Second Floor", "Basement", "Mezzanine", "Roof Plan", "Typical Floor", "Unit Plan",
-or "Unknown". Do not guess when the sheet does not say or imply a level.
+Set is_floor_plan = true ONLY for top-down architectural floor plans with room boundaries.
 
-When is_floor_plan is FALSE:
-- rooms MUST be []
-- total_area_sqft = 0
-- overall_confidence = 0
-- layout_dimensions.available = false
+## STEP 2 — FLOOR IDENTIFICATION
+Identify the floor level from labels/title blocks. Use: Ground Floor, First Floor, Second Floor, Third Floor, Basement, Mezzanine, Roof Plan, Typical Floor, Unit Plan, or Unknown. Do not guess.
 
-EXAMPLE — Measured room (floor plan page only):
-{
-  "page_classification": { "is_floor_plan": true, "page_type": "floorplan", "reason": "Top-down room layout with dimensions" },
-  "floor_identification": { "floor_label": "First Floor", "confidence_pct": 95, "evidence": "Title block says FIRST FLOOR PLAN" },
-  "rooms": [{
-    "name": "Master Bedroom",
-    "bbox": [45, 80, 420, 380],
-    "polygon": [[45,80],[420,80],[420,380],[45,380]],
-    "length_ft": 14, "width_ft": 12, "area_sqft": 168,
-    "confidence_pct": 97, "dimension_source": "measured",
-    "assumptions": []
-  }],
-  "layout_dimensions": { "available": false, "width_ft": null, "height_ft": null, "source": null },
-  "total_area_sqft": 168,
-  "overall_confidence": 97,
-  "units_detected": "feet"
-}
+## ANTI-HALLUCINATION (highest priority — read before extracting anything)
+- Output a dimension ONLY when you can point to specific dimension text on the image for that axis, OR when annotated arithmetic yields exactly one answer.
+- Never infer from furniture, scale bars, room numbers, sheet numbers, title blocks, or visual proportions.
+- Never use standard sizes to fabricate missing dimensions.
+- Wrong numbers are worse than missing rooms — when uncertain, omit the room.
 
-EXAMPLE — Title/cover page (NOT a floor plan):
-{
-  "page_classification": { "is_floor_plan": false, "page_type": "cover", "reason": "Project title sheet with drawing index, no room layout" },
-  "floor_identification": { "floor_label": "Unknown", "confidence_pct": 0, "evidence": "No floor plan level present" },
-  "rooms": [],
-  "layout_dimensions": { "available": false, "width_ft": null, "height_ft": null, "source": null },
-  "total_area_sqft": 0,
-  "overall_confidence": 0,
-  "units_detected": "unknown"
-}
+## DIMENSION SOURCES & CONFIDENCE (drives selective correction pass)
+Assign honest confidence_pct per room. Downstream correction re-reads ONLY rooms at/below the high-confidence cutoff.
 
-EXAMPLE — Area-only annotation (no separate L×W):
-{
-  "page_classification": { "is_floor_plan": true, "page_type": "floorplan", "reason": "Floor plan layout" },
-  "floor_identification": { "floor_label": "Unknown", "confidence_pct": 0, "evidence": "No readable level label" },
-  "rooms": [{
-    "name": "LIVING/DINING",
-    "bbox": [420, 80, 580, 260],
-    "polygon": [[420,80],[580,80],[580,260],[420,260]],
-    "length_ft": null, "width_ft": null, "area_sqft": 285,
-    "confidence_pct": 95, "dimension_source": "measured",
-    "assumptions": []
-  }],
-  "layout_dimensions": { "available": false, "width_ft": null, "height_ft": null, "source": null },
-  "total_area_sqft": 285,
-  "overall_confidence": 95,
-  "units_detected": "feet"
-}
+**measured** (confidence_pct 90–100): Dimension string is clearly readable and tied to that room via leader line, chain, or area callout. Copy exactly. These rooms are frozen after pass 1.
+**derived** (confidence_pct 70–89): ALL input numbers are themselves measured AND arithmetic yields one unambiguous result (e.g. subtraction along a row, shared-wall transfer). Document full arithmetic in assumptions[]. Dimension fields will be re-verified in correction.
+**assumed** (confidence_pct below 70): Use only when data is uncertain. Full room will be re-verified or removed in correction.
+**area-only**: Area annotated (e.g. "168 SF") but no L×W → set area_sqft, leave length_ft/width_ft null, source = "measured", confidence_pct 90+ only when area text is clearly readable.
 
-EXAMPLE — Labeled room with NO dimensions (omit from output):
-If "HALLWAY" appears on the plan but has no readable dimensions or area, do NOT add it to rooms[].
+## ROOM RULES
+- Include ONLY rooms with at least one measured/derived dimension or measured area.
+- Label without dimensions → omit. Dimensions without label → include with descriptive fallback name.
+- Copy room labels exactly as printed (spelling, caps, abbreviations, punctuation).
+- Rooms must not overlap. All bbox/polygon values are integers 0–1000 (0 = top/left edge, 1000 = bottom/right edge).
 
-Now analyze the uploaded page image. Return ONLY a valid JSON object — no markdown, no backticks, no explanation.
+## LAYOUT DIMENSIONS
+Set available = true ONLY when full outer boundary dimensions (total width AND height) are annotated. Do NOT use a single room's size as layout dimensions.
 
-JSON Schema:
+## DIMENSION NOTATION
+Imperial: 17'11" → 17 + 11/12 ft. ½ symbol = 0.5 in.
+Metric: mm ÷ 304.8 = ft; m × 3.281 = ft.
+
+## OUTPUT
+Return ONLY valid JSON — no markdown, no backticks, no explanation.
+
 {
   "page_classification": {
     "is_floor_plan": boolean,
-    "page_type": "floorplan" | "cover" | "notes" | "schedule" | "elevation" | "section" | "other",
-    "reason": "string — brief explanation"
+    "page_type": "floorplan"|"cover"|"notes"|"schedule"|"elevation"|"section"|"other",
+    "reason": string
   },
   "floor_identification": {
-    "floor_label": "Ground Floor" | "First Floor" | "Second Floor" | "Third Floor" | "Basement" | "Mezzanine" | "Roof Plan" | "Typical Floor" | "Unit Plan" | "Unknown" | "string",
-    "confidence_pct": integer 0-100,
-    "evidence": "string - short source text or visual reason"
+    "floor_label": string,
+    "confidence_pct": integer,
+    "evidence": string
   },
-  "rooms": [
-    {
-      "name": "string — descriptive room name",
-      "bbox": [x_min, y_min, x_max, y_max],
-      "polygon": [[x1,y1],[x2,y2],...],
-      "length_ft": number | null,
-      "width_ft": number | null,
-      "area_sqft": number | null,
-      "confidence_pct": integer 0-100,
-      "dimension_source": "measured" | "derived" | "assumed",
-      "assumptions": ["string", ...]
-    }
-  ],
+  "rooms": [{
+    "name": string,
+    "bbox": [x_min, y_min, x_max, y_max],
+    "polygon": [[x,y],...],
+    "length_ft": number|null,
+    "width_ft": number|null,
+    "area_sqft": number|null,
+    "confidence_pct": integer,
+    "dimension_source": "measured"|"derived"|"assumed",
+    "assumptions": [string]
+  }],
   "layout_dimensions": {
     "available": boolean,
-    "width_ft": number | null,
-    "height_ft": number | null,
-    "source": "measured" | "derived" | null
+    "width_ft": number|null,
+    "height_ft": number|null,
+    "source": "measured"|"derived"|null
   },
   "total_area_sqft": number,
-  "overall_confidence": integer 0-100,
-  "units_detected": "feet" | "meters" | "mm" | "unknown"
+  "overall_confidence": integer,
+  "units_detected": "feet"|"meters"|"mm"|"unknown"
 }
 
-LAYOUT DIMENSION RULES (critical for total area):
-- Set layout_dimensions.available = true ONLY when the full floor plan shows overall outer boundary dimensions (total width AND total height/depth of the entire layout).
-- Put those overall dimensions in layout_dimensions.width_ft and layout_dimensions.height_ft (convert to feet if units_detected is meters or mm).
-- If only some rooms have dimensions but NOT the full layout outline, set available = false and width_ft/height_ft = null.
-- Do NOT use a single room's size as layout dimensions.
-- total_area_sqft is recalculated server-side from layout dimensions or room sum when is_floor_plan is true.
+When is_floor_plan is false: rooms=[], total_area_sqft=0, overall_confidence=0, layout_dimensions.available=false."""
 
-COORDINATE RULES (critical — only when is_floor_plan is true):
-- All bbox and polygon values are integers from 0 to 1000
-- 0 = left or top edge of image; 1000 = right or bottom edge
-- bbox: [x_min, y_min, x_max, y_max] tight bounding box around the room
-- polygon: clockwise corner points; rectangular rooms = 4 points; L-shaped = 6–8 points
-- Rooms must not overlap
 
-ROOM LABEL & DIMENSION RULES (critical — follow exactly):
-1. DIMENSIONS WITHOUT LABEL: If length/width (or area) annotations are readable but the room has NO text label on the plan, INCLUDE the room and infer a descriptive name from shape/context (e.g. "Bedroom", "Kitchen", "Corridor"). Do NOT skip measurable rooms just because a label is missing.
-2. LABEL WITHOUT DIMENSIONS: If a room name/label is visible on the plan but NO readable dimensions AND NO readable area annotation exist for that space, DO NOT include that room in the rooms array at all. Omit it completely.
-3. AREA-ONLY: If only a total area is annotated (e.g. "168 SF", "15.6 m²") without separate length and width, set area_sqft to that value, length_ft = null, width_ft = null, dimension_source = "measured". When BOTH length and width are readable, set length_ft and width_ft and leave area_sqft to be computed server-side from L×W.
-4. EXACT LABELS: When a room label IS visible on the plan, copy the text EXACTLY as printed — same spelling, capitalization, abbreviations, and punctuation (e.g. "M. BEDROOM", "KITCHEN/DINING", "BATH-1"). Never paraphrase or normalize plan labels.
+SELECTIVE_CORRECTION_PROMPT_TEMPLATE = """Pass-1 extraction summary for this same image:
 
-INCLUDE ONLY rooms that pass rules 1 or 3 when is_floor_plan is true.
+{targets_json}
 
-DIMENSION EXTRACTION RULES:
-1. Visible readable dimensions on the plan: dimension_source = "measured", confidence 90–100%.
-2. Geometric inference from parallel walls / arithmetic: dimension_source = "derived", confidence 70–89%.
-3. Never invent numbers. Never output a room that has only a label with no measurable dimensions or area.
+## Task A — verify flagged rooms (if rooms_to_verify is non-empty)
+- Re-read dimension text from the image for fields listed in fields_to_verify only.
+- action "update": return corrected values for those fields + updated confidence_pct (90–100 measured, 70–89 derived).
+- action "remove": dimensions cannot be verified — drop the room (do not invent replacements).
+- Do not return high-confidence pass-1 rooms unchanged in room_corrections.
 
-ARCHITECTURAL HEURISTICS (structural only — never guess missing numbers):
-- Interior door ≈ 3 ft, wall thickness ≈ 6 in, corridor ≈ 3.5 ft
-- Document each structural assumption in assumptions[]"""
+## Task B — find missed rooms (when scan_for_missed_rooms is true)
+- Scan the image for labeled spaces with measurable dimensions or annotated area that are NOT in existing_room_names.
+- Add only rooms you can verify from the image (same anti-hallucination rules as pass 1).
+- Do not duplicate rooms already in existing_room_names (case-insensitive).
+- Each rooms_added entry needs: name, bbox, length_ft/width_ft or area_sqft, confidence_pct, dimension_source, assumptions.
 
-CORRECTION_PROMPT_TEMPLATE = """You previously analyzed an architectural sheet and produced this JSON output:
+General:
+- Do not adjust values to make totals or adjacent rooms fit.
+- rooms_added may be [] when nothing was missed.
+
+Return ONLY valid JSON — no markdown, no backticks, no explanation:
+{{
+  "room_corrections": [{{
+    "room_index": integer,
+    "action": "update"|"remove",
+    "name": string|null,
+    "length_ft": number|null,
+    "width_ft": number|null,
+    "area_sqft": number|null,
+    "confidence_pct": integer,
+    "dimension_source": "measured"|"derived"|"assumed",
+    "assumptions": [string],
+    "bbox": [x_min,y_min,x_max,y_max]|null
+  }}],
+  "rooms_added": [{{
+    "name": string,
+    "bbox": [x_min,y_min,x_max,y_max],
+    "polygon": [[x,y],...]|null,
+    "length_ft": number|null,
+    "width_ft": number|null,
+    "area_sqft": number|null,
+    "confidence_pct": integer,
+    "dimension_source": "measured"|"derived",
+    "assumptions": [string]
+  }}],
+  "floor_identification": {{
+    "floor_label": string,
+    "confidence_pct": integer,
+    "evidence": string
+  }}|null
+}}"""
+
+# Fallback when pass-1 JSON is structurally empty/invalid — full re-read (rare).
+CORRECTION_PROMPT_TEMPLATE = """Pass-1 output for this same image:
 
 {first_response}
 
-Review against the image. Correct:
-- page_classification (is_floor_plan, page_type, reason) — reject non-plan pages
-- floor_identification (floor_label, confidence_pct, evidence) — identify Ground/First/Basement/etc only when supported
-- Room names (exact plan labels when visible; infer name only when dimensions exist without a label)
-- Drop any room that has a plan label but no readable dimensions or area
-- Room boundaries (bbox/polygon 0-1000), dimensions, area-only annotations, confidence, assumptions
-- layout_dimensions and total_area_sqft
-- overall_confidence
+Re-read every dimension from the image and correct the JSON. Rules:
+- Verify each number against the image. Do not trust pass-1 values without re-reading them.
+- Remove any room whose dimensions cannot be verified as measured or unambiguously derived.
+- Do not adjust values to make totals or adjacent rooms fit. Delete wrong values, do not replace with guesses.
+- Do not add rooms not in pass-1 unless clearly readable on the image.
 
-If the page is NOT a floor plan, set is_floor_plan=false, rooms=[], total_area_sqft=0.
-
-Return ONLY the corrected valid JSON object with the same schema — no markdown, no backticks, no explanation."""
+Return ONLY the corrected valid JSON — same schema, no markdown, no backticks, no explanation."""
 
 
 def isolated_floor_plan_prompt(session_id: str, page_number: int) -> str:
-    """Prefix prompts so each page/job is an independent analysis (no cross-upload bleed)."""
     header = (
-        f"INDEPENDENT_ANALYSIS_SESSION={session_id}\n"
-        f"PAGE_NUMBER={page_number}\n"
-        "This request analyzes ONLY the attached image for this session and page. "
-        "Do not reuse or modify data from any other document, batch case, or prior API call.\n\n"
+        f"SESSION={session_id} PAGE={page_number}\n"
+        "Analyze ONLY the attached image. Do not reuse data from any other document or prior call.\n\n"
     )
     return header + FLOOR_PLAN_PROMPT
 
 
+def isolated_selective_correction_prompt(
+    session_id: str,
+    page_number: int,
+    targets: CorrectionTargets,
+) -> str:
+    header = (
+        f"SESSION={session_id} PAGE={page_number}\n"
+        "Verify ONLY the flagged low-confidence fields from pass 1 on this same image.\n\n"
+    )
+    targets_json = json.dumps(
+        targets.to_prompt_payload(),
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+    return header + SELECTIVE_CORRECTION_PROMPT_TEMPLATE.format(targets_json=targets_json)
+
+
 def isolated_correction_prompt(session_id: str, page_number: int, first_response: str) -> str:
     header = (
-        f"INDEPENDENT_ANALYSIS_SESSION={session_id}\n"
-        f"PAGE_NUMBER={page_number}\n"
-        "The JSON below is from pass 1 on THIS SAME image only — not from another file or test case.\n\n"
+        f"SESSION={session_id} PAGE={page_number}\n"
+        "The JSON below is from pass 1 on this same image only.\n\n"
     )
-    body = CORRECTION_PROMPT_TEMPLATE.format(first_response=first_response)
-    return header + body
+    return header + CORRECTION_PROMPT_TEMPLATE.format(first_response=first_response)

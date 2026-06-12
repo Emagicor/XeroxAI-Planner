@@ -141,6 +141,9 @@ function TestCaseRow({
   index,
   testCase,
   loading,
+  runnable,
+  selected,
+  onToggleSelect,
   onInputSelect,
   onGroundTruthSelect,
   onGroundTruthClear,
@@ -158,9 +161,27 @@ function TestCaseRow({
     (!testCase.persisted || testCase.dirty)
 
   return (
-    <div className="rounded-xl border border-line bg-card/60 p-4 transition-colors">
+    <div
+      className={`rounded-xl border bg-card/60 p-4 transition-colors ${
+        runnable && selected ? 'border-accent/40' : 'border-line'
+      }`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2 flex-wrap">
+          <input
+            type="checkbox"
+            checked={selected}
+            disabled={!runnable || loading || testCase.saving}
+            onChange={() => onToggleSelect(testCase.id)}
+            className="w-4 h-4 rounded border-line cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            title={
+              runnable
+                ? selected
+                  ? 'Included in batch run'
+                  : 'Excluded from batch run'
+                : 'Save this case before it can run'
+            }
+          />
           <span className="text-xs font-mono text-muted">Case #{index + 1}</span>
           {testCase.label && (
             <span className="text-xs text-text">{testCase.label}</span>
@@ -250,6 +271,9 @@ export default function TestSuiteCaseBuilder({
   onRemoveCase,
   onReloadCases,
   hideAddButton = false,
+  isCaseSelected,
+  onToggleCaseSelection,
+  canRunCase,
 }) {
   const browseBulk = () => bulkInputRef.current?.click()
 
@@ -354,6 +378,9 @@ export default function TestSuiteCaseBuilder({
                 index={i}
                 testCase={testCase}
                 loading={loading}
+                runnable={canRunCase?.(testCase) ?? false}
+                selected={isCaseSelected?.(testCase.id) ?? false}
+                onToggleSelect={onToggleCaseSelection}
                 onInputSelect={(file) => onCaseInputSelect(testCase.id, file)}
                 onGroundTruthSelect={(file) =>
                   onCaseGroundTruthSelect(testCase.id, file)

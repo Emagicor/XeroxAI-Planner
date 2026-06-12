@@ -6,16 +6,16 @@ from __future__ import annotations
 
 import base64
 
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
-
 from config.settings import get_settings
 from domain.exceptions import ProviderError
-from providers.vision.base import ProviderResponse, VisionProvider
+from providers.vision.base import ProviderResponse, TokenUsage, VisionProvider
+from providers.vision.errors import classify_openai_compatible_error
+from providers.vision.retry import call_with_transient_retry
 
 
 class OpenAIProvider(VisionProvider):
 
-    def __init__(self) -> None:
+    def __init__(self, *, model: str | None = None) -> None:
         settings = get_settings()
         if not settings.openai_api_key:
             raise ProviderError(
@@ -23,21 +23,16 @@ class OpenAIProvider(VisionProvider):
                 message="OPENAI_API_KEY is not set.",
             )
         import openai
+
         self._client = openai.OpenAI(api_key=settings.openai_api_key)
-        self._model_name = settings.openai_model
-        self._benchmark = settings.benchmark_mode
+        self._model_name = model or settings.openai_model
+        self._transient_retries = 0
 
     @property
     def model_name(self) -> str:
         return self._model_name
 
-    @retry(
-        retry=retry_if_exception_type(Exception),
-        wait=wait_exponential(multiplier=1, min=2, max=30),
-        stop=stop_after_attempt(3),
-        reraise=False,
-    )
-    def _call_with_retry(
+    def _call_once(
         self, image_bytes: bytes, mime_type: str, prompt: str
     ) -> ProviderResponse:
         b64 = base64.b64encode(image_bytes).decode()
@@ -58,23 +53,38 @@ class OpenAIProvider(VisionProvider):
         )
 
         text = response.choices[0].message.content or ""
-        usage = response.usage
+        api_usage = response.usage
+        usage = None
+        if api_usage:
+            usage = TokenUsage(
+                prompt_token_count=api_usage.prompt_tokens,
+                candidates_token_count=api_usage.completion_tokens,
+                total_token_count=api_usage.total_tokens,
+            )
 
         return ProviderResponse(
             text=text.strip(),
-            input_tokens=usage.prompt_tokens if usage else None,
-            output_tokens=usage.completion_tokens if usage else None,
+            input_tokens=usage.prompt_token_count if usage else None,
+            output_tokens=usage.candidates_token_count if usage else None,
             model_used=self._model_name,
+            usage=usage,
         )
+
+    def _raise_provider_error(self, exc: Exception) -> None:
+        code, message = classify_openai_compatible_error(
+            exc, provider="openai", model=self._model_name
+        )
+        raise ProviderError(
+            code=code,
+            message=message,
+            details={"model": self._model_name, "detail": str(exc)[:400]},
+        ) from exc
 
     def analyze_image(
         self, image_bytes: bytes, mime_type: str, prompt: str
     ) -> ProviderResponse:
-        try:
-            return self._call_with_retry(image_bytes, mime_type, prompt)
-        except Exception as exc:
-            raise ProviderError(
-                code="OPENAI_ERROR",
-                message=f"OpenAI call failed after retries: {exc}",
-                details={"model": self._model_name, "detail": str(exc)},
-            ) from exc
+        return call_with_transient_retry(
+            lambda: self._call_once(image_bytes, mime_type, prompt),
+            transient_retries=self._transient_retries,
+            on_error=self._raise_provider_error,
+        )

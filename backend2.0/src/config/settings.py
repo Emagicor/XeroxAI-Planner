@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     temp_dir: str = "/tmp/zerox"
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
+    # ── Feature flags (optional overrides; APP_ENV sets sensible defaults) ───
+    feature_openapi: bool | None = None          # FEATURE_OPENAPI
+    feature_vision_prompt_log: bool | None = None  # FEATURE_VISION_PROMPT_LOG
+
     # ── Upload limits ─────────────────────────────────────────────────────────
     max_upload_mb: int = 50
     max_pdf_pages: int = 100
@@ -41,50 +45,31 @@ class Settings(BaseSettings):
     vision_image_format: str = "png"   # png | jpeg — format sent to Gemini
 
     # ── Vision provider ───────────────────────────────────────────────────────
-    vision_provider: str = "gemini"    # gemini | openai
-    gemini_model: str = "gemini-2.5-flash"
+    vision_provider: str = "gemini"    # gemini | openai | groq
+    gemini_model: str = "gemini-3.5-flash"
     openai_model: str = "gpt-4o"
+    groq_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
+    # Correction pass (FLOOR_PLAN_PROMPT → CORRECTION_PROMPT); empty = same as extraction
+    vision_correction_provider: str = ""   # gemini | openai | groq
+    vision_correction_model: str = ""      # e.g. gemini-2.5-flash, gpt-4o
     gemini_api_key: str = ""
     openai_api_key: str = ""
+    groq_api_key: str = ""
 
     # ── Analysis / vision API usage ───────────────────────────────────────────
-    # Each page: 1 Gemini call by default; +1 only when pass-1 JSON needs correction.
+    # Pass 1: full extract. Pass 2 (selective): only low-confidence fields from pass 1.
     max_analysis_attempts: int = 1     # full re-runs on validation failure
-    vision_two_pass: bool = False      # true = always run extract + correction (2 calls/page)
-    vision_correction_pass: bool = True  # when two_pass false: 2nd call only if pass-1 weak
+    vision_two_pass: bool = False      # true = allow selective correction when targets exist
+    vision_correction_pass: bool = True  # run pass 2 when pass-1 has low-confidence targets
+    vision_correction_confidence_max: int = 84  # rooms at/below this (and derived/assumed) → pass 2
     gemini_transient_retries: int = 0  # retries on 503 only; never retries quota (429)
+    gemini_request_timeout_seconds: int = 120  # per vision API call; avoids indefinite hangs
+    vision_prompt_log_enabled: bool = True
+    vision_prompt_log_dir: str = ""  # empty → backend2.0/_vision_prompt_logs
 
-    # ── Grounding DINO detection ──────────────────────────────────────────────
-    # backend: local = IDEA-Research repo on disk; huggingface = transformers hub
-    grounding_dino_backend: str = "local"
-    grounding_dino_enabled: bool = True
-    # Local repo (empty → backend2.0/groundingdino_local)
-    grounding_dino_repo_path: str = ""
-    grounding_dino_config_path: str = ""
-    grounding_dino_weights_path: str = ""
-    grounding_dino_model: str = "IDEA-Research/grounding-dino-tiny"
-    grounding_dino_prompt: str = (
-        "individual floor plan . building floor plan . architectural floor plan ."
-    )
-    grounding_dino_threshold: float = 0.30
-    grounding_dino_threshold_fallback: float = 0.22
-    grounding_dino_text_threshold: float = 0.25
-    grounding_dino_nms_iou: float = 0.42
-    grounding_dino_device: str = "cuda"  # cpu | cuda
-    # Crop padding + refinement (reduce over-tight clips)
-    detection_bbox_padding: float = 0.07
-    detection_bbox_padding_px: int = 28
+    # ── Region clipping ─────────────────────────────────────────────────────
     detection_clip_padding_ratio: float = 0.035
     detection_clip_padding_px: int = 20
-    detection_min_area_ratio: float = 0.04
-    detection_min_plan_area_ratio: float = 0.08
-    detection_wide_aspect_ratio: float = 1.55
-    detection_merge_iou: float = 0.12
-    detection_merge_gap_ratio: float = 0.035
-    detection_duplicate_iou: float = 0.55
-    detection_dominant_plan_ratio: float = 0.50
-    detection_fragment_max_ratio: float = 0.22
-    detection_full_page_snap_ratio: float = 0.82
 
     # ── Benchmarking ─────────────────────────────────────────────────────────
     benchmark_mode: bool = False       # logs token/image usage when True

@@ -1,4 +1,4 @@
-"""Crop detected floor-plan regions from rasterized page images."""
+"""Prepare full-page floor-plan regions from rasterized page images."""
 from __future__ import annotations
 
 from config.settings import get_settings
@@ -31,12 +31,12 @@ def clip_region(
     region_index: int,
     label: str,
     confidence: float,
-    detection_method: str = "grounding_dino",
+    detection_method: str = "full_page_fallback",
 ) -> DetectedRegion:
     settings = get_settings()
     img = load_rgb(jpeg_bytes)
     w, h = img.size
-    # Bboxes are pre-expanded in bbox_refinement — add a final safety margin at clip time.
+    # Add a small safety margin at clip time.
     padded = _pad_bbox(
         bbox,
         w,

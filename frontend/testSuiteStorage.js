@@ -189,8 +189,9 @@ function saveResultsIndex(root, index) {
 /**
  * Persist a full batch run and append summary to results-index.json.
  * @param {Array<{ testCaseId, input, output, status, executedAt }>} entries
+ * @param {{ visionProvider?, visionModel?, modelLabel?, modelId? }} modelMeta
  */
-export function saveRunResults(root, entries) {
+export function saveRunResults(root, entries, modelMeta = null) {
   if (!Array.isArray(entries) || !entries.length) {
     throw new Error('Run results must be a non-empty array')
   }
@@ -206,20 +207,23 @@ export function saveRunResults(root, entries) {
   const passed = entries.filter((e) => e.status === 'passed').length
   const failed = entries.length - passed
 
+  const summary = {
+    runId,
+    timestamp,
+    totalTests: entries.length,
+    passed,
+    failed,
+  }
+  if (modelMeta?.visionProvider) summary.visionProvider = modelMeta.visionProvider
+  if (modelMeta?.visionModel) summary.visionModel = modelMeta.visionModel
+  if (modelMeta?.modelLabel) summary.modelLabel = modelMeta.modelLabel
+  if (modelMeta?.modelId) summary.modelId = modelMeta.modelId
+
   const index = loadResultsIndex(root)
-  index.runs = [
-    ...(index.runs ?? []),
-    {
-      runId,
-      timestamp,
-      totalTests: entries.length,
-      passed,
-      failed,
-    },
-  ]
+  index.runs = [...(index.runs ?? []), summary]
   saveResultsIndex(root, index)
 
-  return { runId, timestamp, totalTests: entries.length, passed, failed }
+  return summary
 }
 
 export function loadRunResults(root, runId) {

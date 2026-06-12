@@ -215,6 +215,13 @@
       "inputFile": "0aa90b13a2583521bdfdc4146cf7eec5.jpg",
       "groundTruthFile": "0aa90b13a2583521bdfdc4146cf7eec5_ground_truth (2).json",
       "createdAt": "2026-06-09T10:55:39.326Z"
+    },
+    {
+      "id": "putnam-house-floor-plans",
+      "label": "Putnam_House_-_floor_plans",
+      "inputFile": "Putnam_House_-_floor_plans.jpg",
+      "groundTruthFile": "Putnam_House_-_floor_plans_ground_truth.json",
+      "createdAt": "2026-06-10T05:37:34.277Z"
     }
   ]
 }

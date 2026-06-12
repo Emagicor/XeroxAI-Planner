@@ -1,6 +1,11 @@
 import { formatArea } from '@/utils/exportTable'
 import { roomColor } from '@/constants/colors'
-import { unitLabel } from '@/utils/units'
+import {
+  convertLengthFromFt,
+  convertLengthToFt,
+  linearUnitLabel,
+  unitLabel,
+} from '@/utils/units'
 import { confidenceColor, sourceBadgeClass } from '@/utils/styles'
 import Button from '@/components/ui/Button'
 
@@ -22,6 +27,7 @@ export default function ReviewTable({
   onRowActivate,
 }) {
   const ul = unitLabel(unit)
+  const lengthLabel = linearUnitLabel(unit)
   const editable = rows.filter((r) => r.eligible !== false)
 
   return (
@@ -43,8 +49,8 @@ export default function ReviewTable({
               <th className="px-3 py-2 font-medium w-1" />
               <th className="px-3 py-2 font-medium">Page</th>
               <th className="px-3 py-2 font-medium">Area name</th>
-              <th className="px-3 py-2 font-medium">Length (ft)</th>
-              <th className="px-3 py-2 font-medium">Width (ft)</th>
+              <th className="px-3 py-2 font-medium">Length ({lengthLabel})</th>
+              <th className="px-3 py-2 font-medium">Width ({lengthLabel})</th>
               <th className="px-3 py-2 font-medium">Area ({ul})</th>
               <th className="px-3 py-2 font-medium">Method</th>
               <th className="px-3 py-2 font-medium">Conf.</th>
@@ -64,7 +70,7 @@ export default function ReviewTable({
                 return (
                   <tr
                     key={row.id}
-                    className="border-b border-line/50 bg-red-950/20"
+                    className="border-b border-line/50 bg-[var(--danger-bg)]"
                   >
                     <td />
                     <td />
@@ -100,7 +106,7 @@ export default function ReviewTable({
                       type="checkbox"
                       checked={included}
                       onChange={(e) => onToggleIncluded(row.id, e.target.checked)}
-                      className="w-4 h-4 rounded border-line accent-[#1D9E75] cursor-pointer"
+                      className="w-4 h-4 rounded border-line cursor-pointer"
                       title={included ? 'Included in total' : 'Excluded from total'}
                     />
                   </td>
@@ -131,10 +137,10 @@ export default function ReviewTable({
                       type="number"
                       step="0.1"
                       min="0"
-                      value={row.lengthFt ?? ''}
+                      value={convertLengthFromFt(row.lengthFt, unit) ?? ''}
                       onChange={(e) =>
                         onUpdateRow(row.id, {
-                          lengthFt: e.target.value === '' ? null : e.target.value,
+                          lengthFt: convertLengthToFt(e.target.value, unit),
                         })
                       }
                       onClick={(e) => e.stopPropagation()}
@@ -146,10 +152,10 @@ export default function ReviewTable({
                       type="number"
                       step="0.1"
                       min="0"
-                      value={row.widthFt ?? ''}
+                      value={convertLengthFromFt(row.widthFt, unit) ?? ''}
                       onChange={(e) =>
                         onUpdateRow(row.id, {
-                          widthFt: e.target.value === '' ? null : e.target.value,
+                          widthFt: convertLengthToFt(e.target.value, unit),
                         })
                       }
                       onClick={(e) => e.stopPropagation()}

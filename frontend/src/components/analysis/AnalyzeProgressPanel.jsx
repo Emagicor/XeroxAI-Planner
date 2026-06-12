@@ -93,7 +93,7 @@ export default function AnalyzeProgressPanel({
                       className="w-20 h-20 object-contain rounded-lg border border-line bg-white shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-lg border border-line bg-surface shrink-0 flex items-center justify-center text-[10px] text-accent font-mono font-semibold">
+                    <div className="w-12 h-12 rounded-lg border border-line bg-surface shrink-0 flex items-center justify-center text-xs text-accent font-mono font-medium">
                       {item.planNumber}
                     </div>
                   )}

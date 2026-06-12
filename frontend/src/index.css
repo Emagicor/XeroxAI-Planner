@@ -1,33 +1,68 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 :root {
-  /* Light theme - Clean & Professional (Govrix-inspired) */
-  --bg: #f8fafc;
+  /* Light — clean neutral base with refined emerald accent */
+  --bg: #fafafa;
   --surface: #ffffff;
   --card: #ffffff;
-  --accent: #0f9f74;        /* Rich emerald-teal */
+  --accent: #059669;
   --accent-bright: #10b981;
-  --line: #e2e8f0;
-  --muted: #64748b;         /* Slate gray text */
-  --text: #0f172a;          /* Dark navy/slate text */
-  --grid-color: rgba(15, 23, 42, 0.06);
-  --glow-1: rgba(16, 185, 129, 0.08);
-  --glow-2: rgba(16, 185, 129, 0.04);
+  --accent-subtle: rgba(5, 150, 105, 0.08);
+  --line: #e4e4e7;
+  --muted: #71717a;
+  --text: #18181b;
+  --text-secondary: #52525b;
+
+  --success: #059669;
+  --success-bg: rgba(5, 150, 105, 0.08);
+  --success-border: rgba(5, 150, 105, 0.25);
+  --warning: #d97706;
+  --warning-bg: rgba(217, 119, 6, 0.08);
+  --warning-border: rgba(217, 119, 6, 0.25);
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.06);
+  --danger-border: rgba(220, 38, 38, 0.2);
+  --info: #0284c7;
+  --info-bg: rgba(2, 132, 199, 0.06);
+  --info-border: rgba(2, 132, 199, 0.2);
+
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04);
+  --shadow-md: 0 4px 12px rgba(24, 24, 27, 0.06);
+  --shadow-lg: 0 8px 24px rgba(24, 24, 27, 0.08);
+  --glow-1: rgba(5, 150, 105, 0.04);
+  --glow-2: rgba(5, 150, 105, 0.02);
 }
 
 :root.dark {
-  /* Dark theme - Original */
-  --bg: #08090d;
-  --surface: #12141c;
-  --card: #1a1d28;
-  --accent: #1d9e75;
-  --accent-bright: #22c48a;
-  --line: #2a2e3d;
-  --muted: #8b8a82;
-  --text: #f0eee8;
-  --grid-color: rgba(255, 255, 255, 0.02);
-  --glow-1: rgba(29, 158, 117, 0.12);
-  --glow-2: rgba(29, 158, 117, 0.06);
+  --bg: #09090b;
+  --surface: #18181b;
+  --card: #1c1c1f;
+  --accent: #34d399;
+  --accent-bright: #6ee7b7;
+  --accent-subtle: rgba(52, 211, 153, 0.1);
+  --line: #27272a;
+  --muted: #a1a1aa;
+  --text: #fafafa;
+  --text-secondary: #d4d4d8;
+
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.1);
+  --success-border: rgba(52, 211, 153, 0.25);
+  --warning: #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.1);
+  --warning-border: rgba(251, 191, 36, 0.25);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.1);
+  --danger-border: rgba(248, 113, 113, 0.25);
+  --info: #38bdf8;
+  --info-bg: rgba(56, 189, 248, 0.1);
+  --info-border: rgba(56, 189, 248, 0.25);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --glow-1: rgba(52, 211, 153, 0.06);
+  --glow-2: rgba(52, 211, 153, 0.03);
 }
 
 @theme {
@@ -36,11 +71,23 @@
   --color-card: var(--card);
   --color-accent: var(--accent);
   --color-accent-bright: var(--accent-bright);
+  --color-accent-subtle: var(--accent-subtle);
   --color-line: var(--line);
   --color-muted: var(--muted);
   --color-text: var(--text);
-  --font-sans: 'DM Sans', sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --color-text-secondary: var(--text-secondary);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "DM Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -50,37 +97,44 @@ body {
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   min-height: 100vh;
 }
 
-/* Premium dotted background with subtle radial glow (Govrix style) */
+::selection {
+  background-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--text);
+}
+
+/* Subtle premium background — no dot grid */
 .app-bg {
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, var(--glow-1), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, var(--glow-2), transparent),
-    radial-gradient(var(--grid-color) 1.5px, transparent 1.5px);
-  background-size: 100% 100%, 100% 100%, 24px 24px;
+    radial-gradient(ellipse 70% 45% at 50% -10%, var(--glow-1), transparent),
+    radial-gradient(ellipse 50% 30% at 100% 0%, var(--glow-2), transparent);
+  background-size: 100% 100%;
+  background-attachment: fixed;
 }
 
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -89,5 +143,65 @@ body {
 }
 
 .animate-fade-up {
-  animation: fade-up 0.5s ease-out forwards;
+  animation: fade-up 0.4s ease-out forwards;
+}
+
+/* Shared form controls */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+@layer components {
+  .input {
+    @apply w-full bg-surface border border-line rounded-lg px-3 py-2 text-sm text-text;
+    @apply transition-colors duration-150;
+    @apply hover:border-muted/60;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50;
+  }
+
+  .select {
+    @apply bg-surface border border-line rounded-lg px-3 py-2 text-sm text-text font-medium;
+    @apply transition-colors duration-150 cursor-pointer;
+    @apply hover:border-muted/60;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/50;
+  }
+
+  .eyebrow {
+    @apply text-xs font-medium text-accent mb-2;
+    letter-spacing: 0.04em;
+  }
+
+  .stat-label {
+    @apply text-xs font-medium text-muted mb-1.5;
+  }
+
+  .toast-success {
+    background: var(--surface);
+    border-color: var(--success-border);
+    color: var(--text);
+  }
+
+  .toast-error {
+    background: var(--surface);
+    border-color: var(--danger-border);
+    color: var(--text);
+  }
+
+  .toast-warning {
+    background: var(--surface);
+    border-color: var(--warning-border);
+    color: var(--text);
+  }
+
+  .toast-info {
+    background: var(--surface);
+    border-color: var(--info-border);
+    color: var(--text);
+  }
+
+  .alert-error {
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+  }
 }

@@ -1,17 +1,23 @@
-const MODES = [
-  { id: 'analyze', label: 'Analyze', description: 'Extract room dimensions' },
-  { id: 'testSuite', label: 'Test Suite', description: 'Batch QA against ground truth' },
+import { features } from '@/config/features'
+
+const ALL_MODES = [
+  { id: 'analyze', label: 'Analyze' },
+  { id: 'testSuite', label: 'Test Suite', feature: 'testSuite' },
 ]
-// Component to switch between modes (Analyze and Test-Suite)
+
 export default function AppModeTabs({ mode, onChange }) {
+  const modes = ALL_MODES.filter((m) => !m.feature || features[m.feature])
+
+  if (modes.length <= 1) return null
+
   return (
-    <div className="flex justify-center mb-10">
+    <div className="flex justify-center mb-8">
       <div
-        className="inline-flex rounded-2xl border border-line/80 bg-card/60 p-1.5 backdrop-blur-sm shadow-lg shadow-black/10"
+        className="inline-flex rounded-lg border border-line bg-surface p-1 shadow-[var(--shadow-sm)]"
         role="tablist"
         aria-label="Application mode"
       >
-        {MODES.map((m) => {
+        {modes.map((m) => {
           const active = mode === m.id
           return (
             <button
@@ -21,10 +27,11 @@ export default function AppModeTabs({ mode, onChange }) {
               aria-selected={active}
               onClick={() => onChange(m.id)}
               className={[
-                'px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200',
+                'px-5 py-2 rounded-md text-sm font-medium transition-all duration-150',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30',
                 active
-                  ? 'bg-accent text-white shadow-md shadow-accent/30'
-                  : 'text-muted hover:text-text hover:bg-text/5',
+                  ? 'bg-accent text-white shadow-sm'
+                  : 'text-muted hover:text-text',
               ].join(' ')}
             >
               {m.label}

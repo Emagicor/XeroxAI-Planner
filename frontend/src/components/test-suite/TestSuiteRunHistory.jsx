@@ -1,3 +1,5 @@
+import { formatTestSuiteModelLabel } from '@/constants/testSuiteModels'
+
 function formatRunTime(timestamp) {
   try {
     return new Date(timestamp).toLocaleString(undefined, {
@@ -19,7 +21,7 @@ export default function TestSuiteRunHistory({
 }) {
   if (loading) {
     return (
-      <div className="rounded-xl border border-line bg-card/60 px-4 py-3">
+      <div className="rounded-xl border border-line bg-card px-4 py-3">
         <p className="text-xs text-muted">Loading run history…</p>
       </div>
     )
@@ -28,8 +30,8 @@ export default function TestSuiteRunHistory({
   if (!runs.length) return null
 
   return (
-    <section className="rounded-xl border border-line bg-card/60 overflow-hidden">
-      <div className="px-4 py-3 border-b border-line/60 bg-surface/30">
+    <section className="rounded-xl border border-line bg-card overflow-hidden shadow-[var(--shadow-sm)]">
+      <div className="px-4 py-3 border-b border-line bg-surface">
         <h3 className="text-sm font-medium text-text">Run history</h3>
         <p className="text-xs text-muted mt-0.5">
           Past batch runs are saved under{' '}
@@ -42,6 +44,7 @@ export default function TestSuiteRunHistory({
           const active = run.runId === selectedRunId
           const passRate =
             run.totalTests > 0 ? Math.round((run.passed / run.totalTests) * 100) : 0
+          const modelLabel = formatTestSuiteModelLabel(run)
           return (
             <li key={run.runId}>
               <button
@@ -62,7 +65,8 @@ export default function TestSuiteRunHistory({
                   </span>
                 </div>
                 <p className="text-[10px] text-muted font-mono mt-1 truncate" title={run.runId}>
-                  {run.runId} · {passRate}% pass rate
+                  {modelLabel ? `${modelLabel} · ` : ''}
+                  {passRate}% pass rate
                 </p>
               </button>
             </li>

@@ -79,7 +79,17 @@ function registerTestSuiteApi(middlewares) {
     if (req.method === 'POST' && subpath === '/results') {
       try {
         const body = await readJsonBody(req)
-        const summary = saveRunResults(TEST_SUITE_DIR, body.entries ?? body.results ?? [])
+        const modelMeta = {
+          visionProvider: body.visionProvider ?? null,
+          visionModel: body.visionModel ?? null,
+          modelLabel: body.modelLabel ?? null,
+          modelId: body.modelId ?? null,
+        }
+        const summary = saveRunResults(
+          TEST_SUITE_DIR,
+          body.entries ?? body.results ?? [],
+          modelMeta,
+        )
         sendJson(res, 201, summary)
       } catch (err) {
         sendJson(res, 400, { message: err.message || 'Save results failed' })

@@ -28,18 +28,20 @@ def _pipeline_worker(
     filename: str,
     file_bytes: bytes,
     declared_mime: str | None,
-    detection_id: str | None,
-    excluded_region_ids: list[str] | None,
+    vision_provider: str | None,
+    vision_model: str | None,
 ) -> "AnalyzeJob":
     from application.orchestrators.analyze_orchestrator import run_analyze_pipeline
+    from providers.vision.request_config import VisionOverride
 
-    excluded = set(excluded_region_ids or [])
+    override = None
+    if vision_provider or vision_model:
+        override = VisionOverride(provider=vision_provider, model=vision_model)
     return run_analyze_pipeline(
         filename,
         file_bytes,
         declared_mime,
-        detection_id=detection_id,
-        excluded_region_ids=excluded,
+        vision_override=override,
     )
 
 
@@ -48,35 +50,18 @@ def run_analyze_pipeline_isolated(
     file_bytes: bytes,
     declared_mime: str | None,
     *,
-    detection_id: str | None = None,
-    excluded_region_ids: list[str] | None = None,
+    vision_provider: str | None = None,
+    vision_model: str | None = None,
     timeout_seconds: int = 900,
 ) -> "AnalyzeJob":
-    """
-    Run pipeline in a fresh process; blocks until complete.
-
-    When detection_id is set, run in-process so the in-memory detection store
-    from POST /detect is available (subprocess workers do not share that state).
-    """
-    from application.orchestrators.analyze_orchestrator import run_analyze_pipeline
-
-    excluded = set(excluded_region_ids or [])
-    if detection_id:
-        return run_analyze_pipeline(
-            filename,
-            file_bytes,
-            declared_mime,
-            detection_id=detection_id,
-            excluded_region_ids=excluded,
-        )
-
+    """Run pipeline in a fresh process; blocks until complete."""
     payload = bytes(file_bytes)
     future = _get_executor().submit(
         _pipeline_worker,
         filename,
         payload,
         declared_mime,
-        None,
-        list(excluded),
+        vision_provider,
+        vision_model,
     )
     return future.result(timeout=timeout_seconds)

@@ -90,8 +90,8 @@ export default function TestSuiteProgressPanel({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-line bg-card/80 backdrop-blur-md overflow-hidden shadow-xl shadow-black/20">
-        <div className="px-6 py-5 border-b border-line bg-surface/30">
+      <div className="rounded-xl border border-line bg-card overflow-hidden shadow-[var(--shadow-md)]">
+        <div className="px-6 py-5 border-b border-line bg-surface">
           <div className="flex items-center justify-between gap-4 mb-3">
             <p className="text-sm font-medium text-text">Batch progress</p>
             <p className="text-sm font-mono text-accent">

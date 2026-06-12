@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useBackendHealth } from '@/hooks/useBackendHealth'
 import Badge from '@/components/ui/Badge'
-//Navbar
+
 function BuildingIcon() {
   return (
     <svg
-      className="w-6 h-6 text-accent"
+      className="w-5 h-5 text-accent"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -21,8 +21,8 @@ function BuildingIcon() {
 }
 
 const BACKEND_STATUS = {
-  online: { variant: 'live', label: 'Backend online' },
-  offline: { variant: 'danger', label: 'Backend offline' },
+  online: { variant: 'live', label: 'Online' },
+  offline: { variant: 'danger', label: 'Offline' },
   checking: { variant: 'warning', label: 'Checking…' },
 }
 
@@ -34,7 +34,7 @@ function BackendStatusBadge({ status, apiBaseUrl, onRecheck }) {
       type="button"
       onClick={onRecheck}
       title={`API: ${apiBaseUrl} — click to recheck`}
-      className="hover:opacity-80 transition-opacity"
+      className="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 rounded-full"
     >
       <Badge variant={config.variant} dot={status === 'online'}>
         {config.label}
@@ -59,45 +59,43 @@ export default function Header() {
   }, [theme])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line/60 bg-bg/80 backdrop-blur-xl">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl border border-accent/25 bg-accent/10 flex items-center justify-center shadow-lg shadow-accent/10">
-              <BuildingIcon />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold tracking-tight text-text">
-                  FloorPlan AI
-                </h1>
-                <Badge>Build91</Badge>
-              </div>
-              <p className="text-xs text-muted mt-0.5 hidden sm:block">
-                Room dimension extraction &amp; evaluation
-              </p>
-            </div>
+    <header className="sticky top-0 z-50 border-b border-line bg-bg/90 backdrop-blur-md">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg border border-accent/20 bg-accent-subtle flex items-center justify-center">
+            <BuildingIcon />
           </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-semibold tracking-tight text-text">
+                FloorPlan AI
+              </h1>
+              <Badge>Build91</Badge>
+            </div>
+            <p className="text-xs text-muted hidden sm:block leading-none mt-0.5">
+              Room dimension extraction
+            </p>
+          </div>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <BackendStatusBadge status={status} apiBaseUrl={apiBaseUrl} onRecheck={recheck} />
-            <button
-              type="button"
-              onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-              className="w-10 h-10 rounded-xl border border-line bg-card/60 flex items-center justify-center hover:bg-text/5 active:scale-95 transition-all cursor-pointer shadow-sm"
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {theme === 'dark' ? (
-                <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              )}
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <BackendStatusBadge status={status} apiBaseUrl={apiBaseUrl} onRecheck={recheck} />
+          <button
+            type="button"
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            className="w-9 h-9 rounded-lg border border-line bg-surface flex items-center justify-center hover:bg-card active:scale-[0.98] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? (
+              <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </header>

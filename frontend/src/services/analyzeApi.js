@@ -6,17 +6,21 @@ import { apiFetchJson } from './apiClient'
  */
 export async function analyzeFloorPlan(
   file,
-  { isolateUpload = true, detectionId = null, excludedRegionIds = [] } = {},
+  {
+    isolateUpload = true,
+    visionProvider = null,
+    visionModel = null,
+  } = {},
 ) {
   const uploadFile = isolateUpload ? await cloneFileForUpload(file) : file
 
   const form = new FormData()
   form.append('file', uploadFile, uploadFile.name)
-  if (detectionId) {
-    form.append('detection_id', detectionId)
+  if (visionProvider) {
+    form.append('vision_provider', visionProvider)
   }
-  if (excludedRegionIds?.length) {
-    form.append('excluded_region_ids', JSON.stringify(excludedRegionIds))
+  if (visionModel) {
+    form.append('vision_model', visionModel)
   }
 
   return apiFetchJson('/analyze', {

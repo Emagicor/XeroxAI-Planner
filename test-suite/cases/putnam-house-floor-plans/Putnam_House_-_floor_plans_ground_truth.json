@@ -1,0 +1,75 @@
+{
+  "filename": "Putnam_House_-_floor_plans.jpg",
+  "exported_at": "2026-06-10T05:36:38.320Z",
+  "pages": [
+    {
+      "page_number": 1,
+      "plan_number": 1,
+      "floor_label": "First and Second Floors",
+      "rooms": [
+        {
+          "name": "OLD KITCHEN",
+          "length_ft": 23.58,
+          "width_ft": 15.25,
+          "area_sqft": 359.6,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "DINING ROOM",
+          "length_ft": 24.33,
+          "width_ft": 14.83,
+          "area_sqft": 360.81,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "WEST PARLOR",
+          "length_ft": 19.33,
+          "width_ft": 15.25,
+          "area_sqft": 294.78,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "EAST PARLOR",
+          "length_ft": 19,
+          "width_ft": 13.5,
+          "area_sqft": 256.5,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BED ROOM B",
+          "length_ft": 9,
+          "width_ft": 17.92,
+          "area_sqft": 161.28,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BED ROOM C",
+          "length_ft": 18.58,
+          "width_ft": 15.58,
+          "area_sqft": 289.48,
+          "dimension_source": "measured"
+        },
+        {
+          "name": "BED ROOM D",
+          "length_ft": 18.58,
+          "width_ft": 13.5,
+          "area_sqft": 250.83,
+          "dimension_source": "derived",
+          "assumptions": [
+            "Height derived from adjacent BED ROOM C (18'7\")"
+          ]
+        },
+        {
+          "name": "BATH",
+          "length_ft": 9,
+          "width_ft": 12.5,
+          "area_sqft": 112.5,
+          "dimension_source": "derived",
+          "assumptions": [
+            "Height derived from BED ROOM B (9'0\") on the same horizontal band"
+          ]
+        }
+      ]
+    }
+  ]
+}

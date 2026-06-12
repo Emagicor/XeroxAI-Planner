@@ -1,30 +1,10 @@
 import { useToastStore } from '@/stores/toastStore'
-//Toasts
+
 const STYLES = {
-  error: {
-    border: 'border-red-500/40',
-    bg: 'bg-red-950/90',
-    title: 'text-red-200',
-    icon: 'text-red-400',
-  },
-  warning: {
-    border: 'border-amber-500/40',
-    bg: 'bg-amber-950/90',
-    title: 'text-amber-100',
-    icon: 'text-amber-400',
-  },
-  success: {
-    border: 'border-emerald-500/40',
-    bg: 'bg-emerald-950/90',
-    title: 'text-emerald-100',
-    icon: 'text-emerald-400',
-  },
-  info: {
-    border: 'border-sky-500/40',
-    bg: 'bg-sky-950/90',
-    title: 'text-sky-100',
-    icon: 'text-sky-400',
-  },
+  error: { wrapper: 'toast-error', icon: 'text-[var(--danger)]' },
+  warning: { wrapper: 'toast-warning', icon: 'text-[var(--warning)]' },
+  success: { wrapper: 'toast-success', icon: 'text-[var(--success)]' },
+  info: { wrapper: 'toast-info', icon: 'text-[var(--info)]' },
 }
 
 function ToastIcon({ type }) {
@@ -64,7 +44,7 @@ export default function ToastContainer() {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-[100] flex flex-col gap-3 w-full max-w-md px-4 sm:px-0 pointer-events-none"
+      className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 w-full max-w-sm px-4 sm:px-0 pointer-events-none"
       aria-live="polite"
       aria-relevant="additions"
     >
@@ -74,21 +54,21 @@ export default function ToastContainer() {
           <div
             key={t.id}
             role="alert"
-            className={`pointer-events-auto rounded-xl border shadow-2xl shadow-black/40 backdrop-blur-md p-4 flex gap-3 animate-[toast-in_0.25s_ease-out] ${style.border} ${style.bg}`}
+            className={`pointer-events-auto rounded-lg border p-4 flex gap-3 shadow-[var(--shadow-lg)] animate-[toast-in_0.2s_ease-out] ${style.wrapper}`}
           >
             <div className={style.icon}>
               <ToastIcon type={t.type} />
             </div>
             <div className="min-w-0 flex-1">
               {t.title && (
-                <p className={`text-sm font-semibold ${style.title}`}>{t.title}</p>
+                <p className="text-sm font-semibold text-text">{t.title}</p>
               )}
-              <p className="text-sm text-[#E8E6DE] mt-0.5 leading-relaxed">{t.message}</p>
+              <p className="text-sm text-text-secondary mt-0.5 leading-relaxed">{t.message}</p>
             </div>
             <button
               type="button"
               onClick={() => dismiss(t.id)}
-              className="shrink-0 text-muted hover:text-white p-1 -m-1 rounded"
+              className="shrink-0 text-muted hover:text-text p-1 -m-1 rounded transition-colors"
               aria-label="Dismiss"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

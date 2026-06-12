@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LOADING_STEPS } from '../constants/loading'
-import { analyzeFloorPlan } from '../services/analyzeApi'
+import {
+  DEFAULT_TEST_SUITE_MODEL_ID,
+  getTestSuiteModelById,
+  visionOverrideFromModelChoice,
+} from '../constants/testSuiteModels'
+import { runFloorPlanPipeline } from '../services/floorPlanPipeline'
 import {
   deleteTestSuiteCase,
   fetchResultsIndex,
@@ -150,21 +155,23 @@ async function snapshotCasesForBatch(caseList) {
 }
 
 /**
- * @param {{ cachedAnalyzeResult?: object | null }} options
+ * @param {{ cachedAnalyzeResult?: object | null, enabled?: boolean }} options
  */
-export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
+export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true } = {}) {
   const [cases, setCases] = useState([])
-  const [casesLoading, setCasesLoading] = useState(true)
+  const [casesLoading, setCasesLoading] = useState(enabled)
   const [casesLoadError, setCasesLoadError] = useState(null)
   const [results, setResults] = useState([])
   const [runHistory, setRunHistory] = useState([])
   const [selectedRunId, setSelectedRunId] = useState(null)
-  const [historyLoading, setHistoryLoading] = useState(true)
+  const [historyLoading, setHistoryLoading] = useState(enabled)
   const [runProgress, setRunProgress] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [error, setError] = useState(null)
+  const [selectedModelId, setSelectedModelId] = useState(DEFAULT_TEST_SUITE_MODEL_ID)
+  const [selectedCaseIds, setSelectedCaseIds] = useState(() => new Set())
   const bulkInputRef = useRef(null)
   const casesRef = useRef(cases)
   const cachedAnalyzeRef = useRef(cachedAnalyzeResult)
@@ -246,6 +253,12 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
   }, [])
 
   useEffect(() => {
+    if (!enabled) {
+      setCasesLoading(false)
+      setHistoryLoading(false)
+      return undefined
+    }
+
     let cancelled = false
 
     async function loadCasesAndHistory() {
@@ -283,7 +296,34 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     return () => {
       cancelled = true
     }
-  }, [reloadPersistedCases, loadRunById])
+  }, [enabled, reloadPersistedCases, loadRunById])
+
+  useEffect(() => {
+    if (casesLoading) return
+    setSelectedCaseIds((prev) => {
+      const runnableIds = new Set(cases.filter(canRunCase).map((c) => c.id))
+      const allIds = new Set(cases.map((c) => c.id))
+      const next = new Set()
+
+      for (const id of prev) {
+        if (allIds.has(id) && runnableIds.has(id)) {
+          next.add(id)
+        }
+      }
+
+      for (const id of runnableIds) {
+        if (!prev.has(id)) {
+          next.add(id)
+        }
+      }
+
+      if (prev.size === 0 && runnableIds.size > 0) {
+        return runnableIds
+      }
+
+      return next
+    })
+  }, [cases, casesLoading])
 
   useEffect(() => {
     if (!loading) return
@@ -465,18 +505,46 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
 
   const runnableCases = cases.filter(canRunCase)
   const readyCount = runnableCases.length
+  const selectedCount = runnableCases.filter((c) => selectedCaseIds.has(c.id)).length
   const unsavedCount = cases.filter((c) => !c.persisted || c.dirty).length
 
   const canRun =
-    readyCount > 0 &&
+    selectedCount > 0 &&
     !cases.some((c) => c.dirty) &&
     !loading &&
     !casesLoading
 
+  const toggleCaseSelection = useCallback((caseId) => {
+    setSelectedCaseIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(caseId)) next.delete(caseId)
+      else next.add(caseId)
+      return next
+    })
+  }, [])
+
+  const selectAllRunnable = useCallback(() => {
+    setSelectedCaseIds(new Set(casesRef.current.filter(canRunCase).map((c) => c.id)))
+  }, [])
+
+  const deselectAll = useCallback(() => {
+    setSelectedCaseIds(new Set())
+  }, [])
+
+  const isCaseSelected = useCallback(
+    (caseId) => selectedCaseIds.has(caseId),
+    [selectedCaseIds],
+  )
+
+  const isCaseRunnable = useCallback((c) => canRunCase(c), [])
+
   const hasResults = !loading && results.length > 0
 
   const runBatch = useCallback(async () => {
-    const currentCases = casesRef.current.filter(canRunCase)
+    const selected = selectedCaseIds
+    const currentCases = casesRef.current.filter(
+      (c) => canRunCase(c) && selected.has(c.id),
+    )
 
     if (!currentCases.length || loading) return
 
@@ -509,6 +577,8 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     )
 
     const batchResults = []
+    const modelChoice = getTestSuiteModelById(selectedModelId)
+    const visionOverride = visionOverrideFromModelChoice(modelChoice)
 
     for (let i = 0; i < snapshot.length; i += 1) {
       if (i > 0) {
@@ -530,13 +600,21 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
         let aiResult
         let usedCachedAnalyze = false
 
-        if (cacheHash && testCase.inputSha256 && cacheHash === testCase.inputSha256) {
+        const canReuseAnalyzeCache =
+          modelChoice.matchesAnalyzeTab &&
+          cacheHash &&
+          testCase.inputSha256 &&
+          cacheHash === testCase.inputSha256
+
+        if (canReuseAnalyzeCache) {
           aiResult = cached
           usedCachedAnalyze = true
         } else {
-          aiResult = await analyzeFloorPlan(testCase.inputFile, {
-            isolateUpload: false,
+          const { result } = await runFloorPlanPipeline(testCase.inputFile, {
+            isolateUpload: true,
+            ...visionOverride,
           })
+          aiResult = result
         }
 
         const responseHash = aiResult.content_sha256 ?? ''
@@ -640,6 +718,12 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     try {
       const summary = await saveRunResults(
         batchResults.map((row) => serializeBatchResult(row, executedAt)),
+        {
+          id: modelChoice.id,
+          label: modelChoice.label,
+          provider: modelChoice.provider,
+          model: modelChoice.model,
+        },
       )
       setRunHistory((prev) => [...prev, summary])
       setSelectedRunId(summary.runId)
@@ -648,7 +732,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
         title: 'Run persistence failed',
       })
     }
-  }, [loading])
+  }, [loading, selectedModelId, selectedCaseIds])
 
   const retryBatch = () => {
     setError(null)
@@ -667,8 +751,14 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     currentIndex,
     error,
     readyCount,
+    selectedCount,
     unsavedCount,
     canRun,
+    toggleCaseSelection,
+    selectAllRunnable,
+    deselectAll,
+    isCaseSelected,
+    isCaseRunnable,
     hasResults,
     runHistory,
     selectedRunId,
@@ -687,5 +777,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null } = {}) {
     clearRunState,
     reloadCases,
     retryBatch,
+    selectedModelId,
+    setSelectedModelId,
   }
 }

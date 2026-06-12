@@ -79,11 +79,19 @@ export async function fetchRunResults(runId) {
 }
 
 /** Persist a completed batch run. */
-export async function saveRunResults(entries) {
+export async function saveRunResults(entries, modelMeta = null) {
+  const body = { entries }
+  if (modelMeta) {
+    body.visionProvider = modelMeta.provider ?? null
+    body.visionModel = modelMeta.model ?? null
+    body.modelLabel = modelMeta.label ?? null
+    body.modelId = modelMeta.id ?? null
+  }
+
   const res = await fetch('/api/test-suite/results', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ entries }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error(await parseError(res))
   return res.json()

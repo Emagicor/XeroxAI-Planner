@@ -15,9 +15,9 @@ export default function PlanTabSwitcher({
     plans.find((p) => p.planNumber === activePlan) ?? plans[0]
 
   return (
-    <div className="rounded-xl border border-line bg-card/60 overflow-hidden mb-6">
-      <div className="border-b border-line/60 bg-surface/20 overflow-x-auto">
-        <div className="flex min-w-max px-2 pt-2 gap-1">
+    <div className="rounded-xl border border-line bg-card overflow-hidden mb-6 shadow-[var(--shadow-sm)]">
+      <div className="border-b border-line bg-surface overflow-x-auto">
+        <div className="flex min-w-max p-1 gap-1">
           {plans.map((plan) => {
             const selected = plan.planNumber === active.planNumber
             return (
@@ -25,11 +25,13 @@ export default function PlanTabSwitcher({
                 key={plan.planNumber}
                 type="button"
                 onClick={() => onSelectPlan(plan.planNumber)}
-                className={`px-4 py-2.5 rounded-t-lg text-sm font-medium border border-b-0 transition-colors whitespace-nowrap ${
+                className={[
+                  'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 whitespace-nowrap',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30',
                   selected
-                    ? 'border-line bg-card text-text -mb-px z-10'
-                    : 'border-transparent text-muted hover:text-text hover:bg-surface/40'
-                }`}
+                    ? 'bg-accent-subtle text-accent'
+                    : 'text-muted hover:text-text hover:bg-text/[0.04]',
+                ].join(' ')}
               >
                 {planTabLabel(plan)}
               </button>

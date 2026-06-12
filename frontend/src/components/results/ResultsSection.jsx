@@ -111,31 +111,27 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
           <Badge variant="accent">{scenarioLabel(doc.scenario)}</Badge>
           {doc.sourcePageCount != null && doc.totalRegions != null && (
             <span className="text-xs text-muted font-mono">
-              {doc.sourcePageCount} page{doc.sourcePageCount !== 1 ? 's' : ''} ·{' '}
-              {doc.totalRegions} plan{doc.totalRegions !== 1 ? 's' : ''}
+              {doc.sourcePageCount} page{doc.sourcePageCount !== 1 ? "s" : ""} ·{" "}
+              {doc.totalRegions} plan{doc.totalRegions !== 1 ? "s" : ""}
             </span>
           )}
         </div>
       )}
 
-      <SummaryCards
-        doc={doc}
-        displayTotal={displayTotal}
-        unit={unit}
-        roomCount={visibleRows.length}
-      />
-
       {doc.ineligibleList?.length > 0 && (
         <div className="mb-4 p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 text-sm text-amber-200/90">
           <p className="font-medium mb-1">Skipped pages (not floor plans)</p>
           <p className="text-xs text-amber-200/70 mb-2">
-            Title sheets, notes, schedules, and elevations are ignored automatically.
-            Only floor plan pages are measured and included in totals.
+            Title sheets, notes, schedules, and elevations are ignored
+            automatically. Only floor plan pages are measured and included in
+            totals.
           </p>
           <ul className="space-y-1">
             {doc.ineligibleList.map((p) => (
               <li key={p.page} className="text-xs">
-                <span className="font-mono text-amber-100/90">Page {p.page}</span>
+                <span className="font-mono text-amber-100/90">
+                  Page {p.page}
+                </span>
                 {p.label && (
                   <span className="text-amber-200/60"> · {p.label}</span>
                 )}
@@ -151,13 +147,14 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
           plans={plans}
           activePlan={activePage}
           onSelectPlan={(planNumber) => {
-            selectPlan(planNumber)
-            const plan = plans.find((p) => p.planNumber === planNumber)
+            selectPlan(planNumber);
+            const plan = plans.find((p) => p.planNumber === planNumber);
             const target =
               doc.rows.find(
-                (r) => r.page === planNumber && r.eligible && r.included !== false,
-              ) ?? plan?.rows?.find((r) => r.eligible !== false)
-            if (target?.eligible) selectRow(target)
+                (r) =>
+                  r.page === planNumber && r.eligible && r.included !== false,
+              ) ?? plan?.rows?.find((r) => r.eligible !== false);
+            if (target?.eligible) selectRow(target);
           }}
         >
           {(plan) => (
@@ -178,7 +175,7 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
                   plan.rows.find(
                     (r) => r.roomIndex === roomIndex && r.included !== false,
                   ) ?? plan.rows[0],
-                )
+                );
               }}
             />
           )}
@@ -212,9 +209,11 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
                 Room measurements
               </h3>
               <p className="text-xs text-muted mt-1">
-                Edit the table below. Grand total and downloads use only checked rows.
+                Edit the table below. Grand total and downloads use only checked
+                rows.
               </p>
             </div>
+            <UnitSelector unit={unit} onChange={setUnit} />
             <ReviewTable
               rows={doc.rows}
               unit={unit}
@@ -229,6 +228,12 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
         </div>
       )}
 
+      <SummaryCards
+        doc={doc}
+        displayTotal={displayTotal}
+        unit={unit}
+        roomCount={visibleRows.length}
+      />
       <div className="mt-8 pt-6 border-t border-line/60">
         {exportError && (
           <p className="mb-3 text-sm text-red-400">{exportError}</p>
@@ -245,5 +250,5 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
         />
       </div>
     </section>
-  )
+  );
 }

@@ -90,7 +90,7 @@ class PageResult:
     overall_confidence: int = 0
     units_detected: str = "feet"
     annotated_image: str | None = None  # base64 JPEG
-    # Grounding DINO region metadata (when a document page yields multiple plans)
+    # Region metadata (when a document page yields multiple plans)
     source_page: int | None = None
     region_index: int | None = None
     region_id: str | None = None

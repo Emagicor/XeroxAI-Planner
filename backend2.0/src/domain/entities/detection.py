@@ -1,7 +1,7 @@
-"""Floor-plan region detection entities."""
+"""Floor-plan region entities used during page expansion."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from uuid import uuid4
 
 
@@ -39,33 +39,8 @@ class DetectedRegion:
     confidence: float
     bbox: BoundingBox
     jpeg_bytes: bytes
-    detection_method: str = "grounding_dino"  # grounding_dino | full_page_fallback
-    region_kind: str = "unknown"  # floor_plan | dimension_table | unknown
-    suggested_exclude: bool = False
+    detection_method: str = "full_page_fallback"
 
     @staticmethod
     def new_id() -> str:
         return str(uuid4())
-
-
-@dataclass
-class SourcePageDetection:
-    page_number: int
-    page_width: int
-    page_height: int
-    regions: list[DetectedRegion] = field(default_factory=list)
-    skipped: bool = False
-    skip_reason: str | None = None
-    page_preview_bytes: bytes | None = None
-
-
-@dataclass
-class DocumentDetection:
-    detection_id: str
-    filename: str
-    content_sha256: str
-    document_type: str  # image | pdf
-    source_page_count: int
-    total_regions: int
-    pages: list[SourcePageDetection]
-    detection_method: str = "grounding_dino"

@@ -1,17 +1,14 @@
 import { pageTypeLabel } from '@/utils/pageTypes'
+import Badge from '@/components/ui/Badge'
 
 function PageBadge({ eligible, pageType }) {
   if (eligible) {
-    return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border bg-emerald-500/15 text-emerald-300 border-emerald-500/30">
-        Analyzed
-      </span>
-    )
+    return <Badge variant="success">Analyzed</Badge>
   }
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border bg-amber-500/10 text-amber-200/90 border-amber-500/25">
+    <Badge variant="warning">
       Skipped · {pageTypeLabel(pageType)}
-    </span>
+    </Badge>
   )
 }
 
@@ -23,8 +20,8 @@ export default function DocumentPagesPanel({ pageSummaries, activePage, onSelect
   const multiRegion = pageSummaries.some((p) => (p.regionIndex ?? 1) > 1)
 
   return (
-    <div className="mb-6 rounded-xl border border-line bg-card/70 overflow-hidden">
-      <div className="px-4 py-3 border-b border-line/60 bg-surface/20 flex flex-wrap items-center justify-between gap-2">
+    <div className="mb-6 rounded-xl border border-line bg-card overflow-hidden shadow-[var(--shadow-sm)]">
+      <div className="px-4 py-3 border-b border-line bg-surface flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-sm font-medium text-text">
             {multiRegion ? 'Floor plans' : 'Document pages'}
@@ -36,7 +33,7 @@ export default function DocumentPagesPanel({ pageSummaries, activePage, onSelect
           </p>
         </div>
         {scenario && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full border border-line text-muted">
+          <span className="text-xs px-2 py-0.5 rounded-full border border-line text-muted">
             {scenario.replace(/_/g, ' ')}
           </span>
         )}

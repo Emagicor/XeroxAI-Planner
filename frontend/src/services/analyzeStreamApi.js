@@ -1,6 +1,10 @@
 import { useApiStore } from '../stores/apiStore'
 import { cloneFileForUpload } from '../utils/cloneUploadFile'
-import { logApiFailure, parseApiErrorResponse } from '../utils/apiErrors'
+import {
+  createApiErrorFromPayload,
+  logApiFailure,
+  parseApiErrorResponse,
+} from '../utils/apiErrors'
 import { logError } from '../utils/logger'
 
 /**
@@ -9,19 +13,23 @@ import { logError } from '../utils/logger'
 export async function analyzeFloorPlanStream(
   file,
   handlers = {},
-  { detectionId = null, excludedRegionIds = [] } = {},
+  {
+    isolateUpload = true,
+    visionProvider = null,
+    visionModel = null,
+  } = {},
 ) {
   const base = useApiStore.getState().apiBaseUrl.replace(/\/$/, '')
   const url = `${base}/analyze/stream`
-  const uploadFile = await cloneFileForUpload(file)
+  const uploadFile = isolateUpload ? await cloneFileForUpload(file) : file
 
   const form = new FormData()
   form.append('file', uploadFile, uploadFile.name)
-  if (detectionId) {
-    form.append('detection_id', detectionId)
+  if (visionProvider) {
+    form.append('vision_provider', visionProvider)
   }
-  if (excludedRegionIds?.length) {
-    form.append('excluded_region_ids', JSON.stringify(excludedRegionIds))
+  if (visionModel) {
+    form.append('vision_model', visionModel)
   }
 
   let res
@@ -63,11 +71,14 @@ export async function analyzeFloorPlanStream(
       try {
         const json = JSON.parse(line.slice(5).trim())
 
+        if (json.type === 'error') {
+          throw createApiErrorFromPayload(json, { context: 'analyze/stream', url })
+        }
         if (json.type === 'detected') handlers.onDetected?.(json)
         else if (json.type === 'progress') handlers.onProgress?.(json)
         else if (json.type === 'done') handlers.onDone?.(json)
-        else if (json.type === 'error') handlers.onError?.(json.message)
       } catch (parseErr) {
+        if (parseErr?.isApiError) throw parseErr
         logError('analyze/stream.parse', parseErr, { chunk: line.slice(0, 120) })
       }
     }

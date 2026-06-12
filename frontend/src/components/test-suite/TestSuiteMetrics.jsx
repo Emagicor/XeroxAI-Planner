@@ -28,9 +28,9 @@ function ftSq(n) {
 function MetricTile({ label, value, sub }) {
   return (
     <div className="rounded-lg border border-line/60 bg-surface/40 px-3 py-2.5">
-      <p className="text-[10px] uppercase tracking-wide text-muted">{label}</p>
+      <p className="stat-label">{label}</p>
       <p className="font-mono text-base font-semibold text-text mt-0.5">{value}</p>
-      {sub && <p className="text-[10px] text-muted mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-muted mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -38,7 +38,7 @@ function MetricTile({ label, value, sub }) {
 function SummaryStat({ label, value, accent }) {
   return (
     <div className="text-center px-4 py-2">
-      <p className="text-[10px] uppercase tracking-wider text-muted mb-1">{label}</p>
+      <p className="stat-label mb-1">{label}</p>
       <p className={`font-mono text-2xl font-semibold ${accent ?? 'text-text'}`}>
         {value}
       </p>
@@ -77,14 +77,14 @@ function statusBadge(status) {
 }
 
 function caseOutcome(row) {
-  if (row.error) return { label: 'Analysis failed', tone: 'border-red-500/30 bg-red-950/20 text-red-300' }
-  if (row.evalError) return { label: 'Eval failed', tone: 'border-amber-500/30 bg-amber-950/20 text-amber-200' }
+  if (row.error) return { label: 'Analysis failed', tone: 'border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger)]' }
+  if (row.evalError) return { label: 'Eval failed', tone: 'border-[var(--warning-border)] bg-[var(--warning-bg)] text-[var(--warning)]' }
   const m = row.evaluation
-  if (!m) return { label: 'No data', tone: 'border-line bg-surface/40 text-muted' }
+  if (!m) return { label: 'No data', tone: 'border-line bg-surface text-muted' }
   const score = m.roomF1 ?? 0
-  if (score >= 0.85) return { label: 'Pass', tone: 'border-emerald-500/30 bg-emerald-950/20 text-emerald-300' }
-  if (score >= 0.6) return { label: 'Partial', tone: 'border-amber-500/30 bg-amber-950/20 text-amber-200' }
-  return { label: 'Needs review', tone: 'border-red-500/30 bg-red-950/20 text-red-300' }
+  if (score >= 0.85) return { label: 'Pass', tone: 'border-[var(--success-border)] bg-[var(--success-bg)] text-[var(--success)]' }
+  if (score >= 0.6) return { label: 'Partial', tone: 'border-[var(--warning-border)] bg-[var(--warning-bg)] text-[var(--warning)]' }
+  return { label: 'Needs review', tone: 'border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger)]' }
 }
 
 function PerRoomTable({ evaluation, hidePageColumn = false }) {
@@ -179,7 +179,7 @@ function PlanCaseContent({ plan, planEval }) {
       </p>
 
       <section className="space-y-3">
-        <h5 className="text-[10px] font-medium uppercase tracking-wide text-muted">
+        <h5 className="text-xs font-medium uppercase tracking-wide text-muted">
           Floor plan visuals
         </h5>
         <PlanImagesPanel
@@ -194,7 +194,7 @@ function PlanCaseContent({ plan, planEval }) {
       </section>
 
       <section className="space-y-3">
-        <h5 className="text-[10px] font-medium uppercase tracking-wide text-muted">
+        <h5 className="text-xs font-medium uppercase tracking-wide text-muted">
           Room comparison
         </h5>
         {planEval?.pairs?.length > 0 ? (
@@ -240,7 +240,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
     : row.error || row.evalError || 'No metrics available'
 
   return (
-    <div className="rounded-xl border border-line bg-card overflow-hidden transition-shadow hover:shadow-lg hover:shadow-black/10">
+    <div className="rounded-xl border border-line bg-card overflow-hidden transition-shadow hover:shadow-[var(--shadow-md)]">
       <button
         type="button"
         onClick={onToggle}
@@ -254,7 +254,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
           />
         ) : (
           <div className="w-12 h-12 rounded-lg border border-line bg-surface flex items-center justify-center shrink-0 hidden sm:block">
-            <span className="text-[10px] font-mono text-accent">{isPdf ? 'PDF' : 'IMG'}</span>
+            <span className="text-xs font-mono text-accent">{isPdf ? 'PDF' : 'IMG'}</span>
           </div>
         )}
 
@@ -272,7 +272,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
             Ground truth: {row.groundTruthFileName}
           </p>
           {row.aiResult?.scenario && (
-            <p className="text-[10px] text-accent/80 mt-1">
+            <p className="text-xs text-accent/80 mt-1">
               {scenarioLabel(row.aiResult.scenario)}
               {row.aiResult.total_regions != null && (
                 <span className="font-mono text-muted ml-2">
@@ -288,15 +288,15 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
           {m && (
             <div className="hidden md:grid grid-cols-3 gap-3 mr-2">
               <div className="text-right">
-                <p className="text-[10px] text-muted">Precision</p>
+                <p className="text-xs text-muted">Precision</p>
                 <p className="font-mono text-sm text-text">{pct(m.roomPrecision)}</p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-muted">Recall</p>
+                <p className="text-xs text-muted">Recall</p>
                 <p className="font-mono text-sm text-text">{pct(m.roomRecall)}</p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-muted">Dim MAE</p>
+                <p className="text-xs text-muted">Dim MAE</p>
                 <p className="font-mono text-sm text-text">{ft(m.dimensionMAE)}</p>
               </div>
             </div>
@@ -315,7 +315,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
       {expanded && (
         <div className="px-4 sm:px-5 pb-5 border-t border-line/50 bg-surface/20">
           {(row.error || row.evalError) && (
-            <div className="mt-4 p-3 rounded-lg border border-red-500/25 bg-red-950/20 text-red-300 text-sm">
+            <div className="mt-4 p-3 rounded-lg border border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger)] text-sm">
               {row.error || row.evalError}
             </div>
           )}
@@ -376,7 +376,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
                     />
                   </div>
                   <div className="max-w-xs">
-                    <p className="text-[10px] uppercase tracking-wide text-muted mb-2">
+                    <p className="text-xs uppercase tracking-wide text-muted mb-2">
                       Detection matrix
                     </p>
                     <ConfusionMini tp={m.truePositives} fp={m.falsePositives} fn={m.falseNegatives} />
@@ -391,7 +391,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
   )
 }
 
-export default function TestSuiteMetrics({ results, onNewBatch }) {
+export default function TestSuiteMetrics({ results, onNewBatch, modelLabel = null }) {
   const [expandedIds, setExpandedIds] = useState(new Set())
 
   const aggregate = useMemo(() => {
@@ -433,8 +433,9 @@ export default function TestSuiteMetrics({ results, onNewBatch }) {
         <div>
           <h2 className="text-xl font-medium text-text">Test suite report</h2>
           <p className="text-sm text-muted mt-1">
-            {results.length} cases evaluated · expand any row for full metrics and room-level
-            comparison
+            {results.length} cases evaluated
+            {modelLabel ? ` · ${modelLabel}` : ''}
+            {' · '}expand any row for full metrics and room-level comparison
           </p>
         </div>
         {onNewBatch && (
@@ -445,7 +446,7 @@ export default function TestSuiteMetrics({ results, onNewBatch }) {
       </div>
 
       {aggregate && (
-        <div className="rounded-2xl border border-line bg-gradient-to-br from-card/90 to-surface/40 overflow-hidden">
+        <div className="rounded-xl border border-line bg-card overflow-hidden shadow-[var(--shadow-sm)]">
           <div className="px-6 py-4 border-b border-line/60 bg-surface/20">
             <h3 className="text-sm font-medium text-text">Overall summary</h3>
             <p className="text-xs text-muted mt-0.5">

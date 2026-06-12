@@ -34,6 +34,103 @@
       "totalTests": 29,
       "passed": 29,
       "failed": 0
+    },
+    {
+      "runId": "run-2026-06-10T07-25-24.537Z",
+      "timestamp": "2026-06-10T07:25:24.537Z",
+      "totalTests": 30,
+      "passed": 19,
+      "failed": 11,
+      "visionProvider": "groq",
+      "visionModel": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "modelLabel": "Groq Llama 4 Scout",
+      "modelId": "groq-llama-scout"
+    },
+    {
+      "runId": "run-2026-06-10T08-12-55.511Z",
+      "timestamp": "2026-06-10T08:12:55.511Z",
+      "totalTests": 3,
+      "passed": 1,
+      "failed": 2,
+      "visionProvider": "groq",
+      "visionModel": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "modelLabel": "Groq Llama 4 Scout",
+      "modelId": "groq-llama-scout"
+    },
+    {
+      "runId": "run-2026-06-10T08-26-40.265Z",
+      "timestamp": "2026-06-10T08:26:40.265Z",
+      "totalTests": 6,
+      "passed": 3,
+      "failed": 3,
+      "visionProvider": "openai",
+      "visionModel": "gpt-4o",
+      "modelLabel": "GPT-4o",
+      "modelId": "gpt-4o"
+    },
+    {
+      "runId": "run-2026-06-10T08-33-58.044Z",
+      "timestamp": "2026-06-10T08:33:58.044Z",
+      "totalTests": 6,
+      "passed": 4,
+      "failed": 2,
+      "visionProvider": "gemini",
+      "visionModel": "gemini-3.5-flash",
+      "modelLabel": "Gemini 3.5 Flash",
+      "modelId": "gemini-3.5"
+    },
+    {
+      "runId": "run-2026-06-10T08-43-48.514Z",
+      "timestamp": "2026-06-10T08:43:48.514Z",
+      "totalTests": 6,
+      "passed": 6,
+      "failed": 0,
+      "visionProvider": "gemini",
+      "visionModel": "gemini-3.5-flash",
+      "modelLabel": "Gemini 3.5 Flash",
+      "modelId": "gemini-3.5"
+    },
+    {
+      "runId": "run-2026-06-11T06-32-13.778Z",
+      "timestamp": "2026-06-11T06:32:13.778Z",
+      "totalTests": 5,
+      "passed": 4,
+      "failed": 1,
+      "visionProvider": "gemini",
+      "visionModel": "gemini-2.5-flash",
+      "modelLabel": "Gemini 2.5 Flash",
+      "modelId": "gemini-2.5"
+    },
+    {
+      "runId": "run-2026-06-11T08-02-09.773Z",
+      "timestamp": "2026-06-11T08:02:09.773Z",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "modelLabel": "Server default",
+      "modelId": "server-default"
+    },
+    {
+      "runId": "run-2026-06-11T08-09-22.457Z",
+      "timestamp": "2026-06-11T08:09:22.457Z",
+      "totalTests": 4,
+      "passed": 3,
+      "failed": 1,
+      "visionProvider": "gemini",
+      "visionModel": "gemini-2.5-flash",
+      "modelLabel": "Gemini 2.5 Flash",
+      "modelId": "gemini-2.5"
+    },
+    {
+      "runId": "run-2026-06-11T10-14-31.916Z",
+      "timestamp": "2026-06-11T10:14:31.916Z",
+      "totalTests": 4,
+      "passed": 1,
+      "failed": 3,
+      "visionProvider": "groq",
+      "visionModel": "meta-llama/llama-4-scout-17b-16e-instruct",
+      "modelLabel": "Groq Llama 4 Scout",
+      "modelId": "groq-llama-scout"
     }
   ]
 }

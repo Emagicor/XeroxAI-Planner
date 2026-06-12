@@ -8,6 +8,71 @@ export const ERROR_CODES = {
   PARSE: 'PARSE_ERROR',
 }
 
+/** Backend provider / pipeline codes — show server message verbatim. */
+export const SERVER_PROVIDER_ERROR_CODES = new Set([
+  'MISSING_API_KEY',
+  'INVALID_API_KEY',
+  'QUOTA_EXCEEDED',
+  'BILLING_CREDITS_DEPLETED',
+  'MODEL_NOT_FOUND',
+  'GEMINI_ERROR',
+  'OPENAI_ERROR',
+  'GROQ_ERROR',
+  'VISION_PROVIDER_ERROR',
+  'JSON_PARSE_ERROR',
+])
+
+const SERVER_ERROR_CODES = new Set([
+  ...SERVER_PROVIDER_ERROR_CODES,
+  'INTERNAL_ERROR',
+])
+
+const PROVIDER_FAILURE_MESSAGE_MARKERS =
+  /503|429|unavailable|high demand|api key|quota|rate limit|gemini|openai|groq/i
+
+export function isProviderFailureCode(code) {
+  return Boolean(code && SERVER_PROVIDER_ERROR_CODES.has(code))
+}
+
+export function isProviderFailureMessage(message) {
+  return Boolean(message && PROVIDER_FAILURE_MESSAGE_MARKERS.test(message))
+}
+
+/**
+ * Build a normalized API error from an SSE or JSON error payload.
+ * @param {{ code?: string, message?: string }} payload
+ */
+export function createApiErrorFromPayload(payload, meta = {}) {
+  const message = payload?.message ?? 'Analysis failed'
+  const code = payload?.code ?? undefined
+  const apiError = new Error(message)
+  apiError.isApiError = true
+  apiError.code = isProviderFailureCode(code) ? code : code ?? ERROR_CODES.HTTP
+  apiError.userTitle = isProviderFailureCode(code) ? 'Vision provider error' : 'Analysis failed'
+  apiError.userMessage = message
+  apiError.technicalMessage = message
+  apiError.context = meta.context
+  apiError.url = meta.url
+  return apiError
+}
+
+function extractServerDetail(body) {
+  const detail = body?.detail
+  if (typeof detail === 'string') {
+    return { code: null, message: detail }
+  }
+  if (detail && typeof detail === 'object') {
+    return {
+      code: detail.code ?? null,
+      message: detail.message ?? null,
+    }
+  }
+  return {
+    code: body?.code ?? null,
+    message: body?.message ?? null,
+  }
+}
+
 /**
  * @param {unknown} err
  * @param {{ context?: string, url?: string }} meta
@@ -48,37 +113,23 @@ export async function parseApiErrorResponse(res, meta = {}) {
     body = {}
   }
 
-  const detail = body.detail
+  const { code, message: serverMessage } = extractServerDetail(body)
   let message =
-    typeof detail === 'string'
-      ? detail
-      : detail?.message ||
-        (Array.isArray(detail) ? detail[0]?.msg : null) ||
-        body.error ||
-        body.message ||
-        `Request failed (${res.status})`
+    serverMessage ||
+    (Array.isArray(body.detail) ? body.detail[0]?.msg : null) ||
+    body.error ||
+    `Request failed (${res.status})`
 
-  if (
-    detail?.code === 'QUOTA_EXCEEDED' ||
-    detail?.code === 'BILLING_CREDITS_DEPLETED' ||
-    detail?.code === 'INVALID_API_KEY' ||
-    detail?.code === 'MODEL_NOT_FOUND' ||
-    detail?.code === 'GEMINI_ERROR' ||
-    detail?.code === 'VISION_PROVIDER_ERROR' ||
-    detail?.code === 'MISSING_API_KEY'
-  ) {
-    message = detail.message || message
-  } else if (/quota|429|rate limit/i.test(String(message))) {
-    message =
-      'Gemini API quota exceeded. Wait for the limit to reset or change GEMINI_MODEL in backend .env.'
+  if (code && SERVER_ERROR_CODES.has(code) && serverMessage) {
+    message = serverMessage
   }
 
   const apiError = new Error(message)
   apiError.isApiError = true
-  apiError.code = detail?.code ?? ERROR_CODES.HTTP
+  apiError.code = code ?? ERROR_CODES.HTTP
   apiError.userTitle = res.status >= 500 ? 'Server error' : 'Request failed'
   apiError.userMessage = message
-  apiError.technicalMessage = message
+  apiError.technicalMessage = serverMessage || message
   apiError.status = res.status
   apiError.context = meta.context
   apiError.url = meta.url

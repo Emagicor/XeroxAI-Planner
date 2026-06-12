@@ -5,13 +5,6 @@ export const LOADING_STEPS = [
   'Building review table…',
 ]
 
-export const DETECT_LOADING_STEPS = [
-  'Validating file…',
-  'Rasterizing document…',
-  'Grounding DINO detection…',
-  'Clipping floor plan regions…',
-]
-
 export const ANALYZE_STREAM_STEPS = [
   'Preparing analysis…',
   'Measuring rooms…',

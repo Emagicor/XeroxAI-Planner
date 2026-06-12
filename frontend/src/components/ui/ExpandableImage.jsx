@@ -77,7 +77,7 @@ export default function ExpandableImage({
   return (
     <div className={`min-w-0 ${thumbnail ? 'h-full' : ''} ${className}`}>
       {label && (
-        <p className="text-[10px] uppercase tracking-wide text-muted mb-2">{label}</p>
+        <p className="stat-label mb-2">{label}</p>
       )}
       <div className={`relative group ${thumbnail ? 'h-full' : ''}`}>
         <button
@@ -121,7 +121,7 @@ export default function ExpandableImage({
           </div>
         )}
         {expandable && compact && !thumbnail && (
-          <p className="text-[10px] text-muted mt-1.5">Click to expand</p>
+          <p className="text-xs text-muted mt-1.5">Click to expand</p>
         )}
       </div>
       {open && (
