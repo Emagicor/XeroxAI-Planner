@@ -1,0 +1,109 @@
+{
+  "room_corrections": [
+    {
+      "room_index": 3,
+      "action": "update",
+      "name": "EAST PARLOR",
+      "length_ft": 19.0,
+      "width_ft": 13.5,
+      "area_sqft": 256.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "room_index": 5,
+      "action": "update",
+      "name": "GEN. ISRAEL PUTNAM MEMORIAL ROOM",
+      "length_ft": 15.0,
+      "width_ft": 12.5,
+      "area_sqft": 187.5,
+      "confidence_pct": 85,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Length derived from BED ROOM A's measured length (15'0\").",
+        "Width derived from BATH's measured width (12'6\")."
+      ]
+    },
+    {
+      "room_index": 6,
+      "action": "update",
+      "name": "BED ROOM B",
+      "length_ft": 9.0,
+      "width_ft": 17.917,
+      "area_sqft": 161.25,
+      "confidence_pct": 98,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "room_index": 7,
+      "action": "update",
+      "name": "BATH",
+      "length_ft": 9.0,
+      "width_ft": 12.5,
+      "area_sqft": 112.5,
+      "confidence_pct": 88,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Length derived from adjacent BED ROOM B's measured length (9'0\")."
+      ]
+    },
+    {
+      "room_index": 9,
+      "action": "update",
+      "name": "BED ROOM D",
+      "length_ft": 18.583,
+      "width_ft": 13.5,
+      "area_sqft": 250.87,
+      "confidence_pct": 88,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Length derived from adjacent BED ROOM C's measured length (18'7\")."
+      ]
+    }
+  ],
+  "rooms_added": [
+    {
+      "name": "LATER KITCHEN",
+      "bbox": [
+        166,
+        102,
+        420,
+        283
+      ],
+      "polygon": null,
+      "length_ft": null,
+      "width_ft": null,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "No explicit dimensions written inside the room."
+      ]
+    },
+    {
+      "name": "ATTIC",
+      "bbox": [
+        650,
+        220,
+        900,
+        280
+      ],
+      "polygon": null,
+      "length_ft": null,
+      "width_ft": 27.667,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": [
+        "Width of 27'8\" is explicitly written."
+      ]
+    }
+  ],
+  "floor_identification": {
+    "floor_label": "First Floor & Second Floor",
+    "confidence_pct": 99,
+    "evidence": "Labels 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' are clearly printed at the bottom of each plan."
+  }
+}

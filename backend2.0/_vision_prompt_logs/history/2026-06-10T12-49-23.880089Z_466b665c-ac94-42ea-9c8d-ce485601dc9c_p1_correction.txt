@@ -1,0 +1,254 @@
+# pass=correction
+# session_id=466b665c-ac94-42ea-9c8d-ce485601dc9c
+# page_number=1
+# model=gemini-2.5-flash
+# timestamp=2026-06-10T12-49-23.880089Z
+
+```json
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Page contains two distinct top-down architectural floor plans with room boundaries and dimensions."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor & Second Floor",
+    "confidence_pct": 95,
+    "evidence": "Labels 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' are clearly visible on the page."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [100, 300, 290, 537],
+      "polygon": [
+        [100, 300],
+        [290, 300],
+        [290, 537],
+        [100, 537]
+      ],
+      "length_ft": 23.58,
+      "width_ft": 15.67,
+      "area_sqft": 369.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [290, 300, 480, 537],
+      "polygon": [
+        [290, 300],
+        [480, 300],
+        [480, 537],
+        [290, 537]
+      ],
+      "length_ft": 23.58,
+      "width_ft": 14.83,
+      "area_sqft": 349.6,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Technique B: Length derived from adjacent 'OLD KITCHEN' (23'7\") on shared wall."
+      ]
+    },
+    {
+      "name": "TOILETS",
+      "bbox": [290, 550, 480, 637],
+      "polygon": [
+        [290, 550],
+        [480, 550],
+        [480, 637],
+        [290, 637]
+      ],
+      "length_ft": 8.83,
+      "width_ft": 18.0,
+      "area_sqft": 158.94,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [100, 637, 290, 767],
+      "polygon": [
+        [100, 637],
+        [290, 637],
+        [290, 767],
+        [100, 767]
+      ],
+      "length_ft": 13.0,
+      "width_ft": 15.25,
+      "area_sqft": 198.25,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [290, 637, 480, 767],
+      "polygon": [
+        [290, 637],
+        [480, 637],
+        [480, 767],
+        [290, 767]
+      ],
+      "length_ft": 13.0,
+      "width_ft": 13.5,
+      "area_sqft": 175.5,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM A",
+      "bbox": [510, 300, 690, 457],
+      "polygon": [
+        [510, 300],
+        [690, 300],
+        [690, 457],
+        [510, 457]
+      ],
+      "length_ft": 15.58,
+      "width_ft": 17.92,
+      "area_sqft": 279.29,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GEN. ISRAEL PUTNAM MEMORIAL ROOM",
+      "bbox": [690, 300, 880, 457],
+      "polygon": [
+        [690, 300],
+        [880, 300],
+        [880, 457],
+        [690, 457]
+      ],
+      "length_ft": 15.58,
+      "width_ft": 18.0,
+      "area_sqft": 280.44,
+      "confidence_pct": 95,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Technique B: Length derived from adjacent 'BED ROOM A' (15'7\") on shared wall."
+      ]
+    },
+    {
+      "name": "HALL",
+      "bbox": [690, 457, 780, 507],
+      "polygon": [
+        [690, 457],
+        [780, 457],
+        [780, 507],
+        [690, 507]
+      ],
+      "length_ft": 4.17,
+      "width_ft": 9.0,
+      "area_sqft": 37.53,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [510, 457, 690, 630],
+      "polygon": [
+        [510, 457],
+        [690, 457],
+        [690, 630],
+        [510, 630]
+      ],
+      "length_ft": 17.25,
+      "width_ft": 17.92,
+      "area_sqft": 309.06,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [780, 507, 880, 630],
+      "polygon": [
+        [780, 507],
+        [880, 507],
+        [880, 630],
+        [780, 630]
+      ],
+      "length_ft": 12.33,
+      "width_ft": 10.0,
+      "area_sqft": 123.3,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [510, 630, 690, 757],
+      "polygon": [
+        [510, 630],
+        [690, 630],
+        [690, 757],
+        [510, 757]
+      ],
+      "length_ft": 12.58,
+      "width_ft": 17.92,
+      "area_sqft": 225.46,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM D",
+      "bbox": [690, 630, 880, 757],
+      "polygon": [
+        [690, 630],
+        [880, 630],
+        [880, 757],
+        [690, 757]
+      ],
+      "length_ft": 12.58,
+      "width_ft": 18.0,
+      "area_sqft": 226.44,
+      "confidence_pct": 95,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Technique B: Length derived from adjacent 'BED ROOM C' (12'7\") on shared wall."
+      ]
+    },
+    {
+      "name": "HALL",
+      "bbox": [690, 757, 780, 807],
+      "polygon": [
+        [690, 757],
+        [780, 757],
+        [780, 807],
+        [690, 807]
+      ],
+      "length_ft": 4.17,
+      "width_ft": 9.0,
+      "area_sqft": 37.53,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "LATER KITCHEN",
+      "bbox": [290, 100, 480, 280],
+      "polygon": [
+        [290, 100],
+        [480, 100],
+        [480, 280],
+        [290, 280]
+      ],
+      "length_ft": 18.0,
+      "width_ft": 19.0,
+      "area_sqft": 342.0,
+      "confidence_pct": 85,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Technique A: Dimensions derived from overall building dimensions and visual estimation."
+      ]
+    },
+    {
+      "name": "ATTIC",
+      "bbox": [510, 200

@@ -1,0 +1,86 @@
+# pass=floor_plan
+# session_id=95f6de67-a70e-44dc-a28c-35fab2930c0e
+# page_number=1
+# model=meta-llama/llama-4-scout-17b-16e-instruct
+# timestamp=2026-06-11T10-13-27.920662Z
+
+```
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The image contains a top-down architectural floor plan with room boundaries and labeled spaces."
+  },
+  "floor_identification": {
+    "floor_label": "Unknown",
+    "confidence_pct": 0,
+    "evidence": "No specific floor label is provided."
+  },
+  "rooms": [
+    {
+      "name": "SHOP",
+      "bbox": [0, 0, 0, 0],
+      "polygon": [[0, 0], [0, 0], [0, 0], [0, 0]],
+      "length_ft": 37,
+      "width_ft": 29,
+      "area_sqft": 1073,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BEDROOM",
+      "bbox": [0, 0, 0, 0],
+      "polygon": [[0, 0], [0, 0], [0, 0], [0, 0]],
+      "length_ft": 13,
+      "width_ft": 10,
+      "area_sqft": 130,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BATH",
+      "bbox": [0, 0, 0, 0],
+      "polygon": [[0, 0], [0, 0], [0, 0], [0, 0]],
+      "length_ft": 5,
+      "width_ft": 10,
+      "area_sqft": 50,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BAR",
+      "bbox": [0, 0, 0, 0],
+      "polygon": [[0, 0], [0, 0], [0, 0], [0, 0]],
+      "length_ft": 12,
+      "width_ft": 10,
+      "area_sqft": 120,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "LIVING RM.",
+      "bbox": [0, 0, 0, 0],
+      "polygon": [[0, 0], [0, 0], [0, 0], [0, 0]],
+      "length_ft": 17.583,
+      "width_ft": 12.5,
+      "area_sqft": 219.79,
+      "confidence_pct": 100,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 48,
+    "height_ft": 38,
+    "source": "measured"
+  },
+  "total_area_sqft": 1592.79,
+  "overall_confidence": 100,
+  "units_detected": "feet"
+}
+```

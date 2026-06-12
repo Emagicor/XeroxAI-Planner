@@ -1,0 +1,95 @@
+# pass=floor_plan
+# session_id=534a3bc2-03d4-40f9-901a-49f38407a806
+# page_number=1
+# model=gemini-2.5-flash
+# timestamp=2026-06-12T09-30-45.568716Z
+
+```json
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The page displays two top-down architectural floor plans with room boundaries and labels: 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN'."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor",
+    "confidence_pct": 95,
+    "evidence": "Explicitly labeled 'FIRST FLOOR PLAN' on the lower left side of the drawing."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [80, 290, 250, 450],
+      "polygon": [
+        [80, 290],
+        [250, 290],
+        [250, 450],
+        [80, 450]
+      ],
+      "length_ft": 23.583,
+      "width_ft": 15.667,
+      "area_sqft": 369.08,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [290, 290, 440, 450],
+      "polygon": [
+        [290, 290],
+        [440, 290],
+        [440, 450],
+        [290, 450]
+      ],
+      "length_ft": 24.333,
+      "width_ft": 14.833,
+      "area_sqft": 360.86,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [80, 540, 250, 700],
+      "polygon": [
+        [80, 540],
+        [250, 540],
+        [250, 700],
+        [80, 700]
+      ],
+      "length_ft": 19.333,
+      "width_ft": 15.25,
+      "area_sqft": 294.86,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [290, 540, 440, 700],
+      "polygon": [
+        [290, 540],
+        [440, 540],
+        [440, 700],
+        [290, 700]
+      ],
+      "length_ft": 19.25,
+      "width_ft": 13.5,
+      "area_sqft": 259.88,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 37.917,
+    "height_ft": 43.333,
+    "source": "measured"
+  },
+  "total_area_sqft": 1284.68,
+  "overall_confidence": 90,
+  "units_detected": "feet"
+}
+```

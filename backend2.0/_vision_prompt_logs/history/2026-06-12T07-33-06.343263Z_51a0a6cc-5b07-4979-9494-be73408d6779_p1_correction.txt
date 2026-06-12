@@ -1,0 +1,63 @@
+# pass=correction
+# session_id=51a0a6cc-5b07-4979-9494-be73408d6779
+# page_number=1
+# model=gpt-4o
+# timestamp=2026-06-12T07-33-06.343263Z
+
+{
+  "room_corrections": [
+    {
+      "room_index": 4,
+      "action": "update",
+      "name": "BED ROOM B",
+      "length_ft": 17.916666666666668,
+      "width_ft": 9.0,
+      "area_sqft": 161.25,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": ["Length derived from shared wall with BED ROOM A."],
+      "bbox": [502, 127, 628, 197]
+    },
+    {
+      "room_index": 5,
+      "action": "update",
+      "name": "HALL",
+      "length_ft": 4.166666666666667,
+      "width_ft": 9.0,
+      "area_sqft": 37.5,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": ["Width derived from shared wall with BED ROOM B."],
+      "bbox": [628, 127, 677, 159]
+    },
+    {
+      "room_index": 6,
+      "action": "update",
+      "name": "BATH",
+      "length_ft": 12.5,
+      "width_ft": 9.0,
+      "area_sqft": 112.5,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": ["Length derived from shared wall with GEN. ISRAEL PUTNAM MEMORIAL ROOM.","Width derived from shared wall with BED ROOM B."],
+      "bbox": [759, 127, 859, 209]
+    },
+    {
+      "room_index": 8,
+      "action": "update",
+      "name": "BED ROOM D",
+      "length_ft": 13.5,
+      "width_ft": 18.583333333333332,
+      "area_sqft": 250.875,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": ["Width derived from shared wall with BED ROOM C."],
+      "bbox": [677, 226, 859, 333]
+    }
+  ],
+  "floor_identification": {
+    "floor_label": "SECOND FLOOR PLAN",
+    "confidence_pct": 90,
+    "evidence": "Label at top of floor plan section."
+  }
+}

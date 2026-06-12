@@ -1,0 +1,465 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Top-down room layout with dimensions"
+  },
+  "floor_identification": {
+    "floor_label": null,
+    "confidence_pct": null,
+    "evidence": "Multiple floor plans (First Floor Plan and Second Floor Plan) are present on this page.",
+    "available": false
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [
+        99,
+        290,
+        250,
+        440
+      ],
+      "polygon": [
+        [
+          99,
+          290
+        ],
+        [
+          250,
+          290
+        ],
+        [
+          250,
+          440
+        ],
+        [
+          99,
+          440
+        ]
+      ],
+      "length_ft": 15.67,
+      "width_ft": 8.33,
+      "area_sqft": 130.54,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Derived width by subtracting WEST PARLOR's length (15'3\") from the combined vertical dimension (23'7\") of OLD KITCHEN and WEST PARLOR (23'7\" - 15'3\" = 8'4\")."
+      ]
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [
+        330,
+        290,
+        480,
+        440
+      ],
+      "polygon": [
+        [
+          330,
+          290
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          440
+        ],
+        [
+          330,
+          440
+        ]
+      ],
+      "length_ft": 14.83,
+      "width_ft": 8.33,
+      "area_sqft": 123.54,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Derived width by shared-wall transfer from OLD KITCHEN, which was derived as 8'4\"."
+      ]
+    },
+    {
+      "name": "TOILETS",
+      "bbox": [
+        250,
+        440,
+        330,
+        530
+      ],
+      "polygon": [
+        [
+          250,
+          440
+        ],
+        [
+          330,
+          440
+        ],
+        [
+          330,
+          530
+        ],
+        [
+          250,
+          530
+        ]
+      ],
+      "length_ft": 7.83,
+      "width_ft": 9.33,
+      "area_sqft": 73.06,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [
+        99,
+        530,
+        250,
+        680
+      ],
+      "polygon": [
+        [
+          99,
+          530
+        ],
+        [
+          250,
+          530
+        ],
+        [
+          250,
+          680
+        ],
+        [
+          99,
+          680
+        ]
+      ],
+      "length_ft": 15.25,
+      "width_ft": 15.25,
+      "area_sqft": 232.56,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [
+        330,
+        530,
+        480,
+        680
+      ],
+      "polygon": [
+        [
+          330,
+          530
+        ],
+        [
+          480,
+          530
+        ],
+        [
+          480,
+          680
+        ],
+        [
+          330,
+          680
+        ]
+      ],
+      "length_ft": 13.5,
+      "width_ft": 15.25,
+      "area_sqft": 205.88,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Derived width by shared-wall transfer from WEST PARLOR, which is 15'3\"."
+      ]
+    },
+    {
+      "name": "BED ROOM A",
+      "bbox": [
+        520,
+        290,
+        670,
+        440
+      ],
+      "polygon": [
+        [
+          520,
+          290
+        ],
+        [
+          670,
+          290
+        ],
+        [
+          670,
+          440
+        ],
+        [
+          520,
+          440
+        ]
+      ],
+      "length_ft": 15.0,
+      "width_ft": 9.0,
+      "area_sqft": 135.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "GEN. ISRAEL PUTNAM MEMORIAL ROOM",
+      "bbox": [
+        700,
+        290,
+        850,
+        440
+      ],
+      "polygon": [
+        [
+          700,
+          290
+        ],
+        [
+          850,
+          290
+        ],
+        [
+          850,
+          440
+        ],
+        [
+          700,
+          440
+        ]
+      ],
+      "length_ft": 12.5,
+      "width_ft": 9.0,
+      "area_sqft": 112.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [
+        520,
+        440,
+        670,
+        530
+      ],
+      "polygon": [
+        [
+          520,
+          440
+        ],
+        [
+          670,
+          440
+        ],
+        [
+          670,
+          530
+        ],
+        [
+          520,
+          530
+        ]
+      ],
+      "length_ft": 17.92,
+      "width_ft": 9.0,
+      "area_sqft": 161.28,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "HALL",
+      "bbox": [
+        670,
+        440,
+        700,
+        530
+      ],
+      "polygon": [
+        [
+          670,
+          440
+        ],
+        [
+          700,
+          440
+        ],
+        [
+          700,
+          530
+        ],
+        [
+          670,
+          530
+        ]
+      ],
+      "length_ft": 4.17,
+      "width_ft": 9.0,
+      "area_sqft": 37.53,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Derived width by shared-wall transfer from BED ROOM B, which is 9'0\"."
+      ]
+    },
+    {
+      "name": "BATH",
+      "bbox": [
+        700,
+        440,
+        850,
+        530
+      ],
+      "polygon": [
+        [
+          700,
+          440
+        ],
+        [
+          850,
+          440
+        ],
+        [
+          850,
+          530
+        ],
+        [
+          700,
+          530
+        ]
+      ],
+      "length_ft": 12.5,
+      "width_ft": 9.0,
+      "area_sqft": 112.5,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Derived width by shared-wall transfer from MEMORIAL ROOM and HALL, which are 9'0\"."
+      ]
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [
+        520,
+        530,
+        670,
+        680
+      ],
+      "polygon": [
+        [
+          520,
+          530
+        ],
+        [
+          670,
+          530
+        ],
+        [
+          670,
+          680
+        ],
+        [
+          520,
+          680
+        ]
+      ],
+      "length_ft": 15.58,
+      "width_ft": 18.58,
+      "area_sqft": 289.6,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM D",
+      "bbox": [
+        700,
+        530,
+        850,
+        680
+      ],
+      "polygon": [
+        [
+          700,
+          530
+        ],
+        [
+          850,
+          530
+        ],
+        [
+          850,
+          680
+        ],
+        [
+          700,
+          680
+        ]
+      ],
+      "length_ft": 13.5,
+      "width_ft": 18.58,
+      "area_sqft": 250.83,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Derived width by shared-wall transfer from BED ROOM C, which is 18'7\"."
+      ]
+    },
+    {
+      "name": "HALL",
+      "bbox": [
+        670,
+        680,
+        700,
+        720
+      ],
+      "polygon": [
+        [
+          670,
+          680
+        ],
+        [
+          700,
+          680
+        ],
+        [
+          700,
+          720
+        ],
+        [
+          670,
+          720
+        ]
+      ],
+      "length_ft": 8.08,
+      "width_ft": 3.0,
+      "area_sqft": 24.24,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": false,
+    "width_ft": null,
+    "height_ft": null,
+    "source": null
+  },
+  "total_area_sqft": 1889.66,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}

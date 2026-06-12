@@ -1,0 +1,42 @@
+{
+  "room_corrections": [],
+  "rooms_added": [
+    {
+      "name": "ATTIC",
+      "bbox": [
+        650,
+        220,
+        903,
+        278
+      ],
+      "polygon": null,
+      "length_ft": 27.67,
+      "width_ft": null,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "HALL",
+      "bbox": [
+        745,
+        452,
+        805,
+        555
+      ],
+      "polygon": null,
+      "length_ft": null,
+      "width_ft": 4.17,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "floor_identification": {
+    "floor_label": "First Floor and Second Floor",
+    "confidence_pct": 100,
+    "evidence": "Labels 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' are clearly printed at the bottom of each plan."
+  }
+}

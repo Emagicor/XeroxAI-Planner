@@ -1,0 +1,127 @@
+# pass=floor_plan
+# session_id=a0603d51-af52-4779-bdcf-2df4ddbef7e8
+# page_number=1
+# model=gemini-3.5-flash
+# timestamp=2026-06-11T08-02-08.939151Z
+
+```json
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "The image shows the top-down architectural floor plans for the First Floor and Second Floor of the Gen. Israel Putnam House, complete with walls, room labels, and dimensions."
+  },
+  "floor_identification": {
+    "floor_label": "First Floor and Second Floor",
+    "confidence_pct": 100,
+    "evidence": "Labels 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' are clearly printed at the bottom of each plan."
+  },
+  "rooms": [
+    {
+      "name": "OLD KITCHEN",
+      "bbox": [75, 280, 215, 450],
+      "polygon": [
+        [75, 280],
+        [215, 280],
+        [215, 450],
+        [75, 450]
+      ],
+      "length_ft": 22.583,
+      "width_ft": 15.25,
+      "area_sqft": 344.4,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING ROOM",
+      "bbox": [215, 280, 415, 450],
+      "polygon": [
+        [215, 280],
+        [415, 280],
+        [415, 450],
+        [215, 450]
+      ],
+      "length_ft": 24.333,
+      "width_ft": 14.833,
+      "area_sqft": 360.9,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST PARLOR",
+      "bbox": [75, 550, 215, 770],
+      "polygon": [
+        [75, 550],
+        [215, 550],
+        [215, 770],
+        [75, 770]
+      ],
+      "length_ft": 19.333,
+      "width_ft": 15.25,
+      "area_sqft": 294.9,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST PARLOR",
+      "bbox": [290, 550, 415, 770],
+      "polygon": [
+        [290, 550],
+        [415, 550],
+        [415, 770],
+        [290, 770]
+      ],
+      "length_ft": 19.0,
+      "width_ft": 13.5,
+      "area_sqft": 256.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM B",
+      "bbox": [550, 455, 710, 560],
+      "polygon": [
+        [550, 455],
+        [710, 455],
+        [710, 560],
+        [550, 560]
+      ],
+      "length_ft": 9.0,
+      "width_ft": 17.917,
+      "area_sqft": 161.3,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM C",
+      "bbox": [550, 560, 700, 770],
+      "polygon": [
+        [550, 560],
+        [700, 560],
+        [700, 770],
+        [550, 770]
+      ],
+      "length_ft": 18.083,
+      "width_ft": 15.583,
+      "area_sqft": 281.8,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": true,
+    "width_ft": 37.917,
+    "height_ft": 43.333,
+    "source": "measured"
+  },
+  "total_area_sqft": 3286.0,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}
+```

@@ -1,0 +1,29 @@
+# pass=correction
+# session_id=bbb2297a-6bf5-42f2-b2c7-2f355e4d3273
+# page_number=1
+# model=gemini-2.5-flash
+# timestamp=2026-06-12T08-12-42.117820Z
+
+```json
+{
+  "room_corrections": [
+    {
+      "room_index": 8,
+      "action": "update",
+      "name": "BATH",
+      "length_ft": 12.5,
+      "width_ft": 12.333,
+      "area_sqft": 154.1625,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": [],
+      "bbox": [698, 478, 890, 602]
+    }
+  ],
+  "floor_identification": {
+    "floor_label": "Unknown",
+    "confidence_pct": 0,
+    "evidence": "The page contains two distinct floor plans labeled 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN'. The schema only allows for a single floor_label."
+  }
+}
+```

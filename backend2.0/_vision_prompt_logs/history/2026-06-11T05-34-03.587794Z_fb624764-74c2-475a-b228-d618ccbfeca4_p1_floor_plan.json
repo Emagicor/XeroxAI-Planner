@@ -1,0 +1,188 @@
+{
+  "page_classification": {
+    "is_floor_plan": true,
+    "page_type": "floorplan",
+    "reason": "Top-down room layout with dimensions"
+  },
+  "floor_identification": {
+    "floor_label": "First Floor",
+    "confidence_pct": 95,
+    "evidence": "Title block says FIRST FLOOR PLAN"
+  },
+  "rooms": [
+    {
+      "name": "OLD-KITCHEN",
+      "bbox": [
+        230,
+        150,
+        485,
+        430
+      ],
+      "polygon": [
+        [
+          230,
+          150
+        ],
+        [
+          485,
+          150
+        ],
+        [
+          485,
+          430
+        ],
+        [
+          230,
+          430
+        ]
+      ],
+      "length_ft": 15,
+      "width_ft": 11,
+      "area_sqft": 165,
+      "confidence_pct": 97,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "DINING-ROOM",
+      "bbox": [
+        490,
+        150,
+        745,
+        430
+      ],
+      "polygon": [
+        [
+          490,
+          150
+        ],
+        [
+          745,
+          150
+        ],
+        [
+          745,
+          430
+        ],
+        [
+          490,
+          430
+        ]
+      ],
+      "length_ft": 15,
+      "width_ft": 11,
+      "area_sqft": 165,
+      "confidence_pct": 97,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "TOILETS",
+      "bbox": [
+        355,
+        435,
+        410,
+        490
+      ],
+      "polygon": [
+        [
+          355,
+          435
+        ],
+        [
+          410,
+          435
+        ],
+        [
+          410,
+          490
+        ],
+        [
+          355,
+          490
+        ]
+      ],
+      "length_ft": 4.5,
+      "width_ft": 4,
+      "area_sqft": 18,
+      "confidence_pct": 90,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WEST-PARLOR",
+      "bbox": [
+        230,
+        495,
+        485,
+        765
+      ],
+      "polygon": [
+        [
+          230,
+          495
+        ],
+        [
+          485,
+          495
+        ],
+        [
+          485,
+          765
+        ],
+        [
+          230,
+          765
+        ]
+      ],
+      "length_ft": 15,
+      "width_ft": 11,
+      "area_sqft": 165,
+      "confidence_pct": 97,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "EAST-PARLOR",
+      "bbox": [
+        490,
+        495,
+        745,
+        765
+      ],
+      "polygon": [
+        [
+          490,
+          495
+        ],
+        [
+          745,
+          495
+        ],
+        [
+          745,
+          765
+        ],
+        [
+          490,
+          765
+        ]
+      ],
+      "length_ft": 15,
+      "width_ft": 11,
+      "area_sqft": 165,
+      "confidence_pct": 97,
+      "dimension_source": "measured",
+      "assumptions": []
+    }
+  ],
+  "layout_dimensions": {
+    "available": false,
+    "width_ft": null,
+    "height_ft": null,
+    "source": null
+  },
+  "total_area_sqft": 678,
+  "overall_confidence": 95,
+  "units_detected": "feet"
+}
