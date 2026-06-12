@@ -45,12 +45,12 @@ class Settings(BaseSettings):
     vision_image_format: str = "png"   # png | jpeg — format sent to Gemini
 
     # ── Vision provider ───────────────────────────────────────────────────────
-    vision_provider: str = "gemini"    # gemini | openai | groq
+    vision_provider: str = "gemini"    # gemini | openai | groq | florence2 | qwen25_vl
     gemini_model: str = "gemini-3.5-flash"
     openai_model: str = "gpt-4o"
     groq_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
     # Correction pass (FLOOR_PLAN_PROMPT → CORRECTION_PROMPT); empty = same as extraction
-    vision_correction_provider: str = ""   # gemini | openai | groq
+    vision_correction_provider: str = ""   # gemini | openai | groq | florence2 | qwen25_vl
     vision_correction_model: str = ""      # e.g. gemini-2.5-flash, gpt-4o
     gemini_api_key: str = ""
     openai_api_key: str = ""
@@ -90,6 +90,11 @@ def reload_settings() -> Settings:
     try:
         from providers.vision.factory import clear_vision_provider_cache
         clear_vision_provider_cache()
+    except ImportError:
+        pass
+    try:
+        from providers.vision.florence2 import clear_florence2_model_cache
+        clear_florence2_model_cache()
     except ImportError:
         pass
     return get_settings()

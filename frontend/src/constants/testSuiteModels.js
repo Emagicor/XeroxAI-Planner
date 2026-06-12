@@ -82,6 +82,38 @@ export const TEST_SUITE_MODELS = [
 
   },
 
+  {
+
+    id: 'florence2-large',
+
+    label: 'Florence-2 Large',
+
+    description: 'Local HuggingFace Florence-2 vision (OCR / caption tasks).',
+
+    matchesAnalyzeTab: false,
+
+    provider: 'florence2',
+
+    model: 'microsoft/Florence-2-large',
+
+  },
+
+  {
+
+    id: 'qwen25-vl-7b',
+
+    label: 'Qwen2.5-VL 7B',
+
+    description: 'Hugging Face Inference — multimodal JSON floor-plan extraction.',
+
+    matchesAnalyzeTab: false,
+
+    provider: 'qwen25_vl',
+
+    model: 'Qwen/Qwen2.5-VL-7B-Instruct',
+
+  },
+
 ]
 
 

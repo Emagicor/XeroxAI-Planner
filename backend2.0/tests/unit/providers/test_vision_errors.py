@@ -1,4 +1,5 @@
 from providers.vision.errors import (
+    classify_florence2_error,
     classify_gemini_error,
     classify_openai_compatible_error,
     is_billing_credits_depleted,
@@ -66,10 +67,25 @@ def test_openai_unknown_error_returns_raw():
     assert msg == "upstream connect error"
 
 
+def test_florence2_missing_deps_returns_raw():
+    exc = Exception("No module named 'transformers'")
+    code, msg = classify_florence2_error(exc, model="microsoft/Florence-2-large")
+    assert code == "FLORENCE2_ERROR"
+    assert msg == str(exc)
+
+
+def test_florence2_oom_returns_raw():
+    exc = Exception("CUDA out of memory")
+    code, msg = classify_florence2_error(exc, model="microsoft/Florence-2-large")
+    assert code == "FLORENCE2_ERROR"
+    assert msg == "CUDA out of memory"
+
+
 def test_provider_failure_codes():
     from providers.vision.errors import PROVIDER_FAILURE_CODES, is_provider_failure_code
 
     assert is_provider_failure_code("GEMINI_ERROR")
+    assert is_provider_failure_code("FLORENCE2_ERROR")
     assert is_provider_failure_code("QUOTA_EXCEEDED")
     assert not is_provider_failure_code("INTERNAL_ERROR")
     assert "GEMINI_ERROR" in PROVIDER_FAILURE_CODES

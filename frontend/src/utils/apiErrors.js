@@ -18,6 +18,8 @@ export const SERVER_PROVIDER_ERROR_CODES = new Set([
   'GEMINI_ERROR',
   'OPENAI_ERROR',
   'GROQ_ERROR',
+  'FLORENCE2_ERROR',
+  'QWEN25_VL_ERROR',
   'VISION_PROVIDER_ERROR',
   'JSON_PARSE_ERROR',
 ])
@@ -28,7 +30,7 @@ const SERVER_ERROR_CODES = new Set([
 ])
 
 const PROVIDER_FAILURE_MESSAGE_MARKERS =
-  /503|429|unavailable|high demand|api key|quota|rate limit|gemini|openai|groq/i
+  /503|429|unavailable|high demand|api key|quota|rate limit|gemini|openai|groq|florence2|florence-2|qwen25_vl|qwen2.5-vl|huggingface/i
 
 export function isProviderFailureCode(code) {
   return Boolean(code && SERVER_PROVIDER_ERROR_CODES.has(code))

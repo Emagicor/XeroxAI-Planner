@@ -12,6 +12,8 @@ PROVIDER_FAILURE_CODES = frozenset({
     "GEMINI_ERROR",
     "OPENAI_ERROR",
     "GROQ_ERROR",
+    "FLORENCE2_ERROR",
+    "QWEN25_VL_ERROR",
     "VISION_PROVIDER_ERROR",
     "JSON_PARSE_ERROR",
 })
@@ -119,3 +121,46 @@ def classify_openai_compatible_error(
         return ("QUOTA_EXCEEDED", raw)
 
     return (fallback_code, raw)
+
+
+def classify_florence2_error(exc: BaseException, *, model: str) -> tuple[str, str]:
+    """Return (error_code, message). Message is always the provider's raw error text."""
+    raw = str(exc).strip()
+    lower = raw.lower()
+
+    if is_invalid_api_key(exc) or "401" in lower or "unauthorized" in lower:
+        return ("INVALID_API_KEY", raw)
+    if is_model_not_found(exc):
+        return ("MODEL_NOT_FOUND", raw)
+    if is_quota_exceeded(exc):
+        return ("QUOTA_EXCEEDED", raw)
+    if "out of memory" in lower or "cuda" in lower and "memory" in lower:
+        return ("FLORENCE2_ERROR", raw)
+    if "no module named" in lower or "not installed" in lower:
+        return ("FLORENCE2_ERROR", raw)
+
+    return ("FLORENCE2_ERROR", raw)
+
+
+def classify_qwen25_vl_error(exc: BaseException, *, model: str) -> tuple[str, str]:
+    """Return (error_code, message). Message is always the provider's raw error text."""
+    raw = str(exc).strip()
+    lower = raw.lower()
+
+    if is_invalid_api_key(exc) or "401" in lower or "unauthorized" in lower:
+        return ("INVALID_API_KEY", raw)
+    if is_model_not_found(exc):
+        return ("MODEL_NOT_FOUND", raw)
+    if is_quota_exceeded(exc):
+        return ("QUOTA_EXCEEDED", raw)
+    if "410" in lower and "router" in lower:
+        return (
+            "QWEN25_VL_ERROR",
+            "Hugging Face legacy Inference API is deprecated. "
+            "Set QWEN25_VL_INFERENCE_PROVIDER=auto or a supported provider "
+            "(e.g. fireworks-ai, together).",
+        )
+    if "no module named" in lower or "not installed" in lower:
+        return ("QWEN25_VL_ERROR", raw)
+
+    return ("QWEN25_VL_ERROR", raw)

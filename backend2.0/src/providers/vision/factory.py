@@ -61,6 +61,13 @@ def _resolve_correction_provider_model(
     return provider, model
 
 
+_QWEN25_VL_ALIASES = frozenset({"qwen25_vl", "qwen2.5-vl", "qwen-vl", "qwen25-vl"})
+
+
+def _is_qwen25_vl_provider(provider: str) -> bool:
+    return provider.lower() in _QWEN25_VL_ALIASES
+
+
 def _build_provider(
     override: VisionOverride | None = None,
     *,
@@ -83,11 +90,19 @@ def _build_provider(
         from providers.vision.groq import GroqProvider
         return GroqProvider(model=model)
 
+    if provider in ("florence2", "florence-2"):
+        from providers.vision.florence2 import Florence2Provider
+        return Florence2Provider(model=model)
+
+    if _is_qwen25_vl_provider(provider):
+        from providers.vision.qwen25_vl import Qwen25VLProvider
+        return Qwen25VLProvider(model=model)
+
     raise ZeroxError(
         code="UNKNOWN_PROVIDER",
         message=(
             f"Unknown vision provider '{provider}'. "
-            "Set VISION_PROVIDER=gemini, openai, or groq."
+            "Set VISION_PROVIDER=gemini, openai, groq, florence2, or qwen25_vl."
         ),
     )
 
@@ -136,10 +151,18 @@ def create_correction_validator(override: VisionOverride | None = None) -> Visio
         from providers.vision.groq import GroqProvider
         return GroqProvider(model=model)
 
+    if provider in ("florence2", "florence-2"):
+        from providers.vision.florence2 import Florence2Provider
+        return Florence2Provider(model=model)
+
+    if _is_qwen25_vl_provider(provider):
+        from providers.vision.qwen25_vl import Qwen25VLProvider
+        return Qwen25VLProvider(model=model)
+
     raise ZeroxError(
         code="UNKNOWN_PROVIDER",
         message=(
             f"Unknown vision correction provider '{provider}'. "
-            "Set VISION_CORRECTION_PROVIDER=gemini, openai, or groq."
+            "Set VISION_CORRECTION_PROVIDER=gemini, openai, groq, florence2, or qwen25_vl."
         ),
     )
