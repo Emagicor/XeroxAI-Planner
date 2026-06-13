@@ -52,6 +52,42 @@ class PageSchema(BaseModel):
     clip_preview:           str | None = None
 
 
+class TokenUsageSchema(BaseModel):
+    prompt_token_count: int | None = None
+    candidates_token_count: int | None = None
+    thoughts_token_count: int | None = None
+    total_token_count: int | None = None
+
+
+class VisionPassSchema(BaseModel):
+    pass_number: int = Field(alias="pass")
+    pass_kind: str
+    provider: str
+    model: str | None = None
+    page_number: int | None = None
+    prompt_token_count: int | None = None
+    candidates_token_count: int | None = None
+    thoughts_token_count: int | None = None
+    total_token_count: int | None = None
+    correction_mode: str | None = None
+    correction_fields: dict[str, Any] | None = None
+
+    model_config = {"populate_by_name": True}
+
+
+class VisionModelRefSchema(BaseModel):
+    provider: str | None = None
+    model: str | None = None
+
+
+class VisionUsageSchema(BaseModel):
+    api_calls: int = 0
+    passes: list[VisionPassSchema] = []
+    pages: list[dict[str, Any]] = []
+    totals: TokenUsageSchema = Field(default_factory=TokenUsageSchema)
+    models: dict[str, VisionModelRefSchema] = Field(default_factory=dict)
+
+
 class AnalyzeResponseSchema(BaseModel):
     job_id:             str
     filename:           str
@@ -68,6 +104,7 @@ class AnalyzeResponseSchema(BaseModel):
     has_assumed:        bool
     has_low_confidence: bool
     created_at:         datetime
+    vision_usage:       VisionUsageSchema | None = None
 
 
 class ExportRequestSchema(BaseModel):

@@ -2,16 +2,27 @@
 providers/vision/factory.py
 
 Returns the configured VisionProvider based on VISION_PROVIDER env var.
-Add new providers here — zero changes needed in pipeline code.
+All providers share the same extraction + correction pipeline.
 """
 from __future__ import annotations
-
-from functools import lru_cache
 
 from config.settings import get_settings
 from domain.exceptions import ZeroxError
 from providers.vision.base import VisionProvider
+from providers.vision.instructions import VALIDATOR_SYSTEM_INSTRUCTION
 from providers.vision.request_config import VisionOverride
+
+
+def resolve_extraction_provider(override: VisionOverride | None) -> str:
+    """Public helper — provider used for pass-1 extraction."""
+    return _resolve_provider_name(override)
+
+
+def resolve_correction_provider_model(
+    override: VisionOverride | None,
+) -> tuple[str, str | None]:
+    """Public helper — provider/model configured for pass-2 correction."""
+    return _resolve_correction_provider_model(override)
 
 
 def _resolve_provider_name(override: VisionOverride | None) -> str:
@@ -61,18 +72,12 @@ def _resolve_correction_provider_model(
     return provider, model
 
 
-_QWEN25_VL_ALIASES = frozenset({"qwen25_vl", "qwen2.5-vl", "qwen-vl", "qwen25-vl"})
-
-
-def _is_qwen25_vl_provider(provider: str) -> bool:
-    return provider.lower() in _QWEN25_VL_ALIASES
-
-
 def _build_provider(
     override: VisionOverride | None = None,
     *,
     provider: str | None = None,
     model: str | None = None,
+    system_instruction: str | None = None,
 ) -> VisionProvider:
     """Construct a new provider instance (no shared request state)."""
     provider = provider or _resolve_provider_name(override)
@@ -80,45 +85,28 @@ def _build_provider(
 
     if provider == "gemini":
         from providers.vision.gemini import GeminiProvider
-        return GeminiProvider(model=model)
+        return GeminiProvider(system_instruction=system_instruction, model=model)
 
     if provider == "openai":
         from providers.vision.openai import OpenAIProvider
-        return OpenAIProvider(model=model)
+        return OpenAIProvider(system_instruction=system_instruction, model=model)
 
     if provider == "groq":
         from providers.vision.groq import GroqProvider
-        return GroqProvider(model=model)
-
-    if provider in ("florence2", "florence-2"):
-        from providers.vision.florence2 import Florence2Provider
-        return Florence2Provider(model=model)
-
-    if _is_qwen25_vl_provider(provider):
-        from providers.vision.qwen25_vl import Qwen25VLProvider
-        return Qwen25VLProvider(model=model)
+        return GroqProvider(system_instruction=system_instruction, model=model)
 
     raise ZeroxError(
         code="UNKNOWN_PROVIDER",
         message=(
             f"Unknown vision provider '{provider}'. "
-            "Set VISION_PROVIDER=gemini, openai, groq, florence2, or qwen25_vl."
+            "Set VISION_PROVIDER=gemini, openai, or groq."
         ),
     )
 
 
-@lru_cache(maxsize=1)
-def get_vision_provider() -> VisionProvider:
-    """
-    Cached singleton for long-lived processes (e.g. health checks).
-    Pipeline uses create_vision_provider() for per-request isolation.
-    """
-    return _build_provider()
-
-
 def clear_vision_provider_cache() -> None:
-    """Drop cached provider after .env / API key changes."""
-    get_vision_provider.cache_clear()
+    """No-op — providers are created per request (kept for settings reload hook)."""
+    return None
 
 
 def create_vision_provider(override: VisionOverride | None = None) -> VisionProvider:
@@ -133,36 +121,13 @@ def create_correction_validator(override: VisionOverride | None = None) -> Visio
     """
     Provider for the correction pass (CORRECTION_PROMPT).
 
+    Uses VALIDATOR_SYSTEM_INSTRUCTION on all providers (Gemini, OpenAI, Groq).
     Provider/model can differ from extraction via VISION_CORRECTION_* env vars.
-    Gemini uses a dedicated validator system instruction; OpenAI/Groq use the
-    correction prompt in the user message (same chat API path as extraction).
     """
     provider, model = _resolve_correction_provider_model(override)
-
-    if provider == "gemini":
-        from providers.vision.gemini import VALIDATOR_SYSTEM_INSTRUCTION, GeminiProvider
-        return GeminiProvider(system_instruction=VALIDATOR_SYSTEM_INSTRUCTION, model=model)
-
-    if provider == "openai":
-        from providers.vision.openai import OpenAIProvider
-        return OpenAIProvider(model=model)
-
-    if provider == "groq":
-        from providers.vision.groq import GroqProvider
-        return GroqProvider(model=model)
-
-    if provider in ("florence2", "florence-2"):
-        from providers.vision.florence2 import Florence2Provider
-        return Florence2Provider(model=model)
-
-    if _is_qwen25_vl_provider(provider):
-        from providers.vision.qwen25_vl import Qwen25VLProvider
-        return Qwen25VLProvider(model=model)
-
-    raise ZeroxError(
-        code="UNKNOWN_PROVIDER",
-        message=(
-            f"Unknown vision correction provider '{provider}'. "
-            "Set VISION_CORRECTION_PROVIDER=gemini, openai, groq, florence2, or qwen25_vl."
-        ),
+    return _build_provider(
+        override,
+        provider=provider,
+        model=model,
+        system_instruction=VALIDATOR_SYSTEM_INSTRUCTION,
     )

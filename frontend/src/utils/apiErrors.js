@@ -1,5 +1,6 @@
 import { useApiStore } from '../stores/apiStore'
 import { logError } from './logger'
+import { isProduction } from '../config/features'
 
 export const ERROR_CODES = {
   NETWORK: 'NETWORK_ERROR',
@@ -18,8 +19,6 @@ export const SERVER_PROVIDER_ERROR_CODES = new Set([
   'GEMINI_ERROR',
   'OPENAI_ERROR',
   'GROQ_ERROR',
-  'FLORENCE2_ERROR',
-  'QWEN25_VL_ERROR',
   'VISION_PROVIDER_ERROR',
   'JSON_PARSE_ERROR',
 ])
@@ -30,7 +29,52 @@ const SERVER_ERROR_CODES = new Set([
 ])
 
 const PROVIDER_FAILURE_MESSAGE_MARKERS =
-  /503|429|unavailable|high demand|api key|quota|rate limit|gemini|openai|groq|florence2|florence-2|qwen25_vl|qwen2.5-vl|huggingface/i
+  /503|429|unavailable|high demand|api key|quota|rate limit|gemini|openai|groq/i
+
+/** User-safe copy for provider codes (production hides technical detail). */
+const PRODUCTION_USER_MESSAGES = {
+  JSON_PARSE_ERROR:
+    'The analysis could not be completed because the vision model returned an unreadable response. Please try again.',
+  MISSING_API_KEY:
+    'The analysis service is not fully configured. Please contact support.',
+  INVALID_API_KEY:
+    'The analysis service could not authenticate with the vision provider. Please contact support.',
+  QUOTA_EXCEEDED:
+    'The vision provider rate limit was reached. Please wait a moment and try again.',
+  BILLING_CREDITS_DEPLETED:
+    'Vision provider credits are depleted. Please contact your administrator.',
+  MODEL_NOT_FOUND:
+    'The configured vision model is unavailable. Please contact support.',
+  GEMINI_ERROR:
+    'The Gemini vision service returned an error. Please try again shortly.',
+  OPENAI_ERROR:
+    'The OpenAI vision service returned an error. Please try again shortly.',
+  GROQ_ERROR:
+    'The Groq vision service returned an error. Please try again shortly.',
+  VISION_PROVIDER_ERROR:
+    'The vision provider returned an error. Please try again shortly.',
+  INTERNAL_ERROR:
+    'Something went wrong while analyzing your file. Please try again.',
+}
+
+function backendOfflineMessage(baseUrl) {
+  if (isProduction) {
+    return 'Cannot reach the analysis service. Check your connection and try again.'
+  }
+  return `Cannot reach the backend at ${baseUrl}. Start it with .\\start-backend.ps1 in backend2.0, then retry.`
+}
+
+function backendOfflineTitle() {
+  return isProduction ? 'Service unavailable' : 'Backend not running'
+}
+
+export function userFacingProviderMessage(code, serverMessage) {
+  if (!code) return serverMessage
+  if (isProduction && PRODUCTION_USER_MESSAGES[code]) {
+    return PRODUCTION_USER_MESSAGES[code]
+  }
+  return serverMessage
+}
 
 export function isProviderFailureCode(code) {
   return Boolean(code && SERVER_PROVIDER_ERROR_CODES.has(code))
@@ -45,14 +89,15 @@ export function isProviderFailureMessage(message) {
  * @param {{ code?: string, message?: string }} payload
  */
 export function createApiErrorFromPayload(payload, meta = {}) {
-  const message = payload?.message ?? 'Analysis failed'
+  const serverMessage = payload?.message ?? 'Analysis failed'
   const code = payload?.code ?? undefined
+  const message = userFacingProviderMessage(code, serverMessage)
   const apiError = new Error(message)
   apiError.isApiError = true
   apiError.code = isProviderFailureCode(code) ? code : code ?? ERROR_CODES.HTTP
   apiError.userTitle = isProviderFailureCode(code) ? 'Vision provider error' : 'Analysis failed'
   apiError.userMessage = message
-  apiError.technicalMessage = message
+  apiError.technicalMessage = serverMessage
   apiError.context = meta.context
   apiError.url = meta.url
   return apiError
@@ -88,13 +133,11 @@ export function normalizeNetworkError(err, meta = {}) {
     /failed to fetch|networkerror|load failed|network request failed/i.test(message)
 
   const apiError = new Error(
-    isFetchFailure
-      ? `Cannot reach the backend at ${baseUrl}. Start it with .\\start-backend.ps1 in backend2.0, then retry.`
-      : message,
+    isFetchFailure ? backendOfflineMessage(baseUrl) : message,
   )
   apiError.isApiError = true
   apiError.code = isFetchFailure ? ERROR_CODES.BACKEND_OFFLINE : ERROR_CODES.NETWORK
-  apiError.userTitle = isFetchFailure ? 'Backend not running' : 'Connection error'
+  apiError.userTitle = isFetchFailure ? backendOfflineTitle() : 'Connection error'
   apiError.userMessage = apiError.message
   apiError.technicalMessage = message
   apiError.context = meta.context
@@ -123,7 +166,7 @@ export async function parseApiErrorResponse(res, meta = {}) {
     `Request failed (${res.status})`
 
   if (code && SERVER_ERROR_CODES.has(code) && serverMessage) {
-    message = serverMessage
+    message = userFacingProviderMessage(code, serverMessage)
   }
 
   const apiError = new Error(message)

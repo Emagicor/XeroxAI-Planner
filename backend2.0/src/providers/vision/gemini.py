@@ -1,21 +1,12 @@
 """
-
-providers/vision/gemini.py
-
-
+Gemini vision provider.
 
 Each vision call uses a new GenerativeModel instance (no chat history reuse).
-
-Quota/auth errors fail immediately (no app-level retry). Each call uses a
-bounded request timeout so provider outages do not leave the UI spinning.
-
+Quota/auth errors fail immediately. Each call uses a bounded request timeout.
 """
-
 from __future__ import annotations
 
 import base64
-import json
-import re
 
 import google.generativeai as genai
 
@@ -24,19 +15,19 @@ from domain.exceptions import ProviderError
 from providers.vision.base import ProviderResponse, VisionProvider
 from providers.vision.errors import classify_gemini_error
 from providers.vision.gemini_usage import parse_gemini_usage_metadata
+from providers.vision.instructions import (
+    EXTRACTOR_SYSTEM_INSTRUCTION,
+    VALIDATOR_SYSTEM_INSTRUCTION,
+)
 from providers.vision.retry import call_with_transient_retry
 
-EXTRACTOR_SYSTEM_INSTRUCTION = (
-    "You analyze ONE architectural sheet image per request. "
-    "Each request is independent — ignore any prior images, sessions, or JSON outputs. "
-    "Never reuse room data from another document."
-)
+__all__ = [
+    "GeminiProvider",
+    "EXTRACTOR_SYSTEM_INSTRUCTION",
+    "VALIDATOR_SYSTEM_INSTRUCTION",
+]
 
-VALIDATOR_SYSTEM_INSTRUCTION = (
-    "You verify flagged low-confidence fields and find rooms missed by pass 1. "
-    "Return compact room_corrections + rooms_added JSON — never re-output the full schema. "
-    "High-confidence pass-1 rooms stay frozen. Each request is independent."
-)
+_VISION_MAX_OUTPUT_TOKENS = 4096
 
 
 class GeminiProvider(VisionProvider):
@@ -66,6 +57,8 @@ class GeminiProvider(VisionProvider):
             generation_config=genai.GenerationConfig(
                 temperature=0,
                 top_p=1,
+                # max_output_tokens=_VISION_MAX_OUTPUT_TOKENS,
+                response_mime_type="application/json",
             ),
         )
 
@@ -80,7 +73,6 @@ class GeminiProvider(VisionProvider):
             "mime_type": mime_type,
             "data": base64.b64encode(bytes(image_bytes)).decode(),
         }
-        # Fail fast with a bounded wait — SDK transport retries can otherwise hang the UI.
         response = model.generate_content(
             [prompt, image_part],
             request_options={"timeout": self._request_timeout},
@@ -115,16 +107,3 @@ class GeminiProvider(VisionProvider):
             transient_retries=self._transient_retries,
             on_error=self._raise_provider_error,
         )
-
-
-def parse_provider_json(text: str) -> dict:
-    cleaned = re.sub(r"```(?:json)?|```", "", text).strip()
-    cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError as exc:
-        raise ProviderError(
-            code="JSON_PARSE_ERROR",
-            message=f"Model returned invalid JSON: {exc}",
-            details={"raw_snippet": cleaned[:300]},
-        ) from exc

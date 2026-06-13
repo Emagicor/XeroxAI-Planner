@@ -80,6 +80,3 @@ UNIT_LABELS: dict[str, str] = {
 METERS_TO_FEET = 3.28084
 MM_TO_FEET = 1 / 304.8
 CM_TO_FEET = 1 / 30.48
-
-# ── Vision / analysis (legacy backend defaults) ───────────────────────────────
-MAX_ANALYSIS_ATTEMPTS = 3

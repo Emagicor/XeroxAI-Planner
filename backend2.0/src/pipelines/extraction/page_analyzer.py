@@ -33,9 +33,15 @@ from prompts.floor_plan import (
 )
 from providers.vision.base import VisionProvider
 from providers.vision.base import TokenUsage
-from providers.vision.factory import create_correction_validator, create_vision_provider
+from domain.entities.vision_usage import VisionPassRecord, VisionUsageSnapshot
+from providers.vision.factory import (
+    create_correction_validator,
+    create_vision_provider,
+    resolve_correction_provider_model,
+    resolve_extraction_provider,
+)
 from providers.vision.request_config import VisionOverride
-from providers.vision.gemini import parse_provider_json
+from providers.vision.json_parse import parse_provider_json
 
 log = structlog.get_logger(__name__)
 
@@ -104,6 +110,22 @@ def _should_run_correction(data: dict, settings) -> bool:
     return targets.has_targets
 
 
+def _correction_fields_payload(
+    *,
+    correction_mode: str,
+    targets,
+    pass1_text: str | None = None,
+) -> dict:
+    """Describe pass-2 payload without embedding full pass-1 raw text."""
+    if correction_mode == "full_fallback":
+        return {
+            "mode": "full_fallback",
+            "includes_pass1_raw_text": True,
+            "pass1_text_length": len(pass1_text or ""),
+        }
+    return targets.to_prompt_payload()
+
+
 def _vision_analyze(
     provider: VisionProvider,
     preprocessed_bytes: bytes,
@@ -112,7 +134,7 @@ def _vision_analyze(
     session_id: str,
     page_number: int,
     vision_override: VisionOverride | None = None,
-) -> dict:
+) -> tuple[dict, VisionUsageSnapshot]:
     """
     Run 1–2 vision calls per page (settings-controlled):
       - Pass 1: full floor-plan extraction.
@@ -123,11 +145,23 @@ def _vision_analyze(
     prompt1 = isolated_floor_plan_prompt(session_id, page_number)
     api_calls = 0
     page_usage = TokenUsage()
+    pass_records: list[VisionPassRecord] = []
+    extraction_provider = resolve_extraction_provider(vision_override)
 
     with VISION_API_LOCK:
         r1 = provider.analyze_image(preprocessed_bytes, vision_mime, prompt1)
         api_calls += 1
         page_usage = page_usage.add(r1.usage)
+        pass_records.append(
+            VisionPassRecord(
+                pass_number=1,
+                pass_kind="extraction",
+                provider=extraction_provider,
+                model=r1.model_used,
+                usage=r1.usage or TokenUsage(),
+                page_number=page_number,
+            )
+        )
         _log_usage(r1, pass_num=1, page_number=page_number)
         log_vision_pass_output(
             pass_kind="floor_plan",
@@ -160,12 +194,31 @@ def _vision_analyze(
                 )
                 correction_mode = "selective"
 
+            correction_provider, correction_model_config = resolve_correction_provider_model(
+                vision_override
+            )
             validator = create_correction_validator(vision_override)
             r2 = validator.analyze_image(
                 preprocessed_bytes, vision_mime, correction_prompt
             )
             api_calls += 1
             page_usage = page_usage.add(r2.usage)
+            pass_records.append(
+                VisionPassRecord(
+                    pass_number=2,
+                    pass_kind="correction",
+                    provider=correction_provider,
+                    model=r2.model_used or correction_model_config,
+                    usage=r2.usage or TokenUsage(),
+                    page_number=page_number,
+                    correction_mode=correction_mode,
+                    correction_fields=_correction_fields_payload(
+                        correction_mode=correction_mode,
+                        targets=targets,
+                        pass1_text=r1.text if correction_mode == "full_fallback" else None,
+                    ),
+                )
+            )
             _log_usage(r2, pass_num=2, page_number=page_number)
             log_vision_pass_output(
                 pass_kind="correction",
@@ -203,7 +256,13 @@ def _vision_analyze(
             api_calls=api_calls,
             **page_usage.as_log_fields(),
         )
-    return data
+    usage_snapshot = VisionUsageSnapshot(
+        passes=pass_records,
+        totals=page_usage,
+        api_calls=api_calls,
+        page_number=page_number,
+    )
+    return data, usage_snapshot
 
 
 def _log_usage(response, pass_num: int, *, page_number: int) -> None:
@@ -244,12 +303,12 @@ def analyze_single_page(
     page_number: int,
     from_pdf: bool = False,
     vision_override: VisionOverride | None = None,
-) -> dict:
+) -> tuple[dict, VisionUsageSnapshot]:
     preprocessed, vision_mime = preprocess_image(
         bytes(image_bytes),
         preserve_colors=from_pdf,
     )
-    data = _vision_analyze(
+    data, usage_snapshot = _vision_analyze(
         provider,
         preprocessed,
         vision_mime,
@@ -261,7 +320,7 @@ def analyze_single_page(
     reject_reason = _vision_rejects_page(data)
     if reject_reason:
         log.info("page_analyzer.rejected_non_plan", reason=reject_reason)
-        return _ineligible_payload(reject_reason, data)
+        return _ineligible_payload(reject_reason, data), usage_snapshot
 
     data = sanitize_vision_rooms(data)
     data = apply_total_area(data)
@@ -271,7 +330,7 @@ def analyze_single_page(
     )
     data = _attach_annotated_image(display_bytes, data)
     data["eligible"] = True
-    return data
+    return data, usage_snapshot
 
 
 def analyze_page_safe(
@@ -284,15 +343,16 @@ def analyze_page_safe(
     session_id: str,
     from_pdf: bool = False,
     vision_override: VisionOverride | None = None,
-) -> dict:
+) -> tuple[dict, VisionUsageSnapshot | None]:
     settings = get_settings()
     attempts = max_attempts or settings.max_analysis_attempts
     last_error: Exception | None = None
+    accumulated_usage: VisionUsageSnapshot | None = None
 
     for attempt in range(1, attempts + 1):
         vision = provider or create_vision_provider(vision_override)
         try:
-            result = analyze_single_page(
+            result, page_usage = analyze_single_page(
                 vision,
                 image_bytes,
                 mime_type,
@@ -301,6 +361,9 @@ def analyze_page_safe(
                 from_pdf=from_pdf,
                 vision_override=vision_override,
             )
+            accumulated_usage = (
+                accumulated_usage.merge(page_usage) if accumulated_usage else page_usage
+            )
 
             if not result.get("eligible", True):
                 log.info(
@@ -308,7 +371,7 @@ def analyze_page_safe(
                     page=page_number,
                     reason=result.get("reason"),
                 )
-                return result
+                return result, accumulated_usage
 
             if not is_valid(result):
                 log.warning(
@@ -335,9 +398,18 @@ def analyze_page_safe(
                 session_id=session_id,
                 has_annotation=bool(result.get("annotated_image")),
             )
-            return result
+            return result, accumulated_usage
 
-        except ProviderError:
+        except ProviderError as exc:
+            if exc.code == "JSON_PARSE_ERROR" and attempt < attempts:
+                log.warning(
+                    "page_analyzer.json_parse_retry",
+                    page=page_number,
+                    attempt=attempt,
+                    error=exc.message,
+                )
+                last_error = exc
+                continue
             raise
         except Exception as exc:
             log.warning(
@@ -363,4 +435,4 @@ def analyze_page_safe(
         "total_area_source": "none",
         "overall_confidence": 0,
         "units_detected": "unknown",
-    }
+    }, accumulated_usage

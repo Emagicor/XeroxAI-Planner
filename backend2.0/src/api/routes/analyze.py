@@ -22,6 +22,7 @@ from api.schemas.analyze import AnalyzeResponseSchema, PageSchema, RoomSchema
 from infrastructure.isolated_runner import run_analyze_pipeline_isolated
 from application.use_cases.job_store import get_job, save_job
 from domain.entities.job import AnalyzeJob, JobStatus
+from domain.entities.vision_usage import JobVisionUsage
 from domain.exceptions import IngestionError, ProviderError, ZeroxError
 from providers.vision.errors import PROVIDER_FAILURE_CODES
 
@@ -101,6 +102,8 @@ def _job_to_response(job: AnalyzeJob) -> dict:
     source_pages = len({p.source_page or p.page_number for p in job.pages}) or job.total_pages
     total_regions = len(job.pages)
 
+    vision_usage = job.vision_usage.to_dict() if job.vision_usage else None
+
     payload = AnalyzeResponseSchema(
         job_id=job.job_id,
         filename=job.filename,
@@ -117,7 +120,10 @@ def _job_to_response(job: AnalyzeJob) -> dict:
         has_assumed=job.has_assumed,
         has_low_confidence=job.has_low_confidence,
         created_at=job.created_at,
-    ).model_dump(mode="json")
+    ).model_dump(mode="json", by_alias=True)
+
+    if vision_usage is not None:
+        payload["vision_usage"] = vision_usage
 
     return payload
 
@@ -261,6 +267,7 @@ async def analyze_stream(
             total_units = len(units)
             grand_total = 0.0
             eligible = ineligible = 0
+            page_usage_snapshots = []
 
             yield f"data: {json.dumps({'type': 'detected', 'total_regions': total_units, 'source_page_count': len(pages), 'scenario': _infer_scenario(filename, len(pages), total_units, [])})}\n\n"
 
@@ -280,6 +287,9 @@ async def analyze_stream(
                     else:
                         ineligible += 1
 
+                    if page_result.vision_usage is not None:
+                        page_usage_snapshots.append(page_result.vision_usage)
+
                     event = {
                         "type": "progress",
                         "page": page_result.page_number,
@@ -288,6 +298,8 @@ async def analyze_stream(
                         "region_index": page_result.region_index,
                         "data": _page_schema(page_result, inline_annotation=True).model_dump(),
                     }
+                    if page_result.vision_usage is not None:
+                        event["vision_usage"] = page_result.vision_usage.to_dict()
 
                 except ProviderError as exc:
                     log.error(
@@ -349,7 +361,18 @@ async def analyze_stream(
 
                 yield f"data: {json.dumps(event)}\n\n"
 
-            yield f"data: {json.dumps({'type': 'done', 'grand_total_sqft': round(grand_total, 2), 'eligible_pages': eligible, 'ineligible_pages': ineligible, 'page_count': total_units, 'source_page_count': len(pages)})}\n\n"
+            job_usage = JobVisionUsage.from_page_snapshots(page_usage_snapshots)
+            done_payload = {
+                "type": "done",
+                "grand_total_sqft": round(grand_total, 2),
+                "eligible_pages": eligible,
+                "ineligible_pages": ineligible,
+                "page_count": total_units,
+                "source_page_count": len(pages),
+            }
+            if job_usage is not None:
+                done_payload["vision_usage"] = job_usage.to_dict()
+            yield f"data: {json.dumps(done_payload)}\n\n"
 
         except ZeroxError as exc:
             log.error(

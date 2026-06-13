@@ -218,6 +218,10 @@ export function saveRunResults(root, entries, modelMeta = null) {
   if (modelMeta?.visionModel) summary.visionModel = modelMeta.visionModel
   if (modelMeta?.modelLabel) summary.modelLabel = modelMeta.modelLabel
   if (modelMeta?.modelId) summary.modelId = modelMeta.modelId
+  if (modelMeta?.totalTokens != null) summary.totalTokens = modelMeta.totalTokens
+  if (modelMeta?.totalApiCalls != null) summary.totalApiCalls = modelMeta.totalApiCalls
+  if (modelMeta?.actualExtractionModel) summary.actualExtractionModel = modelMeta.actualExtractionModel
+  if (modelMeta?.actualCorrectionModel) summary.actualCorrectionModel = modelMeta.actualCorrectionModel
 
   const index = loadResultsIndex(root)
   index.runs = [...(index.runs ?? []), summary]

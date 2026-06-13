@@ -1,175 +1,175 @@
 # pass=floor_plan
-# session_id=89716b66-635e-4cd2-95c5-94c559ef813e
+# session_id=b9275072-e8f4-4fbf-bed5-b3fab410a920
 # page_number=1
 # model=gemini-2.5-flash
-# timestamp=2026-06-12T12-10-50.958852Z
+# timestamp=2026-06-13T10-40-51.105059Z
 
-```json
 {
   "page_classification": {
     "is_floor_plan": true,
     "page_type": "floorplan",
-    "reason": "Top-down architectural floor plan with room boundaries and labels."
+    "reason": "The image displays two top-down architectural floor plans with room boundaries and labels."
   },
   "floor_identification": {
     "floor_label": "Unknown",
     "confidence_pct": 0,
-    "evidence": "No explicit floor level label found."
+    "evidence": "No explicit floor level labels found on the page."
   },
   "rooms": [
     {
-      "name": "DINING",
-      "bbox": [40, 140, 290, 260],
+      "name": "Bedroom",
+      "bbox": [100, 100, 350, 250],
       "polygon": [
-        [40, 140],
-        [290, 140],
-        [290, 260],
-        [40, 260]
+        [100, 100],
+        [350, 100],
+        [350, 250],
+        [100, 250]
       ],
-      "length_ft": 11.0,
-      "width_ft": 9.0,
-      "area_sqft": 99.0,
+      "length_ft": 11.22042,
+      "width_ft": 11.8116,
+      "area_sqft": 132.525,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "GREAT ROOM",
-      "bbox": [310, 140, 600, 400],
+      "name": "master Bedroom",
+      "bbox": [350, 100, 600, 250],
       "polygon": [
-        [310, 140],
-        [600, 140],
+        [350, 100],
+        [600, 100],
+        [600, 250],
+        [350, 250]
+      ],
+      "length_ft": 11.22042,
+      "width_ft": 11.8116,
+      "area_sqft": 132.525,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "Toilet",
+      "bbox": [250, 280, 350, 350],
+      "polygon": [
+        [250, 280],
+        [350, 280],
+        [350, 350],
+        [250, 350]
+      ],
+      "length_ft": 5.2496,
+      "width_ft": 6.16748,
+      "area_sqft": 32.377,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "kitchen",
+      "bbox": [250, 400, 350, 500],
+      "polygon": [
+        [250, 400],
+        [350, 400],
+        [350, 500],
+        [250, 500]
+      ],
+      "length_ft": 7.2178,
+      "width_ft": 9.35085,
+      "area_sqft": 67.49,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "Reception",
+      "bbox": [350, 400, 600, 600],
+      "polygon": [
+        [350, 400],
         [600, 400],
-        [310, 400]
+        [600, 600],
+        [350, 600]
       ],
-      "length_ft": 10.5,
-      "width_ft": 17.0,
-      "area_sqft": 178.5,
+      "length_ft": 10.07247,
+      "width_ft": 15.81382,
+      "area_sqft": 159.234,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "MASTER BEDRM",
-      "bbox": [620, 140, 960, 400],
+      "name": "Kitchen",
+      "bbox": [650, 100, 800, 250],
       "polygon": [
-        [620, 140],
-        [960, 140],
-        [960, 400],
-        [620, 400]
+        [650, 100],
+        [800, 100],
+        [800, 250],
+        [650, 250]
       ],
-      "length_ft": 12.0,
-      "width_ft": 13.5,
-      "area_sqft": 162.0,
+      "length_ft": 10.72887,
+      "width_ft": 11.8116,
+      "area_sqft": 126.713,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "KIT.",
-      "bbox": [40, 290, 290, 400],
+      "name": "Room",
+      "bbox": [800, 100, 950, 250],
       "polygon": [
-        [40, 290],
-        [290, 290],
-        [290, 400],
-        [40, 400]
+        [800, 100],
+        [950, 100],
+        [950, 250],
+        [800, 250]
       ],
-      "length_ft": 11.0,
-      "width_ft": 8.0,
-      "area_sqft": 88.0,
+      "length_ft": 10.26953,
+      "width_ft": 11.8116,
+      "area_sqft": 121.288,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "BEDRM 3",
-      "bbox": [40, 440, 290, 560],
+      "name": "Toilet",
+      "bbox": [750, 280, 850, 350],
       "polygon": [
-        [40, 440],
-        [290, 440],
-        [290, 560],
-        [40, 560]
+        [750, 280],
+        [850, 280],
+        [850, 350],
+        [750, 350]
       ],
-      "length_ft": 11.0,
-      "width_ft": 10.0,
-      "area_sqft": 110.0,
+      "length_ft": 5.2496,
+      "width_ft": 7.25001,
+      "area_sqft": 38.061,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "WALK-IN",
-      "bbox": [740, 560, 960, 640],
+      "name": "Hall",
+      "bbox": [650, 400, 950, 600],
       "polygon": [
-        [740, 560],
-        [960, 560],
-        [960, 640],
-        [740, 640]
+        [650, 400],
+        [950, 400],
+        [950, 600],
+        [650, 600]
       ],
-      "length_ft": 8.5,
-      "width_ft": 4.5,
-      "area_sqft": 38.25,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "BEDRM 2",
-      "bbox": [40, 600, 290, 720],
-      "polygon": [
-        [40, 600],
-        [290, 600],
-        [290, 720],
-        [40, 720]
-      ],
-      "length_ft": 11.0,
-      "width_ft": 10.0,
-      "area_sqft": 110.0,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "GARAGE",
-      "bbox": [310, 680, 960, 840],
-      "polygon": [
-        [310, 680],
-        [960, 680],
-        [960, 840],
-        [310, 840]
-      ],
-      "length_ft": 18.0,
-      "width_ft": 19.5,
-      "area_sqft": 351.0,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "PATIO",
-      "bbox": [40, 760, 290, 840],
-      "polygon": [
-        [40, 760],
-        [290, 760],
-        [290, 840],
-        [40, 840]
-      ],
-      "length_ft": null,
-      "width_ft": null,
-      "area_sqft": 104.0,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
+      "length_ft": 19.32409,
+      "width_ft": 9.843,
+      "area_sqft": 190.198,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Hall length derived from sum of 3.50m and 2.39m dimensions."
+      ]
     }
   ],
   "layout_dimensions": {
-    "available": false,
-    "width_ft": null,
-    "height_ft": null,
-    "source": null
+    "available": true,
+    "width_ft": 23.6232,
+    "height_ft": 32.81,
+    "source": "measured"
   },
-  "total_area_sqft": 1240.75,
+  "total_area_sqft": 1000.421,
   "overall_confidence": 90,
-  "units_detected": "feet"
+  "units_detected": "meters"
 }
-```

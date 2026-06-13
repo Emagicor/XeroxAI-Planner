@@ -1,38 +1,30 @@
 # pass=correction
-# session_id=647a4db8-2c41-48e0-8b4f-fea5237cef19
+# session_id=b9275072-e8f4-4fbf-bed5-b3fab410a920
 # page_number=1
-# model=gemini-3.5-flash
-# timestamp=2026-06-12T10-30-39.771075Z
+# model=gemini-2.5-flash
+# timestamp=2026-06-13T10-41-07.965740Z
 
 {
-  "room_corrections": [],
-  "rooms_added": [
+  "room_corrections": [
     {
-      "name": "ATTIC",
-      "bbox": [650, 220, 903, 278],
-      "polygon": null,
-      "length_ft": 27.67,
-      "width_ft": null,
-      "area_sqft": null,
-      "confidence_pct": 90,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "HALL",
-      "bbox": [745, 452, 805, 555],
-      "polygon": null,
-      "length_ft": null,
-      "width_ft": 4.17,
-      "area_sqft": null,
-      "confidence_pct": 90,
-      "dimension_source": "measured",
-      "assumptions": []
+      "room_index": 8,
+      "action": "update",
+      "name": "Hall",
+      "length_ft": 19.324,
+      "width_ft": 9.843,
+      "area_sqft": 190.200,
+      "confidence_pct": 80,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Hall length derived from sum of 3.50m and 2.39m dimensions."
+      ],
+      "bbox": [440, 540, 700, 650]
     }
   ],
+  "rooms_added": [],
   "floor_identification": {
-    "floor_label": "First Floor and Second Floor",
-    "confidence_pct": 100,
-    "evidence": "Labels 'FIRST FLOOR PLAN' and 'SECOND FLOOR PLAN' are clearly printed at the bottom of each plan."
+    "floor_label": "Unknown",
+    "confidence_pct": 0,
+    "evidence": "No explicit floor level labels found on the page."
   }
 }

@@ -10,6 +10,7 @@ import hashlib
 import structlog
 
 from domain.entities.job import AnalyzeJob
+from domain.entities.vision_usage import JobVisionUsage
 from domain.exceptions import ZeroxError
 from infrastructure.rasterizer.pdf_rasterizer import rasterize_pdf, rasterize_single_image
 from pipelines.processing.page_processor import process_analysis_unit
@@ -24,11 +25,6 @@ _PROVIDER_FAILURE_MARKERS = (
     "gemini",
     "openai",
     "groq",
-    "florence2",
-    "florence-2",
-    "qwen25_vl",
-    "qwen2.5-vl",
-    "qwen-vl",
     "provider",
     "api_key",
     "quota",
@@ -137,6 +133,10 @@ def run_analyze_pipeline(
                 vision_override=vision_override,
             )
             job.pages.append(page_result)
+
+        job.vision_usage = JobVisionUsage.from_page_snapshots(
+            [p.vision_usage for p in job.pages]
+        )
 
         job.mark_computing()
         _finalize_job_status(job)

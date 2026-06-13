@@ -18,6 +18,7 @@ import {
   updateTestSuiteCase,
 } from '../services/testSuiteApi'
 import { evaluateAgainstGroundTruth } from '../utils/testSuite/compare'
+import { aggregateBatchVisionUsage } from '../utils/testSuite/visionUsage'
 import { cloneFileForUpload, delay } from '../utils/cloneUploadFile'
 import { sha256Hex } from '../utils/fileHash'
 import { parseGroundTruthFile } from '../utils/testSuite/normalize'
@@ -155,9 +156,9 @@ async function snapshotCasesForBatch(caseList) {
 }
 
 /**
- * @param {{ cachedAnalyzeResult?: object | null, enabled?: boolean }} options
+ * @param {{ enabled?: boolean }} options
  */
-export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true } = {}) {
+export function useTestSuiteBatch({ enabled = true } = {}) {
   const [cases, setCases] = useState([])
   const [casesLoading, setCasesLoading] = useState(enabled)
   const [casesLoadError, setCasesLoadError] = useState(null)
@@ -174,15 +175,10 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true }
   const [selectedCaseIds, setSelectedCaseIds] = useState(() => new Set())
   const bulkInputRef = useRef(null)
   const casesRef = useRef(cases)
-  const cachedAnalyzeRef = useRef(cachedAnalyzeResult)
 
   useEffect(() => {
     casesRef.current = cases
   }, [cases])
-
-  useEffect(() => {
-    cachedAnalyzeRef.current = cachedAnalyzeResult
-  }, [cachedAnalyzeResult])
 
   const revokePreview = (preview) => {
     if (preview) URL.revokeObjectURL(preview)
@@ -595,27 +591,10 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true }
       )
 
       try {
-        const cached = cachedAnalyzeRef.current
-        const cacheHash = cached?.content_sha256 ?? ''
-        let aiResult
-        let usedCachedAnalyze = false
-
-        const canReuseAnalyzeCache =
-          modelChoice.matchesAnalyzeTab &&
-          cacheHash &&
-          testCase.inputSha256 &&
-          cacheHash === testCase.inputSha256
-
-        if (canReuseAnalyzeCache) {
-          aiResult = cached
-          usedCachedAnalyze = true
-        } else {
-          const { result } = await runFloorPlanPipeline(testCase.inputFile, {
-            isolateUpload: true,
-            ...visionOverride,
-          })
-          aiResult = result
-        }
+        const { result: aiResult } = await runFloorPlanPipeline(testCase.inputFile, {
+          isolateUpload: true,
+          ...visionOverride,
+        })
 
         const responseHash = aiResult.content_sha256 ?? ''
         if (
@@ -659,11 +638,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true }
               ? {
                   ...item,
                   status: evalError ? 'warning' : 'done',
-                  message: evalError
-                    ? evalError
-                    : usedCachedAnalyze
-                      ? 'Complete (reused Analyze tab result)'
-                      : 'Complete',
+                  message: evalError ? evalError : 'Complete',
                 }
               : item,
           ),
@@ -715,6 +690,7 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true }
     setLoading(false)
 
     const executedAt = new Date().toISOString()
+    const batchVision = aggregateBatchVisionUsage(batchResults)
     try {
       const summary = await saveRunResults(
         batchResults.map((row) => serializeBatchResult(row, executedAt)),
@@ -723,6 +699,10 @@ export function useTestSuiteBatch({ cachedAnalyzeResult = null, enabled = true }
           label: modelChoice.label,
           provider: modelChoice.provider,
           model: modelChoice.model,
+          totalTokens: batchVision?.totals?.total_token_count ?? null,
+          totalApiCalls: batchVision?.apiCalls ?? null,
+          actualExtractionModel: batchVision?.extractionModels?.[0] ?? null,
+          actualCorrectionModel: batchVision?.correctionModels?.[0] ?? null,
         },
       )
       setRunHistory((prev) => [...prev, summary])

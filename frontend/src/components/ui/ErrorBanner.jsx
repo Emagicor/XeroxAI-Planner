@@ -1,4 +1,5 @@
 import Button from '@/components/ui/Button'
+import { isProduction } from '@/config/features'
 
 export default function ErrorBanner({
   message,
@@ -10,15 +11,18 @@ export default function ErrorBanner({
 }) {
   const isBackendOffline =
     typeof message === 'string' &&
-    (/cannot reach the backend|start-backend|backend not running/i.test(message) ||
+    (/cannot reach the (backend|analysis service)|start-backend|backend not running|service unavailable/i.test(message) ||
       /failed to fetch/i.test(message))
 
   const displayTitle =
-    title ?? (isBackendOffline ? 'Backend not reachable' : 'Something went wrong')
+    title ??
+    (isBackendOffline
+      ? (isProduction ? 'Service unavailable' : 'Backend not reachable')
+      : 'Something went wrong')
 
   const displayHint =
     hint ??
-    (isBackendOffline
+    (isBackendOffline && !isProduction
       ? 'In a terminal: cd backend2.0 → .\\start-backend.ps1 — then click Retry.'
       : null)
 

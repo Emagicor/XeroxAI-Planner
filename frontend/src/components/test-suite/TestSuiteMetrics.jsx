@@ -5,6 +5,8 @@ import {
   splitEvaluationByPlan,
 } from '@/utils/testSuite/compare'
 import { extractPlanSectionsFromAnalyze, isMultiPlanAnalyze } from '@/utils/planSections'
+import { aggregateBatchVisionUsage, formatTokenCount, getVisionUsage } from '@/utils/testSuite/visionUsage'
+import { TestSuiteBatchVisionSummary, TestSuiteCaseVisionUsage } from '@/components/test-suite/TestSuiteVisionUsage'
 import { scenarioLabel } from '@/utils/scenarios'
 import PlanImagesPanel from '@/components/plan/PlanImagesPanel'
 import PlanTabSwitcher from '@/components/plan/PlanTabSwitcher'
@@ -65,6 +67,28 @@ function ConfusionMini({ tp, fp, fn }) {
   )
 }
 
+function confidencePct(n) {
+  if (n == null || !Number.isFinite(n)) return '—'
+  return `${Math.round(n)}%`
+}
+
+function confidenceTone(pct) {
+  if (pct == null || !Number.isFinite(pct)) return 'text-muted'
+  if (pct >= 90) return 'text-emerald-400'
+  if (pct >= 70) return 'text-amber-300'
+  return 'text-red-300'
+}
+
+function overallConfidenceFromResult(aiResult) {
+  if (!aiResult?.pages?.length) return null
+  const values = aiResult.pages
+    .filter((p) => p.eligible !== false)
+    .map((p) => p.overall_confidence)
+    .filter((v) => v != null && Number.isFinite(Number(v)))
+  if (!values.length) return null
+  return Math.round(values.reduce((a, b) => a + Number(b), 0) / values.length)
+}
+
 function statusBadge(status) {
   const map = {
     match: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
@@ -101,6 +125,7 @@ function PerRoomTable({ evaluation, hidePageColumn = false }) {
             <th className="px-3 py-2.5 font-medium">GT dims</th>
             <th className="px-3 py-2.5 font-medium">AI name</th>
             <th className="px-3 py-2.5 font-medium">AI dims</th>
+            <th className="px-3 py-2.5 font-medium">AI conf</th>
             <th className="px-3 py-2.5 font-medium">Dim error</th>
             <th className="px-3 py-2.5 font-medium">Area</th>
           </tr>
@@ -146,6 +171,9 @@ function PerRoomTable({ evaluation, hidePageColumn = false }) {
                 <td className="px-3 py-2">{row.ai?.name ?? '—'}</td>
                 <td className="px-3 py-2 font-mono text-xs">
                   {aiPair ? `${aiPair[0]}×${aiPair[1]} ft` : '—'}
+                </td>
+                <td className={`px-3 py-2 font-mono text-xs ${confidenceTone(row.ai?.confidencePct)}`}>
+                  {confidencePct(row.ai?.confidencePct)}
                 </td>
                 <td className="px-3 py-2 font-mono text-xs text-muted">{dimError}</td>
                 <td className="px-3 py-2">
@@ -239,6 +267,12 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
     ? `F1 ${pct(m.roomF1)} · RMSE ${ft(m.dimensionRMSE)} · ${m.gtCount} GT / ${m.aiCount} AI rooms`
     : row.error || row.evalError || 'No metrics available'
 
+  const caseUsage = getVisionUsage(row.aiResult)
+  const tokenLine = caseUsage?.totals?.total_token_count != null
+    ? `${formatTokenCount(caseUsage.totals.total_token_count)} tokens · ${caseUsage.api_calls ?? 0} API call(s)`
+    : null
+  const overallConf = overallConfidenceFromResult(row.aiResult)
+
   return (
     <div className="rounded-xl border border-line bg-card overflow-hidden transition-shadow hover:shadow-[var(--shadow-md)]">
       <button
@@ -282,11 +316,19 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
             </p>
           )}
           <p className="text-xs font-mono text-muted mt-2">{summaryLine}</p>
+          {tokenLine && (
+            <p className="text-xs font-mono text-accent/80 mt-1">{tokenLine}</p>
+          )}
+          {overallConf != null && (
+            <p className={`text-xs font-mono mt-1 ${confidenceTone(overallConf)}`}>
+              Overall AI confidence {confidencePct(overallConf)}
+            </p>
+          )}
         </div>
 
         <div className="shrink-0 flex items-center gap-2 pt-1">
           {m && (
-            <div className="hidden md:grid grid-cols-3 gap-3 mr-2">
+            <div className="hidden md:grid grid-cols-4 gap-3 mr-2">
               <div className="text-right">
                 <p className="text-xs text-muted">Precision</p>
                 <p className="font-mono text-sm text-text">{pct(m.roomPrecision)}</p>
@@ -298,6 +340,12 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
               <div className="text-right">
                 <p className="text-xs text-muted">Dim MAE</p>
                 <p className="font-mono text-sm text-text">{ft(m.dimensionMAE)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-muted">AI conf</p>
+                <p className={`font-mono text-sm ${confidenceTone(overallConf)}`}>
+                  {confidencePct(overallConf)}
+                </p>
               </div>
             </div>
           )}
@@ -383,6 +431,8 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
                   </div>
                 </div>
               </details>
+
+              <TestSuiteCaseVisionUsage aiResult={row.aiResult} />
             </>
           )}
         </div>
@@ -398,6 +448,8 @@ export default function TestSuiteMetrics({ results, onNewBatch, modelLabel = nul
     const evals = results.filter((r) => r.evaluation).map((r) => r.evaluation)
     return aggregateEvaluations(evals)
   }, [results])
+
+  const batchVisionUsage = useMemo(() => aggregateBatchVisionUsage(results), [results])
 
   const passedCount = results.filter((r) => {
     const o = caseOutcome(r)
@@ -433,9 +485,9 @@ export default function TestSuiteMetrics({ results, onNewBatch, modelLabel = nul
         <div>
           <h2 className="text-xl font-medium text-text">Test suite report</h2>
           <p className="text-sm text-muted mt-1">
-            {results.length} cases evaluated
+            {results.length} cases · fresh API runs with token logging
             {modelLabel ? ` · ${modelLabel}` : ''}
-            {' · '}expand any row for full metrics and room-level comparison
+            {' · '}expand rows for metrics, room comparison, and vision usage
           </p>
         </div>
         {onNewBatch && (
@@ -444,6 +496,8 @@ export default function TestSuiteMetrics({ results, onNewBatch, modelLabel = nul
           </Button>
         )}
       </div>
+
+      {batchVisionUsage && <TestSuiteBatchVisionSummary batchUsage={batchVisionUsage} />}
 
       {aggregate && (
         <div className="rounded-xl border border-line bg-card overflow-hidden shadow-[var(--shadow-sm)]">

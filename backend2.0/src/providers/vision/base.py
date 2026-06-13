@@ -59,7 +59,7 @@ class ProviderResponse:
 class VisionProvider(ABC):
     """
     Contract for a multimodal vision provider.
-    Implementations live in providers/vision/{gemini,openai}.py
+    Implementations live in providers/vision/{gemini,openai,groq}.py
     """
 
     @abstractmethod

@@ -45,12 +45,12 @@ class Settings(BaseSettings):
     vision_image_format: str = "png"   # png | jpeg — format sent to Gemini
 
     # ── Vision provider ───────────────────────────────────────────────────────
-    vision_provider: str = "gemini"    # gemini | openai | groq | florence2 | qwen25_vl
+    vision_provider: str = "gemini"    # gemini | openai | groq
     gemini_model: str = "gemini-3.5-flash"
     openai_model: str = "gpt-4o"
     groq_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
     # Correction pass (FLOOR_PLAN_PROMPT → CORRECTION_PROMPT); empty = same as extraction
-    vision_correction_provider: str = ""   # gemini | openai | groq | florence2 | qwen25_vl
+    vision_correction_provider: str = ""   # gemini | openai | groq
     vision_correction_model: str = ""      # e.g. gemini-2.5-flash, gpt-4o
     gemini_api_key: str = ""
     openai_api_key: str = ""
@@ -62,8 +62,8 @@ class Settings(BaseSettings):
     vision_two_pass: bool = False      # true = allow selective correction when targets exist
     vision_correction_pass: bool = True  # run pass 2 when pass-1 has low-confidence targets
     vision_correction_confidence_max: int = 84  # rooms at/below this (and derived/assumed) → pass 2
-    gemini_transient_retries: int = 0  # retries on 503 only; never retries quota (429)
-    gemini_request_timeout_seconds: int = 120  # per vision API call; avoids indefinite hangs
+    gemini_transient_retries: int = 0  # retries on 503 for all vision providers
+    gemini_request_timeout_seconds: int = 120  # per vision API call (all providers)
     vision_prompt_log_enabled: bool = True
     vision_prompt_log_dir: str = ""  # empty → backend2.0/_vision_prompt_logs
 
@@ -90,11 +90,6 @@ def reload_settings() -> Settings:
     try:
         from providers.vision.factory import clear_vision_provider_cache
         clear_vision_provider_cache()
-    except ImportError:
-        pass
-    try:
-        from providers.vision.florence2 import clear_florence2_model_cache
-        clear_florence2_model_cache()
     except ImportError:
         pass
     return get_settings()

@@ -17,6 +17,7 @@ Set is_floor_plan = true ONLY for top-down architectural floor plans with room b
 Identify the floor level from labels/title blocks. Use: Ground Floor, First Floor, Second Floor, Third Floor, Basement, Mezzanine, Roof Plan, Typical Floor, Unit Plan, or Unknown. Do not guess.
 
 ## ANTI-HALLUCINATION (highest priority — read before extracting anything)
+- Unit detection is critical. Ensure units_detected matches the actual dimension units shown on the drawing.
 - Output a dimension ONLY when you can point to specific dimension text on the image for that axis, OR when annotated arithmetic yields exactly one answer.
 - Never infer from furniture, scale bars, room numbers, sheet numbers, title blocks, or visual proportions.
 - Never use standard sizes to fabricate missing dimensions.
@@ -42,6 +43,7 @@ Set available = true ONLY when full outer boundary dimensions (total width AND h
 ## DIMENSION NOTATION
 Imperial: 17'11" → 17 + 11/12 ft. ½ symbol = 0.5 in.
 Metric: mm ÷ 304.8 = ft; m × 3.281 = ft.
+All numeric JSON fields must be plain numbers (e.g. 96.5), never arithmetic expressions (not 96 + 6/12).
 
 ## OUTPUT
 Return ONLY valid JSON — no markdown, no backticks, no explanation.
@@ -87,8 +89,9 @@ SELECTIVE_CORRECTION_PROMPT_TEMPLATE = """Pass-1 extraction summary for this sam
 {targets_json}
 
 ## Task A — verify flagged rooms (if rooms_to_verify is non-empty)
-- Re-read dimension text from the image for fields listed in fields_to_verify only.
-- action "update": return corrected values for those fields + updated confidence_pct (90–100 measured, 70–89 derived).
+- Treat pass-1 "current" values as unverified — re-read the image for each fields_to_verify entry.
+- If the image disagrees, return action "update" with corrected values and updated confidence_pct.
+- If the image confirms pass-1, omit that room from room_corrections (no rubber-stamping in the payload).
 - action "remove": dimensions cannot be verified — drop the room (do not invent replacements).
 - Do not return high-confidence pass-1 rooms unchanged in room_corrections.
 
@@ -140,6 +143,7 @@ CORRECTION_PROMPT_TEMPLATE = """Pass-1 output for this same image:
 {first_response}
 
 Re-read every dimension from the image and correct the JSON. Rules:
+- Do not assume pass-1 is correct — change any value the image contradicts.
 - Verify each number against the image. Do not trust pass-1 values without re-reading them.
 - Remove any room whose dimensions cannot be verified as measured or unambiguously derived.
 - Do not adjust values to make totals or adjacent rooms fit. Delete wrong values, do not replace with guesses.

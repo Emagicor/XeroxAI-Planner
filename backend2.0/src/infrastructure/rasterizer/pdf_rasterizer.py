@@ -123,8 +123,3 @@ def rasterize_single_image(image_bytes: bytes, mime_type: str) -> list[Rasterize
             from_pdf=False,
         )
     ]
-
-
-def rasterize_pdf_legacy_tuples(pdf_bytes: bytes) -> list[tuple[bytes, str]]:
-    """Backward-compatible tuple API for callers expecting (bytes, mime)."""
-    return [(p.jpeg_bytes, p.mime_type) for p in rasterize_pdf(pdf_bytes)]

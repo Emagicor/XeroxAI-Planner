@@ -5,11 +5,9 @@ import base64
 import gc
 from typing import TYPE_CHECKING
 
-import structlog
-
 from pipelines.processing.page_result_mapper import build_page_result
 from domain.entities.job import PageResult
-from infrastructure.rasterizer.page_raster import RasterizedPage
+from domain.entities.vision_usage import VisionUsageSnapshot
 from infrastructure.preprocessing.image_preprocessor import prepare_ui_preview_image
 from pipelines.extraction.page_analyzer import analyze_page_safe
 from pipelines.processing.page_classifier import classify_page, map_vision_page_type, should_skip_before_vision
@@ -18,8 +16,6 @@ from providers.vision.request_config import VisionOverride
 
 if TYPE_CHECKING:
     from pipelines.processing.region_expander import AnalysisUnit
-
-log = structlog.get_logger(__name__)
 
 
 def _attach_region_metadata(result: PageResult, unit: "AnalysisUnit") -> PageResult:
@@ -68,8 +64,9 @@ def process_analysis_unit(
             return _attach_region_metadata(result, unit)
 
     provider = create_vision_provider(vision_override)
+    vision_usage: VisionUsageSnapshot | None = None
     try:
-        raw = analyze_page_safe(
+        raw, vision_usage = analyze_page_safe(
             provider,
             unit.jpeg_bytes,
             unit.mime_type,
@@ -84,6 +81,7 @@ def process_analysis_unit(
 
     page_type = map_vision_page_type(raw, page_type)
     result = build_page_result(unit.plan_number, page_type, raw)
+    result.vision_usage = vision_usage
 
     if not result.eligible and result.ineligible_reason:
         return _attach_region_metadata(result, unit)
@@ -92,66 +90,3 @@ def process_analysis_unit(
         result.ineligible_reason = result.ineligible_reason or classify_reason
 
     return _attach_region_metadata(result, unit)
-
-
-def process_rasterized_page(
-    page: RasterizedPage,
-    total_pages: int,
-    *,
-    session_id: str,
-    vision_override: VisionOverride | None = None,
-) -> PageResult:
-    """Classify, optionally skip, or analyze one full rasterized page (legacy path)."""
-    page_type, classify_reason = classify_page(
-        page_number=page.page_number,
-        total_pages=total_pages,
-        pdf_text=page.pdf_text,
-        image_bytes=page.jpeg_bytes,
-    )
-
-    log.info(
-        "page_processor.classified",
-        page=page.page_number,
-        page_type=page_type.value,
-        reason=classify_reason,
-        session_id=session_id,
-    )
-
-    if should_skip_before_vision(page_type):
-        return PageResult(
-            page_number=page.page_number,
-            page_type=page_type,
-            eligible=False,
-            plan_number=page.page_number,
-            ineligible_reason=classify_reason,
-            source_page=page.page_number,
-            region_index=1,
-        )
-
-    provider = create_vision_provider(vision_override)
-    try:
-        raw = analyze_page_safe(
-            provider,
-            page.jpeg_bytes,
-            page.mime_type,
-            page_number=page.page_number,
-            session_id=session_id,
-            from_pdf=page.from_pdf,
-            vision_override=vision_override,
-        )
-    finally:
-        del provider
-        gc.collect()
-
-    page_type = map_vision_page_type(raw, page_type)
-    result = build_page_result(page.page_number, page_type, raw)
-    result.source_page = page.page_number
-    result.region_index = 1
-
-    if not result.eligible and result.ineligible_reason:
-        return result
-
-    if not result.eligible:
-        result.ineligible_reason = result.ineligible_reason or classify_reason
-
-    return result

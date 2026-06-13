@@ -75,17 +75,18 @@ export default function TestSuiteProgressPanel({
   loadingSteps,
   totalCases,
 }) {
+  const effectiveTotal = totalCases > 0 ? totalCases : runProgress.length
   const completedCount = runProgress.filter(
     (item) => item.status === 'done' || item.status === 'warning' || item.status === 'error',
   ).length
-  const progressPct = totalCases > 0 ? Math.round((completedCount / totalCases) * 100) : 0
+  const progressPct = effectiveTotal > 0 ? Math.round((completedCount / effectiveTotal) * 100) : 0
 
   return (
     <section className="max-w-3xl mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-xl font-medium text-text">Running test suite</h2>
         <p className="text-sm text-muted mt-2">
-          Processing {totalCases} test case{totalCases !== 1 ? 's' : ''} sequentially.
+          Processing {effectiveTotal} test case{effectiveTotal !== 1 ? 's' : ''} sequentially.
           Results will appear when the full batch completes.
         </p>
       </div>
@@ -95,7 +96,7 @@ export default function TestSuiteProgressPanel({
           <div className="flex items-center justify-between gap-4 mb-3">
             <p className="text-sm font-medium text-text">Batch progress</p>
             <p className="text-sm font-mono text-accent">
-              {completedCount} / {totalCases}
+              {completedCount} / {effectiveTotal}
             </p>
           </div>
           <div className="h-2 rounded-full bg-line/80 overflow-hidden">
@@ -165,7 +166,7 @@ export default function TestSuiteProgressPanel({
         currentStep={loadingStep}
         label={
           currentIndex >= 0
-            ? `Analyzing case ${currentIndex + 1} of ${totalCases}…`
+            ? `Analyzing case ${currentIndex + 1} of ${effectiveTotal}…`
             : 'Finalizing results…'
         }
       />

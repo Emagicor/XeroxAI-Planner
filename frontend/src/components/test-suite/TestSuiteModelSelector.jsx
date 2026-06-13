@@ -10,10 +10,11 @@ export default function TestSuiteModelSelector({
 }) {
   return (
     <div className="rounded-xl border border-line bg-card px-4 py-3 shadow-[var(--shadow-sm)]">
-      <p className="text-sm font-medium text-text">Vision model</p>
+      <p className="text-sm font-medium text-text">Pass 1 vision model</p>
       <p className="text-xs text-muted mt-0.5 mb-3">
-        Server default uses the same analyze pipeline as the Analyze tab.
-        Other options override the vision provider for benchmark runs only.
+        Every batch run calls <span className="font-mono">POST /analyze</span> fresh — no cache from
+        the Analyze tab. Pass 2 correction uses backend{' '}
+        <span className="font-mono">VISION_CORRECTION_*</span> env vars.
       </p>
 
       <div className="flex flex-col sm:flex-row flex-wrap gap-2">

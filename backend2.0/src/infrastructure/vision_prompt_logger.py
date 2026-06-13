@@ -11,7 +11,7 @@ import structlog
 
 from config.features import resolve_vision_prompt_log
 from config.settings import get_settings
-from providers.vision.gemini import parse_provider_json
+from providers.vision.json_parse import parse_provider_json
 
 log = structlog.get_logger(__name__)
 

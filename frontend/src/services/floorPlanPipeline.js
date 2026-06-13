@@ -114,6 +114,9 @@ export async function runFloorPlanAnalyze(
           meta.eligible_pages = evt.eligible_pages
           meta.ineligible_pages = evt.ineligible_pages
           meta.status = 'complete'
+          if (evt.vision_usage) {
+            meta.vision_usage = evt.vision_usage
+          }
           onStreamEvent?.({ type: 'done', event: evt, meta })
         },
       },

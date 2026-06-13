@@ -17,7 +17,7 @@ function normalizeName(name) {
 }
 
 /**
- * @typedef {{ page: number, planNumber: number, sourcePage: number, floorLabel: string|null, name: string, normName: string, lengthFt: number|null, widthFt: number|null, areaSqft: number|null, source: string }} NormRoom
+ * @typedef {{ page: number, planNumber: number, sourcePage: number, floorLabel: string|null, name: string, normName: string, lengthFt: number|null, widthFt: number|null, areaSqft: number|null, source: string, confidencePct: number|null }} NormRoom
  */
 
 /**
@@ -46,6 +46,7 @@ export function extractRoomsFromPayload(data) {
       widthFt,
       areaSqft,
       source: room.dimension_source ?? room.method ?? '',
+      confidencePct: parseNum(room.confidence_pct ?? room.confidencePct),
     })
   }
 

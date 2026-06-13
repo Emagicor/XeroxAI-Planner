@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from enum import Enum
 from uuid import uuid4
 
+from domain.entities.vision_usage import JobVisionUsage, VisionUsageSnapshot
+
 
 # ── Enums (value objects) ─────────────────────────────────────────────────────
 
@@ -98,6 +100,7 @@ class PageResult:
     detection_confidence: float | None = None
     detection_method: str | None = None
     clip_preview: str | None = None  # base64 JPEG of clipped region sent to vision
+    vision_usage: VisionUsageSnapshot | None = None
 
     def compute_totals(self) -> None:
         """Recompute total_area_sqft from rooms. Called after all rooms are set."""
@@ -127,6 +130,7 @@ class AnalyzeJob:
     error_message: str | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    vision_usage: JobVisionUsage | None = None
 
     # ── state transitions ─────────────────────────────────────────────────
 
