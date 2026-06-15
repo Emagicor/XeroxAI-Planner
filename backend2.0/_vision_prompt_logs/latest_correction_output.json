@@ -2,89 +2,35 @@
   "room_corrections": [],
   "rooms_added": [
     {
-      "name": "FAMILY SET",
-      "bbox": [
-        300,
-        500,
-        400,
-        620
-      ],
-      "polygon": null,
-      "length_ft": 9.0,
-      "width_ft": 6.0,
-      "area_sqft": 54.0,
-      "confidence_pct": 100,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "BALCONY RABSAL",
-      "bbox": [
-        850,
-        800,
-        950,
-        850
-      ],
-      "polygon": null,
-      "length_ft": 7.5,
-      "width_ft": 3.5,
-      "area_sqft": 26.25,
-      "confidence_pct": 100,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
       "name": "TRADITIONAL RABSAL",
-      "bbox": [
-        1280,
-        300,
-        1320,
-        500
-      ],
-      "polygon": null,
       "length_ft": 20.0,
       "width_ft": 4.0,
-      "area_sqft": 80.0,
-      "confidence_pct": 100,
+      "area_sqft": null,
+      "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "WASH ROOM",
-      "bbox": [
-        800,
-        500,
-        900,
-        620
-      ],
-      "polygon": null,
-      "length_ft": 9.0,
-      "width_ft": 2.4166666666666665,
-      "area_sqft": 21.75,
-      "confidence_pct": 100,
-      "dimension_source": "measured",
-      "assumptions": []
+      "name": "FAMILY SET",
+      "length_ft": 12.0,
+      "width_ft": 9.5,
+      "area_sqft": null,
+      "confidence_pct": 90,
+      "dimension_source": "derived",
+      "assumptions": [
+        "Assumed length from adjacent room's dimension and visual alignment.",
+        "Assumed width from adjacent room's dimension and visual alignment."
+      ]
     },
     {
-      "name": "WASH ROOM",
-      "bbox": [
-        1050,
-        500,
-        1150,
-        620
-      ],
-      "polygon": null,
-      "length_ft": 9.0,
-      "width_ft": 7.0,
-      "area_sqft": 63.0,
-      "confidence_pct": 100,
+      "name": "space for lift",
+      "length_ft": 6.0,
+      "width_ft": 5.0,
+      "area_sqft": null,
+      "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     }
   ],
-  "floor_identification": {
-    "floor_label": "Unknown",
-    "confidence_pct": 0,
-    "evidence": "No explicit floor level label found on the drawing."
-  }
+  "floor_identification": null
 }

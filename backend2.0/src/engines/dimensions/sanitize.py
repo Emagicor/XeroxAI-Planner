@@ -30,18 +30,6 @@ def _is_plan_label(name: object) -> bool:
     return text.lower() not in _GENERIC_NAMES
 
 
-def _coerce_bbox(bbox: object) -> list[int] | None:
-    if not isinstance(bbox, list) or len(bbox) != 4:
-        return None
-    try:
-        return [
-            max(0, min(1000, int(round(float(v)))))
-            for v in bbox
-        ]
-    except (TypeError, ValueError):
-        return None
-
-
 def _coerce_confidence(value: object) -> int:
     try:
         return max(0, min(100, int(round(float(value)))))
@@ -79,10 +67,6 @@ def sanitize_vision_rooms(data: dict) -> dict:
         if not has_dims and not has_area:
             continue
 
-        bbox = _coerce_bbox(r.get("bbox"))
-        if bbox is None:
-            continue
-        r["bbox"] = bbox
         r["confidence_pct"] = _coerce_confidence(r.get("confidence_pct"))
 
         # Rule 1: dimensions without a plan label → keep with a descriptive fallback name

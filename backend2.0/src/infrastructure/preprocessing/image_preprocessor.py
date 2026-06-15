@@ -55,7 +55,7 @@ def prepare_display_image(
     *,
     from_pdf: bool = False,
 ) -> tuple[bytes, str]:
-    """Bytes for annotated overlays — same CAD color boost as vision input for PDFs."""
+    """Bytes for UI display — same CAD color boost as vision input for PDFs."""
     settings = get_settings()
     img = load_rgb(image_bytes)
     if from_pdf:

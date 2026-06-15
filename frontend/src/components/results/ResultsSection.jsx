@@ -15,8 +15,10 @@ import ResultActions from '@/components/results/ResultActions'
 import ReviewTable from '@/components/results/ReviewTable'
 import SummaryCards from '@/components/results/SummaryCards'
 import UnitSelector from '@/components/results/UnitSelector'
+import VisionUsagePanel from '@/components/vision/VisionUsagePanel'
 import SectionHeader from '@/components/ui/SectionHeader'
 import Badge from '@/components/ui/Badge'
+import { getVisionUsage } from '@/utils/visionUsage'
 import { scenarioLabel } from '@/utils/scenarios'
 
 export default function ResultsSection({ result, onReset, showJsonDownload = true }) {
@@ -30,11 +32,9 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
     toggleIncluded,
     addRoom,
     activePage,
-    activeRoom,
     activeRowId,
     selectRow,
     selectPlan,
-    selectRoomOnPage,
   } = useReviewState(result)
   const [copyDone, setCopyDone] = useState(false)
   const [exportError, setExportError] = useState(null)
@@ -46,19 +46,7 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
   const multiPlan = isMultiPlanDoc(doc)
   const plans = groupDocByPlan(doc)
   const singlePlan = plans[0] ?? null
-
-  const legendRooms = doc.rows
-    .filter(
-      (r) =>
-        r.page === activePage &&
-        r.eligible &&
-        r.included !== false,
-    )
-    .map((r) => ({
-      name: r.name,
-      roomIndex: r.roomIndex,
-      colorIndex: r.colorIndex,
-    }))
+  const visionUsage = getVisionUsage(doc)
 
   const handleCSV = () => {
     setExportError(null)
@@ -142,6 +130,12 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
         </div>
       )}
 
+      {visionUsage && (
+        <section className="mb-6 rounded-xl border border-line/60 bg-card/40 p-4 sm:p-5">
+          <VisionUsagePanel usage={visionUsage} title="Token usage & cost" />
+        </section>
+      )}
+
       {multiPlan ? (
         <PlanTabSwitcher
           plans={plans}
@@ -161,22 +155,13 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
             <PlanResultBlock
               embedded
               plan={plan}
-              jobId={doc.jobId}
               downloadBaseName={exportBase}
               unit={unit}
               activeRowId={activeRowId}
-              activeRoom={activePage === plan.planNumber ? activeRoom : null}
               onUpdateRow={updateRow}
               onToggleIncluded={toggleIncluded}
               onAddRoom={addRoom}
               onRowActivate={selectRow}
-              onSelectRoom={(roomIndex) => {
-                selectRow(
-                  plan.rows.find(
-                    (r) => r.roomIndex === roomIndex && r.included !== false,
-                  ) ?? plan.rows[0],
-                );
-              }}
             />
           )}
         </PlanTabSwitcher>
@@ -190,13 +175,7 @@ export default function ResultsSection({ result, onReset, showJsonDownload = tru
               <PlanImagesPanel
                 floorLabel={singlePlan.floorLabel}
                 clipPreview={singlePlan.clipPreview}
-                jobId={doc.jobId}
                 planNumber={singlePlan.planNumber}
-                annotatedImage={singlePlan.annotatedImage}
-                hasAnnotated={singlePlan.hasAnnotated}
-                rooms={legendRooms}
-                activeRoom={activeRoom}
-                onSelectRoom={selectRoomOnPage}
                 expandable
                 allowDownload
                 downloadBaseName={exportBase}

@@ -35,8 +35,6 @@ Assign honest confidence_pct per room. Downstream correction re-reads ONLY rooms
 - Include ONLY rooms with at least one measured/derived dimension or measured area.
 - Label without dimensions → omit. Dimensions without label → include with descriptive fallback name.
 - Copy room labels exactly as printed (spelling, caps, abbreviations, punctuation).
-- Rooms must not overlap. All bbox/polygon values are integers 0–1000 (0 = top/left edge, 1000 = bottom/right edge).
-
 ## LAYOUT DIMENSIONS
 Set available = true ONLY when full outer boundary dimensions (total width AND height) are annotated. Do NOT use a single room's size as layout dimensions.
 
@@ -61,8 +59,6 @@ Return ONLY valid JSON — no markdown, no backticks, no explanation.
   },
   "rooms": [{
     "name": string,
-    "bbox": [x_min, y_min, x_max, y_max],
-    "polygon": [[x,y],...],
     "length_ft": number|null,
     "width_ft": number|null,
     "area_sqft": number|null,
@@ -99,7 +95,7 @@ SELECTIVE_CORRECTION_PROMPT_TEMPLATE = """Pass-1 extraction summary for this sam
 - Scan the image for labeled spaces with measurable dimensions or annotated area that are NOT in existing_room_names.
 - Add only rooms you can verify from the image (same anti-hallucination rules as pass 1).
 - Do not duplicate rooms already in existing_room_names (case-insensitive).
-- Each rooms_added entry needs: name, bbox, length_ft/width_ft or area_sqft, confidence_pct, dimension_source, assumptions.
+- Each rooms_added entry needs: name, length_ft/width_ft or area_sqft, confidence_pct, dimension_source, assumptions.
 
 General:
 - Do not adjust values to make totals or adjacent rooms fit.
@@ -116,13 +112,10 @@ Return ONLY valid JSON — no markdown, no backticks, no explanation:
     "area_sqft": number|null,
     "confidence_pct": integer,
     "dimension_source": "measured"|"derived"|"assumed",
-    "assumptions": [string],
-    "bbox": [x_min,y_min,x_max,y_max]|null
+    "assumptions": [string]
   }}],
   "rooms_added": [{{
     "name": string,
-    "bbox": [x_min,y_min,x_max,y_max],
-    "polygon": [[x,y],...]|null,
     "length_ft": number|null,
     "width_ft": number|null,
     "area_sqft": number|null,

@@ -16,8 +16,6 @@ from pydantic import BaseModel, Field
 class RoomSchema(BaseModel):
     room_id:          str
     name:             str
-    bbox:             list[int]
-    polygon:          list[list[int]]
     length_ft:        float | None
     width_ft:         float | None
     area_sqft:        float | None       # null for assumed rooms
@@ -41,8 +39,6 @@ class PageSchema(BaseModel):
     layout_dimensions_used: dict | None = None
     overall_confidence:     int
     units_detected:         str
-    has_annotated_image:    bool = False
-    annotated_image:        str | None = None  # base64 JPEG; set for single-page responses
     source_page:            int | None = None
     region_index:           int | None = None
     region_id:              str | None = None

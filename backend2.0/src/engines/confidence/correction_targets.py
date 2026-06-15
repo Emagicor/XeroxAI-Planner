@@ -14,7 +14,7 @@ from dataclasses import asdict, dataclass, field
 from config.constants import MEDIUM_CONFIDENCE_MIN
 
 _DIMENSION_FIELDS = ("length_ft", "width_ft", "area_sqft", "dimension_source", "assumptions")
-_IDENTITY_FIELDS = ("name", "bbox")
+_IDENTITY_FIELDS = ("name",)
 
 
 def _coerce_confidence(value: object) -> int:
@@ -199,8 +199,6 @@ def merge_corrections(pass1: dict, correction: dict) -> dict:
             "confidence_pct",
             "dimension_source",
             "assumptions",
-            "bbox",
-            "polygon",
         ):
             if field in fix:
                 room[field] = fix[field]

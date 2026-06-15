@@ -36,9 +36,8 @@ def validate_analysis_result(data: dict) -> ValidationReport:
 
     Rules:
     - rooms must be a non-empty list
-    - Each room needs: name, bbox (4 values 0–1000), confidence_pct (0–100)
+    - Each room needs: name, confidence_pct (0–100)
     - Each room needs area_sqft > 0 OR both length_ft and width_ft > 0
-    - polygon must be a list of [x,y] pairs if present
     """
     report = ValidationReport(valid=True)
 
@@ -49,12 +48,6 @@ def validate_analysis_result(data: dict) -> ValidationReport:
 
     for room in rooms:
         name = room.get("name", "(unnamed)")
-
-        bbox = room.get("bbox")
-        if not isinstance(bbox, list) or len(bbox) != 4:
-            report.add(name, "bbox", "bbox must be a list of 4 numbers")
-        elif not all(isinstance(v, (int, float)) and 0 <= v <= 1000 for v in bbox):
-            report.add(name, "bbox", f"bbox values must be 0–1000, got {bbox}")
 
         length = room.get("length_ft")
         width = room.get("width_ft")
@@ -77,16 +70,6 @@ def validate_analysis_result(data: dict) -> ValidationReport:
         conf = room.get("confidence_pct")
         if not isinstance(conf, (int, float)) or not (0 <= conf <= 100):
             report.add(name, "confidence_pct", f"confidence_pct must be 0–100, got {conf!r}")
-
-        polygon = room.get("polygon")
-        if polygon is not None:
-            if not isinstance(polygon, list) or len(polygon) < 3:
-                report.add(name, "polygon", "polygon must have at least 3 points")
-            else:
-                for pt in polygon:
-                    if not (isinstance(pt, list) and len(pt) == 2):
-                        report.add(name, "polygon", f"Each polygon point must be [x, y], got {pt!r}")
-                        break
 
     return report
 

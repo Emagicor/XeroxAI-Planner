@@ -50,8 +50,6 @@ class ConfidenceLevel(str, Enum):
 @dataclass
 class RoomResult:
     name: str
-    bbox: list[int]                    # [x_min, y_min, x_max, y_max] 0–1000
-    polygon: list[list[int]]           # [[x,y], ...] clockwise
     length_ft: float | None
     width_ft: float | None
     area_sqft: float | None            # None = assumed/ineligible
@@ -91,7 +89,6 @@ class PageResult:
     layout_dimensions_used: dict | None = None
     overall_confidence: int = 0
     units_detected: str = "feet"
-    annotated_image: str | None = None  # base64 JPEG
     # Region metadata (when a document page yields multiple plans)
     source_page: int | None = None
     region_index: int | None = None

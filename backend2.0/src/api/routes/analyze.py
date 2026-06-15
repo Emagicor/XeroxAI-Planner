@@ -11,12 +11,11 @@ FIX vs original routes/analyze.py:
 from __future__ import annotations
 
 import asyncio
-import base64
 import json
 
 import structlog
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
-from fastapi.responses import JSONResponse, Response, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from api.schemas.analyze import AnalyzeResponseSchema, PageSchema, RoomSchema
 from infrastructure.isolated_runner import run_analyze_pipeline_isolated
@@ -51,7 +50,7 @@ def _infer_scenario(filename: str, source_pages: int, total_regions: int, pages:
     return "mixed"
 
 
-def _page_schema(p, *, inline_annotation: bool) -> PageSchema:
+def _page_schema(p) -> PageSchema:
     return PageSchema(
         page_number=p.page_number,
         plan_number=p.plan_number or p.page_number,
@@ -64,8 +63,6 @@ def _page_schema(p, *, inline_annotation: bool) -> PageSchema:
             RoomSchema(
                 room_id=r.room_id,
                 name=r.name,
-                bbox=r.bbox,
-                polygon=r.polygon,
                 length_ft=r.length_ft,
                 width_ft=r.width_ft,
                 area_sqft=r.area_sqft,
@@ -81,10 +78,6 @@ def _page_schema(p, *, inline_annotation: bool) -> PageSchema:
         layout_dimensions_used=p.layout_dimensions_used,
         overall_confidence=p.overall_confidence,
         units_detected=p.units_detected,
-        has_annotated_image=bool(p.annotated_image),
-        annotated_image=(
-            p.annotated_image if inline_annotation and p.annotated_image else None
-        ),
         source_page=p.source_page,
         region_index=p.region_index,
         region_id=p.region_id,
@@ -96,8 +89,7 @@ def _page_schema(p, *, inline_annotation: bool) -> PageSchema:
 
 
 def _job_to_response(job: AnalyzeJob) -> dict:
-    inline_annotation = len(job.pages) == 1
-    pages = [_page_schema(p, inline_annotation=inline_annotation) for p in job.pages]
+    pages = [_page_schema(p) for p in job.pages]
 
     source_pages = len({p.source_page or p.page_number for p in job.pages}) or job.total_pages
     total_regions = len(job.pages)
@@ -126,32 +118,6 @@ def _job_to_response(job: AnalyzeJob) -> dict:
         payload["vision_usage"] = vision_usage
 
     return payload
-
-
-@router.get("/analyze/{job_id}/pages/{page_number}/annotated")
-def get_page_annotated_image(job_id: str, page_number: int):
-    """Return annotated JPEG for a page (keeps main /analyze JSON small)."""
-    job = get_job(job_id)
-    if not job:
-        raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
-
-    page = next((p for p in job.pages if p.page_number == page_number), None)
-    if not page or not page.annotated_image:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No annotated image for page {page_number}.",
-        )
-
-    try:
-        raw = base64.b64decode(page.annotated_image, validate=True)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail="Invalid annotated image data.") from exc
-
-    return Response(
-        content=raw,
-        media_type="image/jpeg",
-        headers={"Cache-Control": "private, max-age=3600"},
-    )
 
 
 async def _read_upload(file: UploadFile) -> tuple[bytes, str, str]:
@@ -190,7 +156,7 @@ async def analyze(
         vision_model=vision_model.strip() if vision_model else None,
     )
 
-    # Worker subprocess save_job is not visible here — persist for GET .../annotated
+    # Worker subprocess save_job is not visible here — persist for job store lookups
     save_job(job)
 
     if job.status == JobStatus.FAILED:
@@ -296,7 +262,7 @@ async def analyze_stream(
                         "total_pages": total_units,
                         "source_page": page_result.source_page,
                         "region_index": page_result.region_index,
-                        "data": _page_schema(page_result, inline_annotation=True).model_dump(),
+                        "data": _page_schema(page_result).model_dump(),
                     }
                     if page_result.vision_usage is not None:
                         event["vision_usage"] = page_result.vision_usage.to_dict()

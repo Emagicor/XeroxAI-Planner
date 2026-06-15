@@ -2,11 +2,9 @@
 pipelines/extraction/page_analyzer.py
 
 Two-pass vision (preprocessed JPEG), deterministic dimension cleanup,
-annotations drawn on the same image the model saw, spec-based validation.
+spec-based validation.
 """
 from __future__ import annotations
-
-import base64
 
 import structlog
 
@@ -19,11 +17,7 @@ from engines.confidence.correction_targets import (
 )
 from engines.dimensions.sanitize import sanitize_vision_rooms
 from engines.validation.analysis_validator import is_valid
-from infrastructure.annotations.renderer import draw_annotations
-from infrastructure.preprocessing.image_preprocessor import (
-    prepare_display_image,
-    preprocess_image,
-)
+from infrastructure.preprocessing.image_preprocessor import preprocess_image
 from infrastructure.vision_prompt_logger import log_vision_pass_output
 from infrastructure.vision_session import VISION_API_LOCK
 from prompts.floor_plan import (
@@ -279,21 +273,6 @@ def _log_usage(response, pass_num: int, *, page_number: int) -> None:
     )
 
 
-def _attach_annotated_image(display_bytes: bytes, data: dict) -> dict:
-    rooms = data.get("rooms") or []
-    if not rooms:
-        return data
-    try:
-        annotated_bytes = draw_annotations(display_bytes, rooms)
-        return {
-            **data,
-            "annotated_image": base64.b64encode(annotated_bytes).decode("ascii"),
-        }
-    except Exception as exc:
-        log.warning("page_analyzer.annotation_failed", error=str(exc), exc_info=True)
-        return data
-
-
 def analyze_single_page(
     provider: VisionProvider,
     image_bytes: bytes,
@@ -324,11 +303,6 @@ def analyze_single_page(
 
     data = sanitize_vision_rooms(data)
     data = apply_total_area(data)
-    display_bytes, _display_mime = prepare_display_image(
-        bytes(image_bytes),
-        from_pdf=from_pdf,
-    )
-    data = _attach_annotated_image(display_bytes, data)
     data["eligible"] = True
     return data, usage_snapshot
 
@@ -396,7 +370,6 @@ def analyze_page_safe(
                 page=page_number,
                 attempt=attempt,
                 session_id=session_id,
-                has_annotation=bool(result.get("annotated_image")),
             )
             return result, accumulated_usage
 
