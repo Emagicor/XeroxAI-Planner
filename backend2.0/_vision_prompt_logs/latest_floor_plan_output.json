@@ -2,33 +2,37 @@
   "page_classification": {
     "is_floor_plan": true,
     "page_type": "floorplan",
-    "reason": "The image displays two top-down architectural floor plans with room boundaries and labels."
+    "reason": "The image displays a top-down architectural layout with walls and labeled rooms."
   },
   "floor_identification": {
     "floor_label": "Unknown",
     "confidence_pct": 0,
-    "evidence": "No explicit floor level labels found on the page."
+    "evidence": "No explicit floor level label found on the drawing."
   },
   "rooms": [
     {
-      "name": "Bedroom",
+      "name": "BED ROOM",
       "bbox": [
         100,
         100,
-        350,
+        250,
         250
       ],
       "polygon": [
         [
           100,
+          250
+        ],
+        [
+          100,
           100
         ],
         [
-          350,
+          250,
           100
         ],
         [
-          350,
+          250,
           250
         ],
         [
@@ -36,287 +40,576 @@
           250
         ]
       ],
-      "length_ft": 11.22042,
-      "width_ft": 11.8116,
-      "area_sqft": 132.525,
+      "length_ft": 12.0,
+      "width_ft": 8.0,
+      "area_sqft": 96.0,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "master Bedroom",
-      "bbox": [
-        350,
-        100,
-        600,
-        250
-      ],
-      "polygon": [
-        [
-          350,
-          100
-        ],
-        [
-          600,
-          100
-        ],
-        [
-          600,
-          250
-        ],
-        [
-          350,
-          250
-        ]
-      ],
-      "length_ft": 11.22042,
-      "width_ft": 11.8116,
-      "area_sqft": 132.525,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "Toilet",
+      "name": "WASH ROOM",
       "bbox": [
         250,
-        280,
+        100,
         350,
-        350
+        250
       ],
       "polygon": [
         [
           250,
-          280
-        ],
-        [
-          350,
-          280
-        ],
-        [
-          350,
-          350
+          250
         ],
         [
           250,
-          350
+          100
+        ],
+        [
+          350,
+          100
+        ],
+        [
+          350,
+          250
+        ],
+        [
+          250,
+          250
         ]
       ],
-      "length_ft": 5.2496,
-      "width_ft": 6.16748,
-      "area_sqft": 32.377,
+      "length_ft": 6.5,
+      "width_ft": 4.5,
+      "area_sqft": 29.25,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "kitchen",
+      "name": "WASH ROOM",
+      "bbox": [
+        350,
+        100,
+        450,
+        250
+      ],
+      "polygon": [
+        [
+          350,
+          250
+        ],
+        [
+          350,
+          100
+        ],
+        [
+          450,
+          100
+        ],
+        [
+          450,
+          250
+        ],
+        [
+          350,
+          250
+        ]
+      ],
+      "length_ft": 6.5,
+      "width_ft": 4.0,
+      "area_sqft": 26.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "SEMI-DELUXE BED ROOM",
+      "bbox": [
+        450,
+        100,
+        580,
+        250
+      ],
+      "polygon": [
+        [
+          450,
+          250
+        ],
+        [
+          450,
+          100
+        ],
+        [
+          580,
+          100
+        ],
+        [
+          580,
+          250
+        ],
+        [
+          450,
+          250
+        ]
+      ],
+      "length_ft": 12.0,
+      "width_ft": 6.75,
+      "area_sqft": 81.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WASH ROOM",
+      "bbox": [
+        580,
+        100,
+        680,
+        250
+      ],
+      "polygon": [
+        [
+          580,
+          250
+        ],
+        [
+          580,
+          100
+        ],
+        [
+          680,
+          100
+        ],
+        [
+          680,
+          250
+        ],
+        [
+          580,
+          250
+        ]
+      ],
+      "length_ft": 6.5,
+      "width_ft": 4.5,
+      "area_sqft": 29.25,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WASH ROOM",
+      "bbox": [
+        680,
+        100,
+        780,
+        250
+      ],
+      "polygon": [
+        [
+          680,
+          250
+        ],
+        [
+          680,
+          100
+        ],
+        [
+          780,
+          100
+        ],
+        [
+          780,
+          250
+        ],
+        [
+          680,
+          250
+        ]
+      ],
+      "length_ft": 6.5,
+      "width_ft": 4.0,
+      "area_sqft": 26.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM",
+      "bbox": [
+        780,
+        100,
+        900,
+        250
+      ],
+      "polygon": [
+        [
+          780,
+          250
+        ],
+        [
+          780,
+          100
+        ],
+        [
+          900,
+          100
+        ],
+        [
+          900,
+          250
+        ],
+        [
+          780,
+          250
+        ]
+      ],
+      "length_ft": 12.5,
+      "width_ft": 8.5,
+      "area_sqft": 106.25,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "KIDS ROOM",
+      "bbox": [
+        100,
+        450,
+        250,
+        580
+      ],
+      "polygon": [
+        [
+          100,
+          580
+        ],
+        [
+          100,
+          450
+        ],
+        [
+          250,
+          450
+        ],
+        [
+          250,
+          580
+        ],
+        [
+          100,
+          580
+        ]
+      ],
+      "length_ft": 9.5,
+      "width_ft": 12.0,
+      "area_sqft": 114.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WASH ROOM",
       "bbox": [
         250,
-        400,
+        450,
         350,
-        500
+        580
       ],
       "polygon": [
         [
           250,
-          400
-        ],
-        [
-          350,
-          400
-        ],
-        [
-          350,
-          500
+          580
         ],
         [
           250,
-          500
+          450
+        ],
+        [
+          350,
+          450
+        ],
+        [
+          350,
+          580
+        ],
+        [
+          250,
+          580
         ]
       ],
-      "length_ft": 7.2178,
-      "width_ft": 9.35085,
-      "area_sqft": 67.49,
+      "length_ft": 9.0,
+      "width_ft": 6.0,
+      "area_sqft": 54.0,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "Reception",
+      "name": "ADULT ROOM",
       "bbox": [
-        350,
-        400,
+        100,
+        650,
+        250,
+        780
+      ],
+      "polygon": [
+        [
+          100,
+          780
+        ],
+        [
+          100,
+          650
+        ],
+        [
+          250,
+          650
+        ],
+        [
+          250,
+          780
+        ],
+        [
+          100,
+          780
+        ]
+      ],
+      "length_ft": 11.0,
+      "width_ft": 18.5,
+      "area_sqft": 203.5,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WASH ROOM",
+      "bbox": [
+        500,
+        450,
         600,
-        600
+        580
       ],
       "polygon": [
         [
-          350,
-          400
+          500,
+          580
+        ],
+        [
+          500,
+          450
         ],
         [
           600,
-          400
+          450
         ],
         [
           600,
-          600
+          580
         ],
         [
-          350,
-          600
+          500,
+          580
         ]
       ],
-      "length_ft": 10.07247,
-      "width_ft": 15.81382,
-      "area_sqft": 159.234,
+      "length_ft": 9.0,
+      "width_ft": 6.5,
+      "area_sqft": 58.5,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "Kitchen",
+      "name": "WASH ROOM",
       "bbox": [
+        660,
+        450,
+        720,
+        580
+      ],
+      "polygon": [
+        [
+          660,
+          580
+        ],
+        [
+          660,
+          450
+        ],
+        [
+          720,
+          450
+        ],
+        [
+          720,
+          580
+        ],
+        [
+          660,
+          580
+        ]
+      ],
+      "length_ft": 9.0,
+      "width_ft": 2.4166666666666665,
+      "area_sqft": 21.75,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM",
+      "bbox": [
+        500,
         650,
-        100,
-        800,
-        250
+        620,
+        780
       ],
       "polygon": [
         [
-          650,
-          100
+          500,
+          780
         ],
         [
-          800,
-          100
+          500,
+          650
         ],
         [
-          800,
-          250
+          620,
+          650
         ],
         [
-          650,
-          250
+          620,
+          780
+        ],
+        [
+          500,
+          780
         ]
       ],
-      "length_ft": 10.72887,
-      "width_ft": 11.8116,
-      "area_sqft": 126.713,
+      "length_ft": 12.0,
+      "width_ft": 8.0,
+      "area_sqft": 96.0,
       "confidence_pct": 95,
       "dimension_source": "measured",
       "assumptions": []
     },
     {
-      "name": "Room",
+      "name": "DELUXE BED ROOM",
       "bbox": [
-        800,
-        100,
-        950,
-        250
-      ],
-      "polygon": [
-        [
-          800,
-          100
-        ],
-        [
-          950,
-          100
-        ],
-        [
-          950,
-          250
-        ],
-        [
-          800,
-          250
-        ]
-      ],
-      "length_ft": 10.26953,
-      "width_ft": 11.8116,
-      "area_sqft": 121.288,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "Toilet",
-      "bbox": [
-        750,
-        280,
-        850,
-        350
-      ],
-      "polygon": [
-        [
-          750,
-          280
-        ],
-        [
-          850,
-          280
-        ],
-        [
-          850,
-          350
-        ],
-        [
-          750,
-          350
-        ]
-      ],
-      "length_ft": 5.2496,
-      "width_ft": 7.25001,
-      "area_sqft": 38.061,
-      "confidence_pct": 95,
-      "dimension_source": "measured",
-      "assumptions": []
-    },
-    {
-      "name": "Hall",
-      "bbox": [
+        620,
         650,
-        400,
-        950,
-        600
+        760,
+        780
       ],
       "polygon": [
         [
-          650,
-          400
+          620,
+          780
         ],
         [
-          950,
-          400
+          620,
+          650
         ],
         [
-          950,
-          600
+          760,
+          650
         ],
         [
-          650,
-          600
+          760,
+          780
+        ],
+        [
+          620,
+          780
         ]
       ],
-      "length_ft": 19.32409,
-      "width_ft": 9.843,
-      "area_sqft": 190.198,
-      "confidence_pct": 90,
-      "dimension_source": "derived",
-      "assumptions": [
-        "Hall length derived from sum of 3.50m and 2.39m dimensions."
-      ]
+      "length_ft": 14.0,
+      "width_ft": 7.5,
+      "area_sqft": 105.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "BED ROOM",
+      "bbox": [
+        760,
+        650,
+        880,
+        780
+      ],
+      "polygon": [
+        [
+          760,
+          780
+        ],
+        [
+          760,
+          650
+        ],
+        [
+          880,
+          650
+        ],
+        [
+          880,
+          780
+        ],
+        [
+          760,
+          780
+        ]
+      ],
+      "length_ft": 12.5,
+      "width_ft": 8.0,
+      "area_sqft": 100.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "WASH ROOM",
+      "bbox": [
+        790,
+        450,
+        880,
+        580
+      ],
+      "polygon": [
+        [
+          790,
+          580
+        ],
+        [
+          790,
+          450
+        ],
+        [
+          880,
+          450
+        ],
+        [
+          880,
+          580
+        ],
+        [
+          790,
+          580
+        ]
+      ],
+      "length_ft": 9.0,
+      "width_ft": 7.0,
+      "area_sqft": 63.0,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
     }
   ],
   "layout_dimensions": {
     "available": true,
-    "width_ft": 23.6232,
-    "height_ft": 32.81,
+    "width_ft": 82.5,
+    "height_ft": 20.0,
     "source": "measured"
   },
-  "total_area_sqft": 1000.421,
-  "overall_confidence": 90,
-  "units_detected": "meters"
+  "total_area_sqft": 1215.0,
+  "overall_confidence": 95,
+  "units_detected": "feet"
 }
