@@ -124,7 +124,7 @@ function matchScore(gt, ai) {
     ai.lengthFt,
     ai.widthFt,
   )
-  return { ns, dm, am, score: ns * 3 + (dm ? 4 : 0) + (am ? 1 : 0) }
+  return { ns, dm, am, score: ns * 10 + (dm ? 4 : 0) + (am ? 1 : 0) }
 }
 
 /**

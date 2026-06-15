@@ -151,6 +151,24 @@
       "failed": 1,
       "modelLabel": "Server default",
       "modelId": "server-default"
+    },
+    {
+      "runId": "run-2026-06-15T05-11-09.878Z",
+      "timestamp": "2026-06-15T05:11:09.878Z",
+      "totalTests": 4,
+      "passed": 2,
+      "failed": 2,
+      "modelLabel": "Server default",
+      "modelId": "server-default"
+    },
+    {
+      "runId": "run-2026-06-15T06-00-38.928Z",
+      "timestamp": "2026-06-15T06:00:38.928Z",
+      "totalTests": 4,
+      "passed": 1,
+      "failed": 3,
+      "modelLabel": "Server default",
+      "modelId": "server-default"
     }
   ]
 }
