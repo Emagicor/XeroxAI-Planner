@@ -2,22 +2,61 @@ import { useEffect, useState } from 'react'
 import { useBackendHealth } from '@/hooks/useBackendHealth'
 import Badge from '@/components/ui/Badge'
 
-function BuildingIcon() {
+function BuildingIcon({ className = "w-5 h-5" }) {
   return (
     <svg
-      className="w-5 h-5 text-accent"
+      className={className}
+      viewBox="0 0 20 20"
       fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={1.7}
+      xmlns="http://www.w3.org/2000/svg"
     >
+      {/* ground line */}
       <path
+        d="M2 18h16"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
+      {/* building silhouette */}
+      <path
+        d="M4.5 18V8.2L10 3.5l5.5 4.7V18"
+        stroke="currentColor"
+        strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M3 21h18M5 21V9l7-6 7 6v12M9 21v-6h6v6"
+      />
+      {/* door */}
+      <rect
+        x={7.5}
+        y={12.5}
+        width={5}
+        height={5.5}
+        rx={0.75}
+        stroke="currentColor"
+        strokeWidth={1.2}
+      />
+      {/* left window */}
+      <rect
+        x={5.5}
+        y={9.5}
+        width={2.5}
+        height={2.5}
+        rx={0.5}
+        stroke="currentColor"
+        strokeWidth={1.1}
+      />
+      {/* right window */}
+      <rect
+        x={12}
+        y={9.5}
+        width={2.5}
+        height={2.5}
+        rx={0.5}
+        stroke="currentColor"
+        strokeWidth={1.1}
       />
     </svg>
-  )
+  );
 }
 
 const BACKEND_STATUS = {
@@ -68,13 +107,13 @@ export default function Header() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base font-semibold tracking-tight text-text">
-                FloorPlan AI
+                ZeroxAI-Planner
               </h1>
               <Badge>Build91</Badge>
             </div>
-            <p className="text-xs text-muted hidden sm:block leading-none mt-0.5">
+            {/* <p className="text-xs text-muted hidden sm:block leading-none mt-0.5">
               Room dimension extraction
-            </p>
+            </p> */}
           </div>
         </div>
 

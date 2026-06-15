@@ -2,7 +2,7 @@ export default function Card({ children, className = '', padding = true, glow = 
   return (
     <div
       className={[
-        'rounded-xl border border-line bg-card overflow-hidden',
+        'rounded-xl border border-violet-400 bg-card overflow-hidden',
         glow ? 'shadow-[var(--shadow-md)]' : 'shadow-[var(--shadow-sm)]',
         padding ? '' : '',
         className,

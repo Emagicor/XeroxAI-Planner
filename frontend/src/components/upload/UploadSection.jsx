@@ -25,6 +25,22 @@ export default function UploadSection({
 }) {
   return (
     <section>
+      <div className="rounded-xl border border-line mb-4 p-4">
+        <h3 className="font-medium text-text mb-2">
+          How to Analyze a Floor Plan
+        </h3>
+
+        <ol className="space-y-2 text-sm text-muted list-decimal list-inside">
+          <li>Upload a clear floor plan image or PDF.</li>
+          <li>Each page should contain only one floor plan.</li>
+          <li>Ensure room labels and dimensions are visible.</li>
+          <li>Avoid blurry, cropped, or low-resolution files.</li>
+          <li>
+            Click <strong>Analyze</strong> to extract room information.
+          </li>
+          <li>Review the extracted dimensions and AI findings.</li>
+        </ol>
+      </div>
       <FileDropZone
         file={file}
         preview={preview}
@@ -37,13 +53,19 @@ export default function UploadSection({
 
       {file && !loading && (
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Button
-            size="lg"
-            onClick={onUpload}
-            disabled={primaryDisabled}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          <Button size="lg" onClick={onUpload} disabled={primaryDisabled}>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
             </svg>
             {primaryLabel}
           </Button>
@@ -70,5 +92,5 @@ export default function UploadSection({
         />
       )}
     </section>
-  )
+  );
 }
