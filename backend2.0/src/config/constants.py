@@ -3,29 +3,6 @@ Compile-time constants — values that never change between deployments.
 Tunable runtime values belong in settings.py instead.
 """
 
-# ── Annotation palette (matches frontend ROOM_HEX_COLORS) ─────────────────────
-ROOM_COLORS = [
-    (29, 158, 117),
-    (127, 119, 221),
-    (186, 117, 23),
-    (216, 90, 48),
-    (55, 138, 221),
-    (99, 153, 34),
-    (212, 83, 126),
-    (136, 135, 128),
-]
-
-ROOM_HEX_COLORS = [
-    "#1D9E75",
-    "#7F77DD",
-    "#BA7517",
-    "#D85A30",
-    "#378ADD",
-    "#639922",
-    "#D4537E",
-    "#888780",
-]
-
 # ── File validation ───────────────────────────────────────────────────────────
 ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
 ALLOWED_MIME_TYPES = {

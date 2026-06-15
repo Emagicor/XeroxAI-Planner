@@ -10,7 +10,6 @@ PASS1 = {
     "rooms": [
         {
             "name": "Kitchen",
-            "bbox": [100, 100, 300, 300],
             "length_ft": 12.0,
             "width_ft": 10.0,
             "area_sqft": 120.0,
@@ -20,7 +19,6 @@ PASS1 = {
         },
         {
             "name": "Bed 2",
-            "bbox": [400, 100, 600, 300],
             "length_ft": 11.0,
             "width_ft": 9.5,
             "area_sqft": 104.5,
@@ -30,7 +28,6 @@ PASS1 = {
         },
         {
             "name": "Closet",
-            "bbox": [700, 100, 800, 200],
             "length_ft": 4.0,
             "width_ft": 3.0,
             "area_sqft": 12.0,
@@ -64,7 +61,6 @@ def test_assumed_room_includes_identity_fields():
     closet = PASS1["rooms"][2]
     fields = fields_to_verify(closet, threshold=84)
     assert "name" in fields
-    assert "bbox" in fields
 
 
 def test_build_targets_only_includes_low_confidence_rooms():
@@ -119,7 +115,6 @@ def test_merge_appends_missed_rooms():
             "rooms_added": [
                 {
                     "name": "Pantry",
-                    "bbox": [50, 50, 90, 90],
                     "length_ft": 6.0,
                     "width_ft": 4.0,
                     "area_sqft": 24.0,
@@ -142,7 +137,6 @@ def test_merge_skips_duplicate_missed_room_names():
             "rooms_added": [
                 {
                     "name": "Kitchen",
-                    "bbox": [100, 100, 300, 300],
                     "length_ft": 12.0,
                     "width_ft": 10.0,
                     "area_sqft": 120.0,

@@ -9,7 +9,7 @@ export function groupDocByPlan(doc) {
   return doc.pageSummaries
     .filter((s) => s.eligible !== false)
     .map((summary) => {
-      const annotated = doc.annotatedPages?.find((a) => a.page === summary.page)
+      const preview = doc.planPreviews?.find((a) => a.page === summary.page)
       const rows = (doc.rows ?? []).filter(
         (r) => r.page === summary.page && r.eligible !== false,
       )
@@ -18,9 +18,7 @@ export function groupDocByPlan(doc) {
         sourcePage: summary.sourcePage ?? summary.page,
         regionIndex: summary.regionIndex ?? 1,
         floorLabel: summary.floorLabel ?? `Page ${summary.page}`,
-        clipPreview: summary.clipPreview ?? annotated?.clipPreview ?? null,
-        annotatedImage: annotated?.annotatedImage ?? null,
-        hasAnnotated: annotated?.hasAnnotated ?? false,
+        clipPreview: summary.clipPreview ?? preview?.clipPreview ?? null,
         totalAreaSqft: summary.totalAreaSqft ?? 0,
         roomCount: summary.roomCount ?? rows.length,
         rows,
@@ -46,8 +44,6 @@ export function extractPlanSectionsFromAnalyze(data) {
         region_index: page.region_index,
       }),
       clipPreview: page.clip_preview ?? null,
-      annotatedImage: page.annotated_image ?? null,
-      hasAnnotated: Boolean(page.annotated_image || page.has_annotated_image),
       totalAreaSqft: Number(page.total_area_sqft ?? 0),
       roomCount: (page.rooms ?? []).length,
       rooms: page.rooms ?? [],

@@ -1,4 +1,4 @@
-import { inlineImageSrc } from '@/utils/annotatedImage'
+import { inlineImageSrc } from '@/utils/inlineImage'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
 import Card, { CardBody } from '@/components/ui/Card'
 import SectionHeader from '@/components/ui/SectionHeader'

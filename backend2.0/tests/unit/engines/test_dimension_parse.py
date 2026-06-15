@@ -12,7 +12,6 @@ def test_sanitize_recomputes_area():
         "rooms": [
             {
                 "name": "Bed",
-                "bbox": [0, 0, 100, 100],
                 "length_ft": 12,
                 "width_ft": 10,
                 "area_sqft": 999,

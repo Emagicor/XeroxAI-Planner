@@ -6,7 +6,8 @@ import {
 } from '@/utils/testSuite/compare'
 import { extractPlanSectionsFromAnalyze, isMultiPlanAnalyze } from '@/utils/planSections'
 import { aggregateBatchVisionUsage, formatTokenCount, getVisionUsage } from '@/utils/testSuite/visionUsage'
-import { TestSuiteBatchVisionSummary, TestSuiteCaseVisionUsage } from '@/components/test-suite/TestSuiteVisionUsage'
+import { TestSuiteCaseVisionUsage } from '@/components/test-suite/TestSuiteVisionUsage'
+import { VisionUsageBatchSummary } from '@/components/vision/VisionUsagePanel'
 import { scenarioLabel } from '@/utils/scenarios'
 import PlanImagesPanel from '@/components/plan/PlanImagesPanel'
 import PlanTabSwitcher from '@/components/plan/PlanTabSwitcher'
@@ -214,9 +215,6 @@ function PlanCaseContent({ plan, planEval }) {
           floorLabel={plan.floorLabel}
           clipPreview={plan.clipPreview}
           planNumber={plan.planNumber}
-          annotatedImage={plan.annotatedImage}
-          hasAnnotated={plan.hasAnnotated}
-          rooms={[]}
           expandable={false}
         />
       </section>
@@ -379,7 +377,7 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
                 </div>
               ) : (
                 <div className="mt-4 space-y-6">
-                  {(planSections[0]?.clipPreview || planSections[0]?.annotatedImage) && (
+                  {planSections[0]?.clipPreview && (
                     <section className="space-y-3">
                       <p className="text-xs font-medium text-muted uppercase tracking-wide">
                         Floor plan visuals
@@ -388,9 +386,6 @@ function CaseResultCard({ index, row, expanded, onToggle }) {
                         floorLabel={planSections[0].floorLabel}
                         clipPreview={planSections[0].clipPreview}
                         planNumber={planSections[0].planNumber}
-                        annotatedImage={planSections[0].annotatedImage}
-                        hasAnnotated={planSections[0].hasAnnotated}
-                        rooms={[]}
                         expandable={false}
                       />
                     </section>
@@ -497,7 +492,7 @@ export default function TestSuiteMetrics({ results, onNewBatch, modelLabel = nul
         )}
       </div>
 
-      {batchVisionUsage && <TestSuiteBatchVisionSummary batchUsage={batchVisionUsage} />}
+      {batchVisionUsage && <VisionUsageBatchSummary batchUsage={batchVisionUsage} />}
 
       {aggregate && (
         <div className="rounded-xl border border-line bg-card overflow-hidden shadow-[var(--shadow-sm)]">

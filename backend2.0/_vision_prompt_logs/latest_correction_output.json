@@ -1,29 +1,36 @@
 {
-  "room_corrections": [
+  "room_corrections": [],
+  "rooms_added": [
     {
-      "room_index": 8,
-      "action": "update",
-      "name": "Hall",
-      "length_ft": 19.324,
-      "width_ft": 9.843,
-      "area_sqft": 190.2,
-      "confidence_pct": 80,
+      "name": "TRADITIONAL RABSAL",
+      "length_ft": 20.0,
+      "width_ft": 4.0,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
+    },
+    {
+      "name": "FAMILY SET",
+      "length_ft": 12.0,
+      "width_ft": 9.5,
+      "area_sqft": null,
+      "confidence_pct": 90,
       "dimension_source": "derived",
       "assumptions": [
-        "Hall length derived from sum of 3.50m and 2.39m dimensions."
-      ],
-      "bbox": [
-        440,
-        540,
-        700,
-        650
+        "Assumed length from adjacent room's dimension and visual alignment.",
+        "Assumed width from adjacent room's dimension and visual alignment."
       ]
+    },
+    {
+      "name": "space for lift",
+      "length_ft": 6.0,
+      "width_ft": 5.0,
+      "area_sqft": null,
+      "confidence_pct": 95,
+      "dimension_source": "measured",
+      "assumptions": []
     }
   ],
-  "rooms_added": [],
-  "floor_identification": {
-    "floor_label": "Unknown",
-    "confidence_pct": 0,
-    "evidence": "No explicit floor level labels found on the page."
-  }
+  "floor_identification": null
 }

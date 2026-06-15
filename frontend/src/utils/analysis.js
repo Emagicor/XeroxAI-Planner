@@ -1,5 +1,5 @@
 /**
- * Normalize backend2.0 analyze responses into review rows + annotated pages.
+ * Normalize backend2.0 analyze responses into review rows + plan previews.
  */
 
 import { pageTypeLabel } from './pageTypes'
@@ -15,7 +15,7 @@ export function normalizeAnalyzeResponse(data) {
   const pages = data.pages ?? []
   const rows = []
   const ineligiblePages = []
-  const annotatedPages = []
+  const planPreviews = []
   const pageSummaries = []
 
   for (const page of pages) {
@@ -48,23 +48,13 @@ export function normalizeAnalyzeResponse(data) {
       clipPreview: page.clip_preview ?? null,
     })
 
-    const hasAnnotated =
-      Boolean(page.has_annotated_image) || Boolean(page.annotated_image)
-
     const clipPreview = page.clip_preview ?? null
 
-    if ((hasAnnotated || clipPreview) && eligible) {
-      annotatedPages.push({
+    if (clipPreview && eligible) {
+      planPreviews.push({
         page: pageNum,
         floorLabel,
-        annotatedImage: page.annotated_image ?? null,
         clipPreview,
-        hasAnnotated: Boolean(page.annotated_image),
-        rooms: pageRooms.map((r, i) => ({
-          name: r.name,
-          roomIndex: i,
-          colorIndex: i,
-        })),
         eligible,
       })
     }
@@ -122,10 +112,8 @@ export function normalizeAnalyzeResponse(data) {
     })
   }
 
-  const firstAnnotated =
-    annotatedPages.find((p) => p.eligible && p.annotatedImage) ??
-    annotatedPages[0] ??
-    null
+  const firstPreview =
+    planPreviews.find((p) => p.eligible) ?? planPreviews[0] ?? null
 
   const doc = {
     jobId: data.job_id ?? data.jobId ?? null,
@@ -138,8 +126,9 @@ export function normalizeAnalyzeResponse(data) {
     ineligiblePages: data.ineligible_pages ?? ineligiblePages.length,
     ineligibleList: ineligiblePages,
     pageSummaries,
-    annotatedPages,
-    defaultPage: firstAnnotated?.page ?? annotatedPages[0]?.page ?? 1,
+    planPreviews,
+    visionUsage: data.vision_usage ?? null,
+    defaultPage: firstPreview?.page ?? planPreviews[0]?.page ?? 1,
     rows,
     raw: data,
   }

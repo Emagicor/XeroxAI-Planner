@@ -41,7 +41,6 @@ def build_page_result(page_number: int, page_type: PageType, raw: dict) -> PageR
         layout_dimensions_used=raw.get("layout_dimensions_used"),
         overall_confidence=int(raw.get("overall_confidence") or 0),
         units_detected=raw.get("units_detected", "feet"),
-        annotated_image=raw.get("annotated_image"),
     )
     page.compute_totals()
     return page
@@ -56,8 +55,6 @@ def _build_room(r: dict) -> RoomResult:
 
     return RoomResult(
         name=r.get("name", "Unknown"),
-        bbox=r.get("bbox", [0, 0, 0, 0]),
-        polygon=r.get("polygon", []),
         length_ft=r.get("length_ft"),
         width_ft=r.get("width_ft"),
         area_sqft=r.get("area_sqft"),
