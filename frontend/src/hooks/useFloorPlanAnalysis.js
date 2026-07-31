@@ -1,4 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import {
+  DEFAULT_ANALYZE_MODEL_ID,
+  DEFAULT_CORRECTION_MODEL_ID,
+  visionOverrideFromAnalyzeModel,
+} from '../constants/analyzeModels'
 import { ANALYZE_STREAM_STEPS, LOADING_STEPS } from '../constants/loading'
 import { runFloorPlanAnalyze, shouldUseAnalyzeStream } from '../services/floorPlanPipeline'
 import { toastFromError, toastSuccess } from '../stores/toastStore'
@@ -13,6 +18,8 @@ export function useFloorPlanAnalysis() {
   const [analyzeProgress, setAnalyzeProgress] = useState([])
   const [currentPlanIndex, setCurrentPlanIndex] = useState(-1)
   const [error, setError] = useState(null)
+  const [modelId, setModelId] = useState(DEFAULT_ANALYZE_MODEL_ID)
+  const [correctionModelId, setCorrectionModelId] = useState(DEFAULT_CORRECTION_MODEL_ID)
   const fileInputRef = useRef(null)
 
   const loadingSteps =
@@ -70,6 +77,7 @@ export function useFloorPlanAnalysis() {
     try {
       const data = await runFloorPlanAnalyze(file, {
         isolateUpload: true,
+        ...visionOverrideFromAnalyzeModel(modelId, correctionModelId),
         onStreamEvent: ({ type, planIndex, pageData, progressItems }) => {
           if (type === 'detected' && progressItems?.length) {
             setAnalyzeProgress(
@@ -133,6 +141,11 @@ export function useFloorPlanAnalysis() {
     analyzeProgress,
     currentPlanIndex,
     error,
+    modelId,
+    correctionModelId,
+    // Deliberately survive resetAll — models are user preferences, not per-file state.
+    setModelId,
+    setCorrectionModelId,
     fileInputRef,
     handleFileSelect,
     handleDrop,

@@ -21,6 +21,7 @@ import { evaluateAgainstGroundTruth } from '../utils/testSuite/compare'
 import { aggregateBatchVisionUsage } from '../utils/testSuite/visionUsage'
 import { cloneFileForUpload, delay } from '../utils/cloneUploadFile'
 import { sha256Hex } from '../utils/fileHash'
+import { randomId } from '../utils/randomId'
 import { parseGroundTruthFile } from '../utils/testSuite/normalize'
 import { toastFromError, toastSuccess, toastWarning } from '../stores/toastStore'
 import { logApiFailure } from '../utils/apiErrors'
@@ -30,7 +31,7 @@ const INTER_CASE_DELAY_MS = 2500
 
 function createDraftCase(inputFile = null) {
   return {
-    id: crypto.randomUUID(),
+    id: randomId(),
     persisted: false,
     permanent: false,
     dirty: false,

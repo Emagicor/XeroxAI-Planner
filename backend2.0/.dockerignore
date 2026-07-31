@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+.venv
+.pytest_cache
+
+# Secrets are injected at runtime via compose env_file, never baked into the image.
+.env
+.env.*
+!.env.example
+
+_vision_prompt_logs
+tests
+.git
+Dockerfile
+.dockerignore
+*.log

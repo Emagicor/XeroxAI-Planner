@@ -1,5 +1,6 @@
 import { useApiStore } from '../stores/apiStore'
 import { cloneFileForUpload } from '../utils/cloneUploadFile'
+import { randomId } from '../utils/randomId'
 import {
   createApiErrorFromPayload,
   logApiFailure,
@@ -17,6 +18,8 @@ export async function analyzeFloorPlanStream(
     isolateUpload = true,
     visionProvider = null,
     visionModel = null,
+    visionCorrectionProvider = null,
+    visionCorrectionModel = null,
   } = {},
 ) {
   const base = useApiStore.getState().apiBaseUrl.replace(/\/$/, '')
@@ -31,6 +34,12 @@ export async function analyzeFloorPlanStream(
   if (visionModel) {
     form.append('vision_model', visionModel)
   }
+  if (visionCorrectionProvider) {
+    form.append('vision_correction_provider', visionCorrectionProvider)
+  }
+  if (visionCorrectionModel) {
+    form.append('vision_correction_model', visionCorrectionModel)
+  }
 
   let res
   try {
@@ -39,7 +48,7 @@ export async function analyzeFloorPlanStream(
       body: form,
       cache: 'no-store',
       headers: {
-        'X-Request-Id': crypto.randomUUID(),
+        'X-Request-Id': randomId(),
       },
     })
   } catch (err) {

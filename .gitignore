@@ -7,3 +7,4 @@ backend2.0/_vision_prompt_logs/
 .pytest_cache
 .env.development
 .env.production
+logs/

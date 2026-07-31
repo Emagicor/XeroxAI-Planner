@@ -1,6 +1,7 @@
 import ErrorBanner from '@/components/ui/ErrorBanner'
 import FileDropZone from '@/components/upload/FileDropZone'
 import LoadingIndicator from '@/components/ui/LoadingIndicator'
+import ModelSelector from '@/components/analysis/ModelSelector'
 import Button from '@/components/ui/Button'
 
 export default function UploadSection({
@@ -22,7 +23,13 @@ export default function UploadSection({
   primaryLabel = 'Analyze floor plan',
   primaryDisabled = false,
   showFilePreview = true,
+  modelId,
+  onModelChange,
+  correctionModelId,
+  onCorrectionModelChange,
 }) {
+  // Only render the picker when a caller opts in by wiring onModelChange.
+  const showModelSelector = Boolean(onModelChange)
   return (
     <section>
       <div className="rounded-xl border border-line mb-4 p-4">
@@ -41,6 +48,16 @@ export default function UploadSection({
           <li>Review the extracted dimensions and AI findings.</li>
         </ol>
       </div>
+      {showModelSelector && (
+        <ModelSelector
+          value={modelId}
+          onChange={onModelChange}
+          correctionValue={correctionModelId}
+          onCorrectionChange={onCorrectionModelChange}
+          disabled={loading}
+        />
+      )}
+
       <FileDropZone
         file={file}
         preview={preview}

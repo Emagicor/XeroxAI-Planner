@@ -20,7 +20,7 @@ def _get_executor() -> ProcessPoolExecutor:
     global _executor
     if _executor is None:
         ctx = mp.get_context("spawn")
-        _executor = ProcessPoolExecutor(max_workers=1, mp_context=ctx)
+        _executor = ProcessPoolExecutor(max_workers=3, mp_context=ctx)
     return _executor
 
 
@@ -30,18 +30,23 @@ def _pipeline_worker(
     declared_mime: str | None,
     vision_provider: str | None,
     vision_model: str | None,
+    vision_correction_provider: str | None,
+    vision_correction_model: str | None,
 ) -> "AnalyzeJob":
     from application.orchestrators.analyze_orchestrator import run_analyze_pipeline
     from providers.vision.request_config import VisionOverride
 
-    override = None
-    if vision_provider or vision_model:
-        override = VisionOverride(provider=vision_provider, model=vision_model)
+    override = VisionOverride(
+        provider=vision_provider,
+        model=vision_model,
+        correction_provider=vision_correction_provider,
+        correction_model=vision_correction_model,
+    )
     return run_analyze_pipeline(
         filename,
         file_bytes,
         declared_mime,
-        vision_override=override,
+        vision_override=override if override.is_set else None,
     )
 
 
@@ -52,6 +57,8 @@ def run_analyze_pipeline_isolated(
     *,
     vision_provider: str | None = None,
     vision_model: str | None = None,
+    vision_correction_provider: str | None = None,
+    vision_correction_model: str | None = None,
     timeout_seconds: int = 900,
 ) -> "AnalyzeJob":
     """Run pipeline in a fresh process; blocks until complete."""
@@ -63,5 +70,7 @@ def run_analyze_pipeline_isolated(
         declared_mime,
         vision_provider,
         vision_model,
+        vision_correction_provider,
+        vision_correction_model,
     )
     return future.result(timeout=timeout_seconds)

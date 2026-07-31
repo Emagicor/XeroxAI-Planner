@@ -30,6 +30,10 @@ export default function DevApp() {
     analyzeProgress,
     currentPlanIndex,
     error: analyzeError,
+    modelId,
+    setModelId,
+    correctionModelId,
+    setCorrectionModelId,
     fileInputRef: analyzeFileInputRef,
     handleFileSelect,
     handleDrop,
@@ -184,6 +188,10 @@ export default function DevApp() {
                   onDrop={handleDrop}
                   onUpload={handleUpload}
                   onRetry={retryUpload}
+                  modelId={modelId}
+                  onModelChange={setModelId}
+                  correctionModelId={correctionModelId}
+                  onCorrectionModelChange={setCorrectionModelId}
                 />
               </div>
             </div>
@@ -205,6 +213,10 @@ export default function DevApp() {
               onDismiss={handleResetAnalyze}
               retryLabel="Retry analysis"
               primaryDisabled={!canAnalyze}
+              modelId={modelId}
+              onModelChange={setModelId}
+              correctionModelId={correctionModelId}
+              onCorrectionModelChange={setCorrectionModelId}
             />
           )}
 

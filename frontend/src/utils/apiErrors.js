@@ -128,8 +128,12 @@ export function normalizeNetworkError(err, meta = {}) {
   const baseUrl = useApiStore.getState().apiBaseUrl
   const message = err?.message ?? String(err)
 
+  // fetch() rejects with a TypeError on network failure: "Failed to fetch" (Chrome/Edge),
+  // "NetworkError when attempting to fetch resource" (Firefox), "Load failed" (Safari).
+  // Match on the message, not `instanceof TypeError` alone — a bare type check also swallows
+  // ordinary programming errors thrown near the call (e.g. a secure-context-only API being
+  // undefined over plain HTTP) and reports them to the user as "the backend is down".
   const isFetchFailure =
-    err instanceof TypeError ||
     /failed to fetch|networkerror|load failed|network request failed/i.test(message)
 
   const apiError = new Error(

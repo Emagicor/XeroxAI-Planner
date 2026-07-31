@@ -1,0 +1,72 @@
+# LAN deployment — one office machine acts as the server, everyone else
+# reaches it over WiFi at http://<server-ip>/
+#
+#   docker compose -f docker-compose.lan.yml up -d --build
+#
+# Differences from docker-compose.yml (which is localhost-only):
+#   - web is built with VITE_API_BASE_URL=/api, so the bundle contains no
+#     hardcoded host and works from any client machine.
+#   - the API is not published to the LAN; it is only reachable through the
+#     nginx /api/ proxy (and on 127.0.0.1:5000 from the server itself).
+#   - APP_ENV / TEMP_DIR are forced here because backend2.0/.env is a dev file
+#     and `environment` wins over `env_file` in Compose.
+
+services:
+  api:
+    build:
+      context: ./backend2.0
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:5000:5000"   # server-local only — debugging, /docs, curl
+    env_file:
+      - ./backend2.0/.env       # API keys, model + pipeline tuning
+    environment:
+      APP_ENV: production       # disables /docs and vision prompt logging
+      TEMP_DIR: /tmp/zerox      # override the Windows path in .env
+      # Re-enable raw pass-1/pass-2 JSON logging despite APP_ENV=production.
+      # An explicit flag wins over the env-derived default (config/features.py).
+      FEATURE_VISION_PROMPT_LOG: "true"
+      VISION_PROMPT_LOG_DIR: /logs/vision
+      # Requests arrive same-origin through the nginx proxy, so CORS is unused.
+      # Kept narrow in case anyone points a browser straight at :5000.
+      CORS_ORIGINS: '["http://localhost:5000"]'
+    volumes:
+      # Bind-mounted to the host so the JSON survives container recreation and is
+      # readable from Windows at C:\Tech\ZeroxAI-Planner\logs\vision.
+      - ./logs/vision:/logs/vision
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:5000/health').read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api          # relative — resolves to whatever host the user typed
+        VITE_APP_ENV: production
+        VITE_FEATURE_TEST_SUITE: "false" # Test Suite needs the Vite dev server; see DEPLOY-LAN.md
+        # Token pricing for the cost panel — must match the model actually configured in
+        # backend2.0/.env. Baked into the bundle, so changing these needs a `--build`.
+        VITE_TOKEN_INPUT_COST_PER_MILLION_USD: "0.3"
+        VITE_TOKEN_OUTPUT_COST_PER_MILLION_USD: "1.5"
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_started
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

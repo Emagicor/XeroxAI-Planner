@@ -1,0 +1,21 @@
+# Host node_modules must never reach the image: the Dockerfile runs `npm ci`
+# and then `COPY . .`, so a Windows-built esbuild/rollup would clobber the
+# alpine one installed inside the container and break `npm run build`.
+node_modules
+dist
+dist-ssr
+
+# Build config comes from Docker build args (VITE_API_BASE_URL etc.).
+# Keeping these out removes any doubt about which value wins.
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+Dockerfile
+.dockerignore
+*.log
+.vscode
+.idea
+.DS_Store

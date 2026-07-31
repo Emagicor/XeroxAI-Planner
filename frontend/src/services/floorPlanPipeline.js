@@ -1,5 +1,6 @@
 import { analyzeFloorPlan } from './analyzeApi'
 import { analyzeFloorPlanStream } from './analyzeStreamApi'
+import { randomId } from '../utils/randomId'
 import {
   createApiErrorFromPayload,
   isProviderFailureMessage,
@@ -34,12 +35,16 @@ export async function runFloorPlanAnalyze(
     isolateUpload = true,
     visionProvider = null,
     visionModel = null,
+    visionCorrectionProvider = null,
+    visionCorrectionModel = null,
     onStreamEvent = null,
   } = {},
 ) {
   const analyzeOpts = {
     visionProvider,
     visionModel,
+    visionCorrectionProvider,
+    visionCorrectionModel,
     isolateUpload,
   }
 
@@ -49,7 +54,7 @@ export async function runFloorPlanAnalyze(
     let meta = {
       filename: file.name,
       content_sha256: '',
-      job_id: crypto.randomUUID(),
+      job_id: randomId(),
       status: 'processing',
       pages: [],
       grand_total_sqft: 0,

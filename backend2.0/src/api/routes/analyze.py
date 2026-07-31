@@ -139,6 +139,8 @@ async def analyze(
     file: UploadFile = File(...),
     vision_provider: str | None = Form(None),
     vision_model: str | None = Form(None),
+    vision_correction_provider: str | None = Form(None),
+    vision_correction_model: str | None = Form(None),
 ):
     """
     Process the full document synchronously and return one JSON object.
@@ -154,6 +156,12 @@ async def analyze(
         mime,
         vision_provider=vision_provider.strip() if vision_provider else None,
         vision_model=vision_model.strip() if vision_model else None,
+        vision_correction_provider=(
+            vision_correction_provider.strip() if vision_correction_provider else None
+        ),
+        vision_correction_model=(
+            vision_correction_model.strip() if vision_correction_model else None
+        ),
     )
 
     # Worker subprocess save_job is not visible here — persist for job store lookups
@@ -184,6 +192,8 @@ async def analyze_stream(
     file: UploadFile = File(...),
     vision_provider: str | None = Form(None),
     vision_model: str | None = Form(None),
+    vision_correction_provider: str | None = Form(None),
+    vision_correction_model: str | None = Form(None),
 ):
     """
     Server-Sent Events endpoint.
@@ -205,12 +215,18 @@ async def analyze_stream(
     stream_session_id = str(uuid4())
     from providers.vision.request_config import VisionOverride
 
-    vision_override = None
-    if vision_provider or vision_model:
-        vision_override = VisionOverride(
-            provider=vision_provider.strip() if vision_provider else None,
-            model=vision_model.strip() if vision_model else None,
-        )
+    vision_override = VisionOverride(
+        provider=vision_provider.strip() if vision_provider else None,
+        model=vision_model.strip() if vision_model else None,
+        correction_provider=(
+            vision_correction_provider.strip() if vision_correction_provider else None
+        ),
+        correction_model=(
+            vision_correction_model.strip() if vision_correction_model else None
+        ),
+    )
+    if not vision_override.is_set:
+        vision_override = None
 
     async def _event_stream():
         try:

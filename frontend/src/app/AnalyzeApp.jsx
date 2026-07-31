@@ -18,6 +18,10 @@ export default function AnalyzeApp() {
     analyzeProgress,
     currentPlanIndex,
     error: analyzeError,
+    modelId,
+    setModelId,
+    correctionModelId,
+    setCorrectionModelId,
     fileInputRef: analyzeFileInputRef,
     handleFileSelect,
     handleDrop,
@@ -58,6 +62,10 @@ export default function AnalyzeApp() {
                   onDrop={handleDrop}
                   onUpload={handleUpload}
                   onRetry={retryUpload}
+                  modelId={modelId}
+                  onModelChange={setModelId}
+                  correctionModelId={correctionModelId}
+                  onCorrectionModelChange={setCorrectionModelId}
                 />
               </div>
             </div>
@@ -79,6 +87,10 @@ export default function AnalyzeApp() {
               onDismiss={resetAnalyze}
               retryLabel="Retry analysis"
               primaryDisabled={!canAnalyze}
+              modelId={modelId}
+              onModelChange={setModelId}
+              correctionModelId={correctionModelId}
+              onCorrectionModelChange={setCorrectionModelId}
             />
           )}
 

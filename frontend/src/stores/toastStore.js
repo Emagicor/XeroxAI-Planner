@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { randomId } from '../utils/randomId'
 
 const DEFAULT_DURATION = 7000
 
@@ -6,7 +7,7 @@ export const useToastStore = create((set, get) => ({
   toasts: [],
 
   add: (toast) => {
-    const id = crypto.randomUUID()
+    const id = randomId()
     const entry = {
       id,
       type: 'info',

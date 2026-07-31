@@ -1,4 +1,5 @@
 import { cloneFileForUpload } from '../utils/cloneUploadFile'
+import { randomId } from '../utils/randomId'
 import { apiFetchJson } from './apiClient'
 
 /**
@@ -10,6 +11,8 @@ export async function analyzeFloorPlan(
     isolateUpload = true,
     visionProvider = null,
     visionModel = null,
+    visionCorrectionProvider = null,
+    visionCorrectionModel = null,
   } = {},
 ) {
   const uploadFile = isolateUpload ? await cloneFileForUpload(file) : file
@@ -22,6 +25,12 @@ export async function analyzeFloorPlan(
   if (visionModel) {
     form.append('vision_model', visionModel)
   }
+  if (visionCorrectionProvider) {
+    form.append('vision_correction_provider', visionCorrectionProvider)
+  }
+  if (visionCorrectionModel) {
+    form.append('vision_correction_model', visionCorrectionModel)
+  }
 
   return apiFetchJson('/analyze', {
     method: 'POST',
@@ -29,7 +38,7 @@ export async function analyzeFloorPlan(
     cache: 'no-store',
     context: 'analyze',
     headers: {
-      'X-Request-Id': crypto.randomUUID(),
+      'X-Request-Id': randomId(),
     },
   })
 }
